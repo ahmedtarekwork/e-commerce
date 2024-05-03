@@ -1,0 +1,54 @@
+@mixin flex($jc: center, $ai: center, $gap: false, $col: false) {
+  display: flex;
+  justify-content: $jc;
+  align-items: $ai;
+  gap: $gap or null;
+  flex-direction: $col or null;
+}
+
+@mixin cardBorder(
+  $radius: var(--radius),
+  $width: 1px,
+  $style: solid,
+  $clr: var(--main)
+) {
+  border-radius: $radius;
+  border: brdr($width, $style, $clr);
+}
+
+@mixin sharedElements($elements, $selectors, $events: ()) {
+  @if $elements {
+    @each $el in $elements {
+      @if $selectors {
+        // normal selectors
+        @each $sel, $props in $selectors {
+          $keys: map-keys($props);
+
+          #{$el + $sel} {
+            @each $key in $keys {
+              #{$key}: map-get($props, $key);
+            }
+          }
+        }
+      }
+
+      @if $events {
+        // events
+        @each $eve, $selectors in $events {
+          #{$el + ":" + $eve} {
+            // events selectors
+            @each $sel, $props in $selectors {
+              $keys: map-keys($props);
+
+              &#{$sel} {
+                @each $key in $keys {
+                  #{$key}: map-get($props, $key);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

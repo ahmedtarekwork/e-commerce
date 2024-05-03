@@ -1,0 +1,72 @@
+#app-side-bar {
+  position: fixed;
+  left: 0;
+  width: 250px;
+  max-width: 100%;
+  background: #fff;
+  box-shadow: bx_shad(0, 10px);
+  z-index: 1000;
+  transition: 0.3s;
+  translate: -100%;
+
+  .main-btns-list {
+    display: none;
+  }
+
+  ul.app-side-bar-list {
+    li {
+      a,
+      button {
+        width: 100%;
+        padding: 5px 9px;
+        color: var(--main);
+        @include flex(flex-start);
+
+        svg {
+          opacity: 0;
+          translate: -10px;
+
+          &,
+          ~ p {
+            transition: all 0.3s, color 0.15s, translate 0.3s 70ms; // set delay "translate" property element
+          }
+        }
+
+        &:hover {
+          p {
+            margin-left: 20px;
+          }
+          svg {
+            opacity: 1;
+            translate: 10px;
+          }
+
+          &:not(.active) {
+            background: var(--trans);
+          }
+        }
+
+        &.active {
+          color: #fff;
+          background: var(--light);
+        }
+      }
+    }
+  }
+
+  &.active {
+    translate: 0;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+
+    .main-btns-list {
+      @include flex(space-between, center, 10px);
+    }
+  }
+}
+
+#aside-overlay {
+  --index: 999;
+}

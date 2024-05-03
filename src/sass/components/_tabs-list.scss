@@ -1,0 +1,27 @@
+.tabs-list {
+  display: flex;
+  gap: 20px;
+
+  &-left-side {
+    flex-basis: 20%;
+  }
+
+  &-right-side {
+    flex: 1;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  &-btn {
+    width: 100%;
+    text-align-last: left;
+    padding: 5px;
+
+    &:hover {
+      background: var(--trans);
+    }
+    &.active {
+      background: var(--dark-trans);
+    }
+  }
+}

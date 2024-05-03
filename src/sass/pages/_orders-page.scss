@@ -1,0 +1,14 @@
+.orders-page-order-cell {
+  @include flex(null, null, 10px);
+
+  .select-list-holder {
+    flex-basis: 20%;
+  }
+
+  @media (max-width: 385px) {
+    flex-direction: column;
+    @include cardBorder(var(--radius));
+    padding: 10px;
+    background: #eee;
+  }
+}

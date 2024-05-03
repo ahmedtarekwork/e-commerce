@@ -1,0 +1,7 @@
+@function bx_shad($x: 0, $y: 2px, $blur: 11px, $clr: #c2bfbf88) {
+  @return #{$x + " " + $y + " " + $blur + " " + $clr};
+}
+
+@function brdr($width: 1px, $style: solid, $clr: var(--main)) {
+  @return #{$width + " " + $style + " " + $clr};
+}

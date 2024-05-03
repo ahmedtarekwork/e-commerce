@@ -1,0 +1,34 @@
+.app-arrow {
+  width: 12px;
+  height: 12px;
+  position: relative;
+  pointer-events: none;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    height: 80%;
+    width: 2px;
+    background: var(--main);
+    transition: 0.3s;
+  }
+
+  &::before {
+    rotate: -142deg;
+    right: 2px;
+  }
+  &::after {
+    rotate: 145deg;
+    left: 3px;
+  }
+
+  &.active {
+    &::before {
+      rotate: -45deg;
+    }
+    &::after {
+      rotate: 45deg;
+    }
+  }
+}

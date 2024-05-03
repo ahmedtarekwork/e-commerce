@@ -1,0 +1,42 @@
+.dashboard-squares-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.dashboard-square {
+  flex: 1;
+  background: var(--main);
+
+  a {
+    color: #fff;
+    width: 100%;
+    padding: 10px;
+
+    &:hover {
+      background: var(--dark);
+    }
+
+    .square-top {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    strong {
+      margin-top: 10px;
+      font-size: 30px;
+      display: block;
+      text-align: center;
+    }
+  }
+}
+
+.see-more-btn {
+  margin: auto {
+    top: 15px;
+  }
+}

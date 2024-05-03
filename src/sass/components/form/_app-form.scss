@@ -1,0 +1,177 @@
+// forms \\
+form {
+  display: grid;
+  > * {
+    display: block;
+    width: 100%;
+
+    + * {
+      margin-top: 15px;
+    }
+  }
+
+  .form-title {
+    color: var(--main);
+    font-size: 22px;
+  }
+
+  .form-secondary-title {
+    font-size: 17px;
+    margin-bottom: 5px;
+  }
+}
+.form-btns-holder {
+  @include flex(center, center, 10px);
+  > * {
+    flex: 1;
+  }
+}
+
+// inputs
+.inputs-group {
+  @include flex(center, center, 5px);
+
+  > * {
+    flex: 1;
+  }
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+    padding: 10px;
+    @include cardBorder;
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+label {
+  color: var(--dark);
+
+  &[data-disabled="true"] {
+    color: gray;
+    cursor: default;
+    user-select: none;
+  }
+
+  @media (max-width: 450px) {
+    font-size: 14px;
+  }
+}
+
+// <input type="color" />
+.color-input-wrapper {
+  @include flex(flex-start, center, 10px);
+}
+
+input[type="color"] {
+  padding: 0;
+  box-shadow: 2px 2px 7px -2px;
+  width: 70px;
+  max-width: 100%;
+
+  &::-moz-color-swatch {
+    border-radius: var(--radius);
+  }
+  &::-webkit-color-swatch {
+    border-radius: var(--radius);
+  }
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+}
+
+// all inputs
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+textarea,
+input {
+  outline: none;
+  border: none;
+  transition: 0.3s;
+
+  border-radius: var(--radius);
+
+  &::placeholder {
+    color: var(--main);
+    transition: 0.3s;
+    user-select: none;
+  }
+
+  // don't hide => "search about that"
+  &[type="password"]::-ms-reveal,
+  &[type="password"]::-ms-clear {
+    display: none;
+  }
+
+  &:not([disabled], [type="submit"], [type="color"]) {
+    border: var(--brdr);
+  }
+
+  &.red {
+    &,
+    &::placeholder {
+      color: var(--danger);
+    }
+  }
+
+  &[readonly] {
+    border-color: var(--dark);
+    cursor: default;
+
+    &::placeholder {
+      color: var(--dark);
+    }
+  }
+
+  &:focus {
+    &:not([readonly])::placeholder {
+      opacity: 0;
+    }
+  }
+}
+
+.input-holder {
+  z-index: 2;
+  position: relative;
+  transition: 0.3s;
+
+  &:not(:has([type="color"])) > * {
+    width: 100%;
+  }
+
+  &[data-type="button"] input {
+    border-bottom: 0px // width
+ {
+      // radius
+      left-radius: 0;
+      right-radius: 0;
+    }
+  }
+
+  button {
+    @include flex(center, center, 7px);
+    border-top: {
+      left-radius: 0;
+      right-radius: 0;
+    }
+    span {
+      @include flex;
+      font-size: 20px;
+    }
+  }
+}
+
+.error-div {
+  position: absolute;
+  color: var(--danger);
+  transition: 0.3s;
+  z-index: -1;
+
+  &.active {
+    translate: 0 !important;
+  }
+}

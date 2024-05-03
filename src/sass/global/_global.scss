@@ -1,0 +1,134 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900;1000&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+// scroll bar \\
+::-webkit-scrollbar {
+  width: var(--scrlbar-width);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--light);
+
+  &:hover {
+    background: var(--main);
+  }
+  &:active {
+    background: var(--dark);
+  }
+}
+
+::selection {
+  background-color: var(--dark);
+  color: #fff;
+}
+
+:is(.white-selection, .white-selection a)::selection {
+  background-color: #fff;
+  color: var(--main);
+}
+
+button.link,
+a {
+  display: block;
+  width: fit-content;
+  transition: 0.3s background-color;
+  text-decoration: none;
+
+  &:not(.white) {
+    color: var(--main);
+  }
+
+  &.white {
+    color: #fff;
+  }
+
+  &.hov:hover {
+    text-decoration: underline;
+  }
+
+  &.link {
+    text-decoration: underline;
+  }
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+
+  font-size: 15px;
+
+  transition: 0.3s;
+}
+
+svg {
+  pointer-events: none;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+body.block-scroll {
+  overflow: hidden;
+}
+
+main.app-holder {
+  --remove-size: 0px;
+  display: flex;
+  min-height: calc(100vh - var(--remove-size));
+  padding-bottom: 20px;
+
+  &.center-content {
+    align-items: center;
+    justify-content: center;
+  }
+
+  > .container {
+    height: 100%;
+  }
+}
+
+main.grid-page {
+  display: grid;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+}
+
+// inputs && select-list-summary
+$elements: ("input", "textarea", ".select-list-summary");
+$selectors: (
+  "": (
+    padding: 5px,
+  ),
+  "[disabled]": (
+    border: brdr(1px, solid, #ddd),
+  ),
+  ".red:not([disabled])": (
+    border-color: var(--danger),
+  ),
+  "[readonly]": (
+    border-color: var(--dark),
+    cursor: default,
+  ),
+);
+$events: (
+  "focus": (
+    ":not(.red, [readonly])": (
+      border-color: var(--light),
+    ),
+  ),
+);
+@include sharedElements($elements, $selectors, $events);

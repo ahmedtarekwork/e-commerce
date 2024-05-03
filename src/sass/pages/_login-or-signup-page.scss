@@ -1,0 +1,16 @@
+main.app-holder.login-page {
+  background: #efefef;
+}
+
+form#auth-form {
+  background: #fff;
+  width: 100%;
+  max-width: 570px;
+  margin: 20px auto;
+  padding: 17px;
+  border-radius: var(--radius);
+}
+
+.auth-msg {
+  @include flex(center, center, 5px);
+}

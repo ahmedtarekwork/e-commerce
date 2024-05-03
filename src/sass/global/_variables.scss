@@ -1,0 +1,21 @@
+:root {
+  --main: #0084ff;
+  --dark: #0756bd;
+  --light: #00a2ff;
+  --trans: rgba(0, 132, 255, 0.24);
+  --dark-trans: rgba(0, 132, 255, 0.6);
+  --selected: rgb(157 177 1 / 61%);
+  --danger: #e31a1a;
+  --white-danger: #f9caca;
+
+  --bx-shadow: 0 2px 11px #c2bfbf88;
+  --brdr: 1px solid var(--main);
+  --radius: 5px;
+
+  --scrlbar-width: 10px;
+
+  --rotate-circle: loading-animation 880ms cubic-bezier(0.79, 0.11, 0.26, 0.95)
+    infinite;
+
+  --header-index: 1000;
+}

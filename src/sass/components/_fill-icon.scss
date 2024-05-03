@@ -1,0 +1,40 @@
+.fill-icon {
+  --diminsions: 18px;
+  position: relative;
+  transition: 0.3s;
+
+  > * {
+    transition: 0.3s ease;
+
+    svg {
+      display: block;
+      font-size: var(--diminsions);
+    }
+  }
+
+  .fill {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  &:hover {
+    .stroke {
+      opacity: 0;
+    }
+
+    .fill {
+      opacity: 1;
+    }
+  }
+}
+
+*:has(> .fill-icon):is(:hover, .active) .fill-icon {
+  .stroke {
+    opacity: 0;
+  }
+
+  .fill {
+    opacity: 1;
+  }
+}

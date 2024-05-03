@@ -1,0 +1,119 @@
+.select-list-holder {
+  height: 100%;
+  @include flex(null, null);
+  flex-direction: column;
+}
+
+.select-list-holder.out-of-flow .select-list-list-holder {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 100%;
+}
+
+.select-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  button {
+    width: 100%;
+  }
+  &-summary {
+    @include flex(space-between);
+    flex: 1;
+    background: #fff;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    p {
+      pointer-events: none;
+      flex: 1;
+      text-align: left;
+    }
+    .app-arrow {
+      flex-basis: 12px;
+    }
+
+    border: var(--brdr) {
+      top: {
+        left-radius: var(--radius);
+        right-radius: var(--radius);
+      }
+      bottom: {
+        left-radius: var(--radius);
+        right-radius: var(--radius);
+      }
+    }
+
+    svg {
+      fill: var(--main);
+    }
+  }
+
+  &-list-holder {
+    transition: 0.3s;
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+    background: #fff;
+  }
+
+  &-list {
+    border: var(--brdr) // color and width
+ {
+      top: {
+        // radius
+        left-radius: 0;
+        right-radius: 0;
+      }
+
+      bottom: {
+        // radius
+        left-radius: 3px;
+        right-radius: 3px;
+      }
+    }
+
+    button {
+      padding: 5px;
+      text-align: left;
+
+      &[data-selected="true"] {
+        background: var(--main);
+        color: #fff;
+      }
+
+      &:hover {
+        padding-right: 15px;
+
+        &[data-selected="true"] {
+          background: var(--dark);
+        }
+
+        &:not([data-selected="true"]) {
+          background: var(--trans);
+        }
+      }
+    }
+  }
+
+  &.active {
+    .select-list-summary {
+      border: {
+        bottom: {
+          color: transparent;
+          left-radius: 0;
+          right-radius: 0;
+        }
+      }
+
+      svg {
+        rotate: 180deg;
+      }
+    }
+  }
+}

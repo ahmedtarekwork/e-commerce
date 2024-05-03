@@ -1,0 +1,48 @@
+.main-btns-list {
+  @include flex(space-between, center, 10px);
+  flex-wrap: wrap;
+
+  li {
+    display: flex;
+
+    a,
+    button {
+      @include flex(center, center, false, column);
+      font-size: 13px;
+      color: var(--main);
+      transition: 0.1s color;
+      text-align: center;
+
+      svg {
+        font-size: 20px;
+        &.logOut-icon {
+          font-size: 23px;
+        }
+      }
+
+      &:hover {
+        color: var(--dark);
+      }
+    }
+  }
+
+  #header-cart-icon {
+    position: relative;
+
+    #cart-products-length {
+      position: absolute;
+      background: var(--light);
+      font-weight: bold;
+      font-size: 15px;
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-content: center;
+      border-radius: 50%;
+      top: -8px;
+      right: 2px;
+      pointer-events: none;
+    }
+  }
+}

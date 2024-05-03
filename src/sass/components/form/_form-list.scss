@@ -1,0 +1,34 @@
+.form-list {
+  [type="checkbox"] {
+    display: none;
+    &:checked ~ label svg {
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+
+  label {
+    @include flex(flex-start, center, 7px);
+    width: fit-content;
+    padding: 5px;
+    transition: 0.3s;
+    user-select: none;
+
+    &:hover {
+      color: var(--main);
+    }
+
+    button {
+      pointer-events: none;
+      border: 1px solid var(--main);
+      display: inline-flex;
+      cursor: default;
+      border-radius: 3px;
+
+      svg {
+        scale: 0;
+        rotate: 45deg;
+      }
+    }
+  }
+}

@@ -1,0 +1,124 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: var(--radius);
+  padding: 10px;
+  transition: 0.3s;
+  position: relative;
+
+  .delete-product-btn {
+    position: absolute;
+    right: -40px;
+    width: 35px;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-content: center;
+  }
+
+  .add-to-wishlist {
+    position: absolute;
+    top: -14px;
+    right: -8px;
+    background: var(--dark-trans);
+    padding: 7px;
+    @include cardBorder(var(--radius), 2px);
+
+    svg {
+      fill: #fff;
+    }
+  }
+
+  .product-card-more-info {
+    margin-inline: auto;
+  }
+
+  &-btns-holder {
+    display: flex;
+    gap: 10px;
+
+    > * {
+      flex: 1;
+      text-align: center;
+    }
+  }
+}
+
+@mixin product-in-columns-list {
+  background: var(--trans);
+
+  // product imgs
+  .slider-big-holder {
+    display: grid;
+    flex: 1;
+  }
+
+  .product-data-big-holder > * + * {
+    margin-top: 7px;
+  }
+}
+
+.columns-list:not(:has(.select-list-holder)) {
+  .product-card:hover {
+    scale: 0.98;
+  }
+}
+
+.rows-list:not(:has(.select-list-holder)) {
+  @media (max-width: 630px) {
+    .product-card:hover {
+      scale: 0.98;
+    }
+  }
+}
+
+.rows-list .product-card {
+  @media (min-width: 631px) {
+    grid-template-columns: var(--list-item-cell-width) calc(
+        var(--list-item-cell-width) * calc(var(--cells-length) - 1) - var(--gap)
+      );
+
+    .slider-dots-holder {
+      display: none;
+    }
+
+    // show first image only in product card if list type === "row"
+    .slider-img-holder:not(:first-of-type) {
+      display: none;
+    }
+
+    .slider-real-list {
+      width: 100% !important;
+    }
+
+    .slider-img-holder img {
+      border-radius: var(--radius);
+    }
+
+    .product-data-big-holder {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      grid-column: 2 / -1;
+
+      > * {
+        flex: 1;
+      }
+    }
+  }
+
+  @media (max-width: 630px) {
+    @include product-in-columns-list();
+
+    .delete-product-btn {
+      position: unset;
+      aspect-ratio: unset;
+      padding-block: 10px;
+      width: 100%;
+    }
+  }
+}
+
+.columns-list .product-card {
+  @include product-in-columns-list();
+}

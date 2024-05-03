@@ -1,0 +1,21 @@
+.section {
+  .sec-heading {
+    margin-bottom: 17px;
+
+    color: var(--main);
+    position: relative;
+    width: fit-content;
+    user-select: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      translate: -50%;
+      height: 3px;
+      width: 80%;
+      background: currentColor;
+    }
+  }
+}

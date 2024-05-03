@@ -1,0 +1,27 @@
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  display: grid;
+  place-content: center;
+
+  color: var(--dark);
+  font: {
+    size: 30px;
+    weight: bold;
+  }
+
+  // under the header
+  &.not-main {
+    z-index: calc(var(--header-index) - 1);
+  }
+
+  // take all the screen
+  &:not(.not-main) {
+    z-index: calc(var(--header-index) + 1);
+  }
+
+  @media (max-width: 250px) {
+    font-size: 18px;
+  }
+}

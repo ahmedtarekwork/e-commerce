@@ -1,0 +1,79 @@
+// globals \\
+@import "global/variables";
+@import "global/functions";
+@import "global/mixins";
+@import "global/global";
+@import "global/classes";
+@import "global/animations";
+
+// pages \\
+// error page
+@import "pages/error-page";
+
+// login-or-signup page
+@import "pages/login-or-signup-page";
+
+// home page
+@import "pages/home-page";
+@import "pages/dashboard-home-page";
+
+// orders page
+@import "pages/orders-page";
+
+// products pages
+@import "pages/products/product-form-page";
+@import "pages/products/single-product-page";
+
+// profile page
+@import "pages/profile-page";
+
+// cart or wishlist page
+@import "pages/cart-or-wishlist-page";
+
+// layouts \\
+
+// app header
+@import "components/layout/header/header";
+// app sidebar
+@import "components/layout/header/sider-bar";
+@import "components/layout/header/main-btns-list";
+
+// app footer
+@import "components/layout/app-footer";
+
+// some elements \\
+// order card
+@import "components/order-card";
+// grid list
+@import "components/layout/grid-list";
+// imgs slider
+@import "components/imgs-slider";
+// fill icon element
+@import "./components/fill-icon";
+// section
+@import "components/section";
+
+// top msg
+@import "components/top-msg";
+
+// modal
+@import "components/app-modal";
+
+// forms
+@import "components/form/app-form";
+@import "components/form/form-list";
+@import "components/form/form-table";
+
+// selct list
+@import "./components/selectList/select-list";
+@import "./components//selectList/arrow";
+
+// tabs list
+@import "./components/tabs-list";
+
+// spinners
+@import "./components/spinners/spinner";
+@import "components/spinners/splash-screen";
+
+// product card
+@import "components/product-card";

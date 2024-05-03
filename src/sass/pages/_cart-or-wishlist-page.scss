@@ -1,0 +1,10 @@
+.cart-or-wishlist-down-btns-holder {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+
+  > * {
+    flex: 1;
+  }
+}

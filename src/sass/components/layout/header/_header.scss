@@ -1,0 +1,55 @@
+.app-header {
+  position: fixed;
+  z-index: var(--header-index);
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: #fff;
+  box-shadow: var(--bx-shadow);
+  padding: 10px 0;
+
+  .container {
+    @include flex(space-between);
+  }
+
+  @media (max-width: 480px) {
+    .main-btns-list {
+      display: none;
+    }
+  }
+}
+
+.logo-and-open-btn-holder {
+  @include flex(center, center, 10px);
+
+  #open-side-bar {
+    display: grid;
+  }
+
+  .logo {
+    color: var(--main);
+    transition: 0.3s;
+    font : {
+      size: 21px;
+      weight: 800;
+    }
+
+    padding: 5px;
+    &:hover {
+      color: var(--dark);
+    }
+
+    @media (max-width: 250px) {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    flex: 1;
+    justify-content: space-between;
+
+    .logo {
+      order: -1;
+    }
+  }
+}

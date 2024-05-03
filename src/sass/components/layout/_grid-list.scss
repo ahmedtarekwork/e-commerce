@@ -1,0 +1,132 @@
+@mixin columns-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 0.8fr));
+  gap: 15px;
+  justify-content: center;
+
+  > li {
+    @include cardBorder(var(--radius), 2px);
+    padding: 10px;
+
+    .grid-list-item-content {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      overflow-wrap: anywhere;
+
+      button {
+        flex: 1;
+        margin-top: 5px;
+      }
+    }
+  }
+
+  .rows-list-header {
+    display: none;
+  }
+
+  @media (max-width: 330px) {
+    grid-template-columns: auto;
+    justify-content: unset;
+  }
+}
+
+// .columns-list | .rows-list \\
+.grid-list-switcher-btns .btn {
+  &:hover:not(.active) {
+    background-color: var(--dark-trans);
+  }
+
+  &.active {
+    background-color: var(--dark);
+  }
+}
+
+.grid-list {
+  &-switcher-btns {
+    margin-left: auto;
+    width: fit-content;
+    display: flex;
+    margin-block: 10px;
+
+    .btn:first-child {
+      border: {
+        top-right-radius: 0;
+        bottom-right-radius: 0;
+      }
+    }
+    .btn:last-child {
+      border: {
+        top-left-radius: 0;
+        bottom-left-radius: 0;
+      }
+    }
+  }
+}
+
+.columns-list {
+  @include columns-list();
+}
+
+.rows-list {
+  @media (min-width: 631px) {
+    --list-item-cell-width: 0%;
+    --cells-length: 0;
+
+    &.with-margin {
+      margin-right: 40px;
+    }
+
+    .rows-list-header {
+      background: var(--dark);
+      color: #fff;
+    }
+
+    > li {
+      --gap: 5px;
+      width: 100%;
+      display: grid;
+      align-items: center;
+      gap: var(--gap);
+      padding: 10px;
+      border-radius: var(--radius);
+      text-align: center;
+
+      &:not(.product-card) {
+        grid-template-columns: repeat(
+          var(--cells-length),
+          minmax(auto, var(--list-item-cell-width))
+        );
+      }
+
+      .cell-prop-name {
+        display: none;
+      }
+
+      > *:not(:has(.select-list-holder.out-of-flow), .delete-product-btn) {
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        text-align: center;
+      }
+    }
+
+    > *:not(.rows-list-header) {
+      &:nth-of-type(odd) {
+        background: var(--trans);
+      }
+      &:nth-of-type(even) {
+        background: var(--dark-trans);
+      }
+    }
+    > * + * {
+      margin-top: 10px;
+    }
+  }
+
+  @media (max-width: 630px) {
+    @include columns-list();
+  }
+}

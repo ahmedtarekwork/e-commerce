@@ -1,0 +1,61 @@
+.single-product-wrapper {
+  @include flex(space-between, flex-start, 10px);
+
+  @media (max-width: 615px) {
+    flex-direction: column;
+  }
+}
+
+.single-product-color {
+  @include flex(flex-start, center, 10px);
+  span:last-child {
+    width: 60px;
+    height: 25px;
+    display: block;
+    border-radius: var(--radius);
+  }
+}
+
+.single-product-description {
+  --padding: 10px;
+  --brdr-width: 2px;
+
+  position: relative;
+  margin-top: 20px;
+  background-color: var(--trans);
+  color: var(--dark);
+  font-weight: bold;
+  @include cardBorder(var(--radius), var(--brdr-width));
+  padding: var(--padding);
+
+  .cell-prop-name {
+    user-select: none;
+    position: absolute;
+    bottom: calc(100% - var(--padding) - var(--brdr-width));
+    left: 0;
+    background: #fff;
+    @include cardBorder;
+    padding-inline: 5px;
+  }
+}
+
+.single-product-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+
+  > * {
+    @include flex(center, center, 10px);
+
+    svg path {
+      font-size: 20px;
+    }
+
+    font : {
+      weight: bold;
+      size: 16px;
+    }
+
+    width: 100%;
+  }
+}

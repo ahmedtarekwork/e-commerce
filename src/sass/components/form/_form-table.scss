@@ -1,0 +1,44 @@
+.form-table {
+  background: transparent;
+  border: 1px solid var(--main);
+
+  border-radius: 4px;
+  padding: 10px;
+  transition: 0.3s;
+
+  &.red {
+    background: var(--white-danger);
+    border-color: var(--danger);
+  }
+
+  > * + *:not(.form-table-form-holder + *) {
+    margin-top: 13px;
+  }
+
+  .form-secondary-title {
+    @include flex(space-between);
+
+    > .btn {
+      @include flex(center, center, 7px);
+    }
+  }
+
+  &-form-holder {
+    margin-bottom: 30px;
+
+    > ul > li {
+      + * {
+        margin-top: 8px;
+      }
+    }
+
+    .submit-form-table {
+      min-width: 300px;
+      max-width: 100%;
+      margin: 10px auto {
+        bottom: 0;
+      }
+      display: block;
+    }
+  }
+}

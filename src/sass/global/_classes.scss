@@ -1,0 +1,130 @@
+// global classes
+
+.container {
+  padding-inline: 15px;
+  margin-inline: auto;
+  width: 100%;
+
+  /* Small */
+  @media (min-width: 768px) {
+    width: 750px;
+  }
+  /* Medium */
+  @media (min-width: 992px) {
+    width: 980px;
+  }
+  /* Large */
+  @media (min-width: 1200px) {
+    width: 1180px;
+  }
+}
+
+// component classes
+
+.head-holder {
+  @include flex(space-between, center);
+}
+
+a.btn,
+.btn,
+.red-btn,
+.green-btn {
+  cursor: pointer;
+  user-select: none;
+
+  padding: 5px 10px;
+  border-radius: 3px;
+  color: #fff !important;
+
+  &:is([disabled], [data-disabled="true"]) {
+    background: #999;
+    cursor: not-allowed;
+
+    &:hover {
+      background: #888;
+    }
+
+    &:active {
+      pointer-events: none;
+    }
+  }
+}
+
+$btns: (
+  "btn": (
+    "back": var(--main),
+    "hover-back": var(--dark),
+    "active-back": var(--light),
+  ),
+  "red-btn": (
+    "back": var(--danger),
+    "hover-back": rgb(126, 6, 6),
+    "active-back": var(--white-danger),
+  ),
+  "green-btn": (
+    "back": rgb(3, 173, 3),
+    "hover-back": darken(rgb(3, 173, 3), 15%),
+    "active-back": lighten(rgb(3, 173, 3), 15%),
+  ),
+);
+@each $name, $props in $btns {
+  .#{$name} {
+    background: map-get($props, "back");
+
+    &:not([disabled]) {
+      &:hover {
+        background: map-get($props, "hover-back");
+      }
+
+      &:active {
+        background: map-get($props, "active-back");
+      }
+    }
+  }
+}
+
+.overlay {
+  z-index: 999;
+  background: rgba(#2b2a2a, 0.85);
+  position: fixed;
+  inset: 0;
+  transition: 0.3s;
+  opacity: 0;
+  pointer-events: none;
+
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+// helper classes
+.sec-mt {
+  margin-top: 25px;
+}
+
+// styling calsses
+
+$status: (
+  waiting: rgb(175, 144, 3),
+  done: rgb(5, 223, 5),
+  cancel: var(--danger),
+);
+
+@each $stat, $clr in $status {
+  .#{$stat} {
+    font-weight: 700;
+    color: $clr;
+  }
+}
+
+.flex-cell-prop-name {
+  @include flex(flex-start, center, 10px);
+}
+strong.cell-prop-name {
+  color: var(--dark);
+}
+
+.selected {
+  background: var(--selected) !important;
+}

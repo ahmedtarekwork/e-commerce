@@ -1,0 +1,14 @@
+.app-footer {
+  background: var(--dark);
+  padding: 13px 0;
+  color: #fff;
+
+  .container {
+    @include flex(center, center, 7px);
+  }
+
+  &-white-logo {
+    width: 40px;
+    display: grid;
+  }
+}

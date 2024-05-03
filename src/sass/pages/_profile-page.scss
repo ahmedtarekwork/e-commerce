@@ -1,0 +1,57 @@
+.delete-user-btn-holder {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+
+  button {
+    width: 100%;
+  }
+}
+
+.profile-page-cell {
+  @include flex(space-between, center, 10px);
+
+  + * {
+    margin-top: 10px;
+  }
+
+  &-content-holder {
+    flex: 1;
+    @include flex(null, center, 10px);
+
+    @media (max-width: 335px) {
+      flex-direction: column;
+      > * {
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 525px) {
+    flex-direction: column;
+    padding: 7px;
+    @include cardBorder;
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+.profile-cell-content {
+  flex: 1;
+}
+
+.profile-cell-btns-holder {
+  @include flex(center, center, 10px);
+
+  @media (max-width: 525px) {
+    > * {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 335px) {
+    flex-direction: column;
+  }
+}

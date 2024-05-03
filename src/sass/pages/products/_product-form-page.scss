@@ -1,0 +1,145 @@
+.product-imgs-area {
+  @include cardBorder;
+  padding: 10px;
+  transition: 0.15s;
+  position: relative;
+  z-index: 1;
+
+  &::after {
+    content: "+ drop here";
+    display: grid;
+    place-content: center;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    color: #fff;
+    background: var(--dark-trans);
+    font: {
+      size: 25px;
+      weight: bold;
+    }
+    transition: 0.3s opacity;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.drag-over::after {
+    opacity: 1;
+  }
+
+  --size-of-squares: 100px;
+
+  &-title {
+    margin-bottom: 10px;
+    color: var(--main);
+    display: block;
+  }
+
+  .preview-product-imgs-list {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--size-of-squares), 1fr)
+    );
+    align-items: center;
+    gap: 10px;
+  }
+
+  .add-input-holder {
+    display: grid;
+    place-content: center;
+  }
+
+  .input-holder {
+    width: var(--size-of-squares);
+    height: var(--size-of-squares);
+  }
+
+  input#imgs[type="file"] {
+    display: none;
+  }
+
+  label {
+    display: grid;
+    place-content: center;
+    align-self: stretch;
+    transition: 0.3s;
+    padding: 10px;
+    font-size: 40px;
+
+    // if label enabled
+    &:not([data-disabled="true"]) {
+      background: var(--dark-trans);
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--main);
+      }
+    }
+
+    // if label disabled
+    &[data-disabled="true"] {
+      background: rgb(207, 207, 207);
+      &:hover {
+        color: #fff;
+        background: rgb(156, 156, 156);
+      }
+    }
+  }
+
+  .product-imgs-real-area {
+    background: #fff;
+  }
+
+  .img-preview-cell {
+    position: relative;
+    flex-basis: var(--size-of-squares);
+    height: var(--size-of-squares);
+    z-index: 1;
+
+    // overlay
+    &::after {
+      content: "";
+      inset: 0;
+      background: var(--dark-trans);
+      position: absolute;
+      z-index: 2;
+      isolation: isolate;
+      opacity: 0;
+      scale: 0.7;
+      transition: 0.3s;
+    }
+    &:hover::after {
+      opacity: 1;
+      scale: 1;
+    }
+
+    button {
+      z-index: 3;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      position: absolute;
+      opacity: 0;
+      scale: 0.7;
+      pointer-events: none;
+      transition-delay: 100ms;
+    }
+    &:hover button {
+      opacity: 1;
+      scale: 1;
+      pointer-events: initial;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .error-div.active {
+    translate: 0 5px !important;
+  }
+}
