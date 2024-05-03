@@ -2,7 +2,6 @@ import ReactDOM from "react-dom/client";
 
 // react query
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // redux
 import { Provider } from "react-redux";
@@ -27,7 +26,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <App />
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </Provider>
 );
