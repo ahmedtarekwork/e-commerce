@@ -74,14 +74,15 @@ const HomePage = () => {
           Updating Products...
         </strong>
       )}
-      {productsErr && "response" in productsErrData ? (
-        <DisplayError error={productsErrData} />
-      ) : (
-        <h1>
-          sorry, something went wrong while getting the products, you can try
-          again later.
-        </h1>
-      )}
+      {!productsLoading &&
+        (productsErr && "response" in productsErrData ? (
+          <DisplayError error={productsErrData} />
+        ) : (
+          <h1>
+            sorry, something went wrong while getting the products, you can try
+            again later.
+          </h1>
+        ))}
 
       <GridList initType="column" isChanging={false} cells={[]}>
         {products.map((prd: ProductType) => (

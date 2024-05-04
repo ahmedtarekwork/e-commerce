@@ -26,9 +26,10 @@ const MainBtnsList = () => {
   useEffect(() => {
     if (cart && !("msg" in cart)) dispatch(setCart(cart));
   }, [cart, dispatch]);
+
   useEffect(() => {
-    getCart();
-  }, []);
+    if (user) getCart();
+  }, [user]);
 
   let productsLength = 0;
 
