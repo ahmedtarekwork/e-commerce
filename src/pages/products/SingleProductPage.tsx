@@ -266,30 +266,43 @@ const SingleProductPage = () => {
             </>
           ) : (
             <>
-              <button
-                ref={addToCartBtnRef}
-                className={`btn${
-                  addToCartLoading
-                    ? " center spinner-pseudo-after fade scale"
-                    : ""
-                }`}
-                disabled={addToCartLoading || !isInStock}
-                onClick={() => {
-                  if (!isInCart) {
-                    addToCart({
-                      productId: id,
-                      count: 1,
-                    });
-                  }
-                }}
-              >
-                <FillIcon
-                  diminsions={23}
-                  stroke={<PiShoppingCartSimpleLight />}
-                  fill={<PiShoppingCartSimpleFill />}
-                />
-                {isInCart ? "show cart" : "add to cart"}
-              </button>
+              {user ? (
+                <button
+                  ref={addToCartBtnRef}
+                  className={`btn${
+                    addToCartLoading
+                      ? " center spinner-pseudo-after fade scale"
+                      : ""
+                  }`}
+                  disabled={addToCartLoading || !isInStock}
+                  onClick={() => {
+                    if (!isInCart) {
+                      addToCart({
+                        productId: id,
+                        count: 1,
+                      });
+                    }
+                  }}
+                >
+                  <FillIcon
+                    diminsions={23}
+                    stroke={<PiShoppingCartSimpleLight />}
+                    fill={<PiShoppingCartSimpleFill />}
+                  />
+                  {isInCart
+                    ? "show cart"
+                    : `${!isInStock ? "add to cart" : "sold out"}`}
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  relative="path"
+                  data-disabled={!isInStock}
+                  className="btn"
+                >
+                  {isInStock ? "add to cart" : "sold out"}
+                </Link>
+              )}
 
               <button
                 className={`btn${

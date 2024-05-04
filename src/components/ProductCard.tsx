@@ -278,7 +278,20 @@ const ProductCard = ({
               more info
             </Link>
 
+            {/* if user not loged in and wan't to put item into cart => redirect him to login page */}
+            {withAddToCart && !user && (
+              <Link
+                to="/login"
+                className="btn"
+                relative="path"
+                data-disabled={!isInStock}
+              >
+                {isInStock ? "add to cart" : "sold out"}
+              </Link>
+            )}
+
             {withAddToCart &&
+              user &&
               (userCart?.products.find((prd) => prd._id === _id) ? (
                 <Link className="btn" to="/cart" relative="path">
                   show cart
