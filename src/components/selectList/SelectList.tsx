@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, MouseEvent } from "react";
+import { useState, useEffect, useRef, MouseEvent, CSSProperties } from "react";
 
 // components
 import Arrow from "./Arrow";
@@ -84,7 +84,16 @@ const SelectList = ({
           <Arrow active={toggleList} />
         </button>
 
-        <div className="select-list-list-holder">
+        <div
+          className="select-list-list-holder"
+          style={
+            {
+              "--max-height": `calc(100vh - (${
+                theList.current?.parentElement?.getBoundingClientRect().top || 0
+              }px))`,
+            } as CSSProperties
+          }
+        >
           <ul className="select-list-list" ref={theList}>
             {list.map((opt) => (
               <li className="select-list-opt" key={nanoid()}>

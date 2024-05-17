@@ -1585,6 +1585,9 @@ input:focus:not([readonly])::placeholder {
   z-index: 1;
   left: 0;
   top: 100%;
+  --max-height: unset;
+  max-height: var(--max-height);
+  overflow-y: scroll;
 }
 
 .select-list {
@@ -1942,6 +1945,13 @@ input:focus:not([readonly])::placeholder {
   }
   .rows-list .product-card .product-data-big-holder > * {
     flex: 1;
+  }
+  .rows-list .product-card-btns-holder {
+    flex-direction: column;
+  }
+  .rows-list .product-card-btns-holder > * {
+    width: 100%;
+    margin: 0;
   }
 }
 @media (max-width: 630px) {

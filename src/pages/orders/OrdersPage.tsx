@@ -40,6 +40,7 @@ const getOrdersQueryFn = async ({
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const isDashboard = pathname.includes("dashboard");
 
   // get orders
   const {
@@ -59,18 +60,18 @@ const OrdersPage = () => {
   if (isLoading)
     return (
       <SplashScreen>
-        Loading {pathname.includes("dashboard") ? "orders" : "your orders"}...
+        Loading {isDashboard ? "orders" : "your orders"}...
       </SplashScreen>
     );
 
   return (
     <>
       <div className="section">
-        <Heading content="Orders Page" />
+        <Heading content={isDashboard ? "Orders Page" : "Your Orders"} />
       </div>
 
       <OrdersArea
-        withEditStatus={pathname.includes("dashboard")}
+        withEditStatus={isDashboard}
         error={error}
         isError={isError}
         loading={isLoading}

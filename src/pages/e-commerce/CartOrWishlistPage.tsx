@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import useDispatch from "../../hooks/useDispatch";
 import { useSelector } from "react-redux";
 // redux actions
-import { resteCart } from "../../store/fetures/userSlice";
+import { resteCart, setUser } from "../../store/fetures/userSlice";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,7 +24,7 @@ import { axiosWithToken } from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 // types
-import { RootStateType } from "../../utiles/types";
+import { RootStateType, UserType } from "../../utiles/types";
 
 // fetchers
 const makeOrderMutationFn = async () => {
@@ -35,13 +35,21 @@ const clearCartMutationFn = async () => {
   return await axiosWithToken.delete("carts/empty-user-cart");
 };
 
+const deleteWishlistMutationFn = async (user: UserType) => {
+  return (await axiosWithToken.put("users/" + user._id, user)).data;
+};
+
 const CartOrWishlistPage = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user, userCart } = useSelector((state: RootStateType) => state.user);
   const queryClient = useQueryClient();
 
   const { pathname } = useLocation();
   const isCartPage = pathname.includes("cart");
+
+  const showDeleteBtn = isCartPage
+    ? !!userCart?.products.length
+    : !!user?.wishlist.length;
 
   // refs
   const msgRef = useRef<TopMessageRefType>(null);
@@ -69,6 +77,18 @@ const CartOrWishlistPage = () => {
     mutationKey: ["makeOrder"],
     mutationFn: makeOrderMutationFn,
     onSuccess: () => queryClient.prefetchQuery({ queryKey: ["getProducts"] }),
+  });
+
+  // delete wishlist
+  const {
+    mutate: deleteWishlist,
+    isPending: deleteWishlistLoading,
+    data: deleteWishlistData,
+    isError: deleteWishlistErr,
+    error: deleteWishlistErrData,
+  } = useMutation({
+    mutationFn: deleteWishlistMutationFn,
+    mutationKey: ["deleteWishlist"],
   });
 
   // useEffects
@@ -109,13 +129,30 @@ const CartOrWishlistPage = () => {
       });
   }, [clearCartErrData]);
 
+  // delete wishlist
+  useEffect(() => {
+    console.log(deleteWishlistData);
+    console.log(deleteWishlistErrData);
+
+    if (deleteWishlistData) dispatch(setUser(deleteWishlistData));
+
+    if (deleteWishlistErr)
+      handleError(deleteWishlistErrData, msgRef, {
+        forAllStates:
+          "something went wrong while trying to delete your wishlist",
+      });
+  }, [deleteWishlistData, deleteWishlistErr, deleteWishlistErrData, dispatch]);
+
   // show spinners while loading
   useEffect(() => {
     makeOrderBtnRef.current?.classList.toggle("active", orderLoading);
   }, [orderLoading]);
   useEffect(() => {
-    clearCartBtnRef.current?.classList.toggle("active", clearCartLoading);
-  }, [clearCartLoading]);
+    clearCartBtnRef.current?.classList.toggle(
+      "active",
+      clearCartLoading || deleteWishlistLoading
+    );
+  }, [clearCartLoading, deleteWishlistLoading]);
 
   return (
     <>
@@ -136,7 +173,7 @@ const CartOrWishlistPage = () => {
       <hr style={{ marginBlock: 15 }} />
 
       <div className="cart-or-wishlist-down-btns-holder">
-        {isCartPage && (
+        {isCartPage && userCart?.products.length && (
           <button
             ref={makeOrderBtnRef}
             className={`btn ${
@@ -149,16 +186,23 @@ const CartOrWishlistPage = () => {
           </button>
         )}
 
-        <button
-          className={`red-btn ${
-            clearCartLoading ? "center spinner-pseudo-after fade scale" : ""
-          }`}
-          ref={clearCartBtnRef}
-          onClick={() => clearCart()}
-          disabled={clearCartLoading || orderLoading}
-        >
-          Clear Your {isCartPage ? "Cart" : "Wishlist"}
-        </button>
+        {showDeleteBtn && (
+          <button
+            className={`red-btn ${
+              clearCartLoading || deleteWishlistLoading
+                ? "center spinner-pseudo-after fade scale"
+                : ""
+            }`}
+            ref={clearCartBtnRef}
+            onClick={() => {
+              if (isCartPage) return clearCart();
+              if (user) deleteWishlist({ ...user, wishlist: [] });
+            }}
+            disabled={clearCartLoading || orderLoading || deleteWishlistLoading}
+          >
+            Clear Your {isCartPage ? "Cart" : "Wishlist"}
+          </button>
+        )}
       </div>
       <TopMessage ref={msgRef} />
     </>

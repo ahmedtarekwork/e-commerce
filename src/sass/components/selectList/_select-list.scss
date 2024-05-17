@@ -9,6 +9,9 @@
   z-index: 1;
   left: 0;
   top: 100%;
+  --max-height: unset;
+  max-height: var(--max-height);
+  overflow-y: scroll;
 }
 
 .select-list {
