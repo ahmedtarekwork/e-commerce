@@ -1,0 +1,13 @@
+User-agent: *
+
+Disallow: /wishlist
+Disallow: /cart
+Disallow: /orders
+Disallow: /dashboard
+Disallow: /dashboard/orders
+Disallow: /dashboard/products
+Disallow: /dashboard/users
+
+Allow: /
+
+sitemap: https://ahmed-e-commerce.netlify.app/sitemap.xml

@@ -1,9 +1,9 @@
 // react
-import { CSSProperties, useEffect } from "react";
+import { type CSSProperties, useEffect } from "react";
 
 // redux
-import useDispatch from "../../hooks/useDispatch";
-import { useSelector } from "react-redux";
+import useDispatch from "../../hooks/redux/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
 // redux actions
 import { setProducts } from "../../store/fetures/productsSlice";
 
@@ -16,11 +16,10 @@ import DisplayError from "../../components/layout/DisplayError";
 import ImgsSlider from "../../components/ImgsSlider";
 
 // hooks
-import useGetProducts from "../../hooks/useGetProducts";
+import useGetProducts from "../../hooks/ReactQuery/useGetProducts";
 
 // types
-import { RootStateType } from "../../utiles/types";
-import { ProductType } from "../../utiles/types";
+import type { ProductType } from "../../utiles/types";
 
 // home slider imgs
 import img1 from "../../imgs/home-slider/1.png";
@@ -28,7 +27,7 @@ import img2 from "../../imgs/home-slider/31591673541.jpg";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const { products } = useSelector((state: RootStateType) => state.products);
+  const { products } = useSelector((state) => state.products);
 
   const {
     data: apiProducts,
@@ -61,7 +60,7 @@ const HomePage = () => {
         }}
       />
 
-      <h3>browse or products</h3>
+      <h3>Browse Our Products</h3>
 
       {productsLoading && (
         <Spinner settings={{ clr: "var(--main)" }}>Loading Products...</Spinner>

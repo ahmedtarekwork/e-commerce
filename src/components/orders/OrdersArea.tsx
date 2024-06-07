@@ -28,6 +28,8 @@ const OrdersArea = ({
   withId = false,
   withEditStatus = false,
 }: Props) => {
+  console.log(orders);
+
   if (loading)
     return (
       <Spinner
@@ -72,10 +74,10 @@ const OrdersArea = ({
       <ul className="orders-list">
         {orders.map((order) => (
           <li key={order._id} className="orders-page-order-cell">
-            {!withEditStatus && <OrderCard order={order} withId={withId} />}
-
-            {withEditStatus && (
-              <OrderCellWithChangeStatus order={order} withId={withId} />
+            {withEditStatus ? (
+              <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
+            ) : (
+              <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
             )}
           </li>
         ))}

@@ -8,8 +8,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "../hooks/useDispatch";
+import useSelector from "../hooks/redux/useSelector";
+import useDispatch from "../hooks/redux/useDispatch";
 // redux actions
 import {
   setUser,
@@ -30,17 +30,17 @@ import SelectList, { selectListOptionType } from "./selectList/SelectList";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { AiOutlineDelete, AiFillDelete } from "react-icons/ai";
 
-// utiles
+// utils
 import handleError from "../utiles/functions/handleError";
 import { axiosWithToken } from "../utiles/axios";
 
 // types
-import { OrderProductType, ProductType, RootStateType } from "../utiles/types";
+import type { OrderProductType, ProductType } from "../utiles/types";
 
 // hooks
 import useInitProductsCells from "../hooks/useInitProductsCells";
-import useAddToCart from "../hooks/CartRequest/useAddToCart";
-import useToggleFromWishlist from "../hooks/useToggleFromWishlist";
+import useAddToCart from "../hooks/ReactQuery/CartRequest/useAddToCart";
+import useToggleFromWishlist from "../hooks/ReactQuery/useToggleFromWishlist";
 
 export type ProductCardDeleteBtn = {
   withDeleteBtn?: "cart" | "wishlist";
@@ -52,6 +52,7 @@ type Props = ProductCardDeleteBtn & {
   withAddToCart?: boolean;
   withAddToWishList?: boolean;
   withAddMore?: boolean;
+  imgWidth?: `${number}px`;
 };
 
 // fetchers
@@ -75,6 +76,7 @@ const ProductCard = ({
   withAddToWishList,
   withDeleteBtn,
   withAddMore,
+  imgWidth,
 }: Props) => {
   const dispatch = useDispatch();
   const { _id, imgs, title } = product;
@@ -86,7 +88,7 @@ const ProductCard = ({
   const msgRef = useRef<TopMessageRefType>(null);
   const deleteProductBtnRef = useRef<HTMLButtonElement>(null);
 
-  const { userCart, user } = useSelector((state: RootStateType) => state.user);
+  const { userCart, user } = useSelector((state) => state.user);
   const isInStock = +((product as ProductType).quantity || 0) > 0;
 
   // add to cart
@@ -196,7 +198,7 @@ const ProductCard = ({
           </button>
         )}
 
-        <ImgsSlider imgWidth="150px" imgs={imgs} />
+        <ImgsSlider imgWidth={imgWidth || "150px"} imgs={imgs} />
 
         <div className="product-data-big-holder">
           <strong className="product-card-title">{title}</strong>

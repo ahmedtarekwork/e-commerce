@@ -5,7 +5,7 @@ import { CSSProperties, useRef, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // redux
-import useDispatch from "../hooks/useDispatch";
+import useDispatch from "../hooks/redux/useDispatch";
 import { setUser } from "../store/fetures/userSlice";
 
 // components
@@ -162,10 +162,11 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
   // register new user
   useEffect(() => {
     if (registerStatus !== "idle") {
-      if (registerErr)
+      if (registerErr) {
         handleError(registerErrData, msgRef, {
           forAllStates: "something went wrong while register a new user",
         });
+      }
 
       if (registerData) {
         setDisableSubmit(true);
@@ -224,6 +225,10 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
           errorMsg={passwordErr?.message}
           {...register("password", {
             required: "password is required",
+            minLength: {
+              value: 6,
+              message: "password must be 6 characters or more",
+            },
           })}
           type="password"
           id="password"

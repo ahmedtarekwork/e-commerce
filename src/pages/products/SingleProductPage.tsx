@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "../../hooks/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
 import { setCart, setUser } from "../../store/fetures/userSlice";
 
@@ -25,7 +25,7 @@ import axios, { axiosWithToken } from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 // types
-import { ProductType, RootStateType } from "../../utiles/types";
+import type { ProductType } from "../../utiles/types";
 
 // icons
 import {
@@ -36,8 +36,8 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiBallPenFill, RiBallPenLine } from "react-icons/ri";
 
 // hooks
-import useAddToCart from "../../hooks/CartRequest/useAddToCart";
-import useToggleFromWishlist from "../../hooks/useToggleFromWishlist";
+import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
+import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
 
 // fetchers
 const getSingleProductQueryFn = async ({
@@ -67,18 +67,18 @@ const SingleProductPage = () => {
   const addToCartBtnRef = useRef<HTMLButtonElement>(null);
   const toggleWishlistBtnRef = useRef<HTMLButtonElement>(null);
 
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
-  const isInCart = useSelector((state: RootStateType) =>
+  const isInCart = useSelector((state) =>
     state.user.userCart?.products?.some((prd) => prd._id === id)
   );
 
-  const isInWishlist = useSelector((state: RootStateType) =>
+  const isInWishlist = useSelector((state) =>
     state.user.user?.wishlist?.some((prdId: string) => prdId === id)
   );
 
   const [product, setProduct] = useState<ProductType | undefined>(
-    useSelector((state: RootStateType) =>
+    useSelector((state) =>
       state.products.products.find((prd) => prd._id === id)
     )
   );

@@ -1,9 +1,8 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootStateType } from "../utiles/types";
+import useSelector from "../hooks/redux/useSelector";
 
 const AlreadyLogedInLayout = () => {
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
   return user ? <Navigate to="/" relative="path" /> : <Outlet />;
 };

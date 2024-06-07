@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "../../hooks/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
 import { setProducts } from "../../store/fetures/productsSlice";
 
@@ -17,12 +17,9 @@ import ProductCard from "../../components/ProductCard";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import DisplayError from "../../components/layout/DisplayError";
 
-// types
-import { RootStateType } from "../../utiles/types";
-
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
-import useGetProducts from "../../hooks/useGetProducts";
+import useGetProducts from "../../hooks/ReactQuery/useGetProducts";
 
 const GoToMakeNewBtn = () => (
   <Link className="btn" to="/dashboard/new-product" relative="path">
@@ -35,8 +32,8 @@ const ProductsPage = () => {
   const isDashboard = pathname.includes("dashboard");
 
   const dispatch = useDispatch();
-  const { products } = useSelector((state: RootStateType) => state.products);
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { products } = useSelector((state) => state.products);
+  const { user } = useSelector((state) => state.user);
   const { listCell } = useInitProductsCells();
 
   // get products

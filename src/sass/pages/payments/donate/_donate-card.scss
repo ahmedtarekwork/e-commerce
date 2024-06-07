@@ -1,0 +1,127 @@
+.donate-plan-card {
+  --clr: var(--light);
+
+  padding: 8px;
+  background-color: #fff;
+  $width: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &-name {
+    font-size: 30px;
+    color: var(--clr);
+    text-transform: uppercase;
+    position: relative;
+    width: fit-content;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 70%;
+      height: 3px;
+      background: var(--clr);
+    }
+  }
+
+  &-price {
+    text-align: center;
+    font-size: 35px;
+    font-weight: bold;
+    color: var(--clr);
+
+    span {
+      font-size: 20px;
+    }
+  }
+
+  &-description {
+    line-height: 22px;
+    color: #444;
+    font-size: 15px;
+    margin-bottom: 10px;
+
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 539px) {
+    &-name {
+      font-size: 24px;
+      margin-inline: auto;
+      text-align: center;
+
+      &::after {
+        left: 50%;
+        translate: -50% 0;
+      }
+    }
+
+    &-price {
+      font-size: 27px;
+
+      span {
+        font-size: 16px;
+      }
+    }
+
+    &-description {
+      text-align: center;
+    }
+  }
+
+  &-btn {
+    margin-inline: auto;
+    margin-top: auto;
+    display: block;
+    background: var(--clr);
+
+    @media (max-width: 300px) {
+      width: 100%;
+    }
+  }
+
+  &.popular {
+    --clr: var(--main);
+    position: relative;
+
+    .porpular-mark {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      translate: -50%;
+      background: var(--clr);
+      color: #fff;
+      padding: 0 7px;
+      text-transform: capitalize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: max-content;
+    }
+
+    @media (min-width: 992px) {
+      box-shadow: var(--bx-shadow);
+      scale: 1.12;
+    }
+    @media (min-width: 1200px) {
+      scale: 1.09 1.15;
+    }
+  }
+
+  // gold plan
+  &.expensive {
+    --clr: rgb(163 107 4);
+    --dark-clr: rgb(114, 78, 10);
+
+    .donate-plan-card-btn:not([disabled]):hover {
+      background: var(--dark-clr);
+    }
+  }
+
+  @include cardBorder(null, $width, null, var(--clr));
+}

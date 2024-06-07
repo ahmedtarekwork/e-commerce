@@ -2,24 +2,21 @@
 import { CSSProperties, useEffect } from "react";
 
 // redux
-import useDispatch from "../hooks/useDispatch";
-import { useSelector } from "react-redux";
+import useDispatch from "../hooks/redux/useDispatch";
+import useSelector from "../hooks/redux/useSelector";
 import { resteCart, setCart } from "../store/fetures/userSlice";
 
 // hooks
-import useGetUserCart from "../hooks/CartRequest/useGetUserCart";
+import useGetUserCart from "../hooks/ReactQuery/CartRequest/useGetUserCart";
 import useInitProductsCells from "../hooks/useInitProductsCells";
 
 // components
 import Spinner from "./spinners/Spinner";
-import ProductCard, { ProductCardDeleteBtn } from "./ProductCard";
+import ProductCard, { type ProductCardDeleteBtn } from "./ProductCard";
 import GridList from "./gridList/GridList";
 
-// utiles
+// utils
 import axios from "../utiles/axios";
-
-// types
-import { RootStateType } from "../utiles/types";
 
 type Props = ProductCardDeleteBtn & {
   userId?: string;
@@ -33,9 +30,7 @@ const replaceQty = (arr: string[]) =>
 
 const CartArea = ({ userId, withDeleteBtn, withAddMore }: Props) => {
   const dispatch = useDispatch();
-  const { userCart, cartMsg } = useSelector(
-    (state: RootStateType) => state.user
-  );
+  const { userCart, cartMsg } = useSelector((state) => state.user);
   const { listCell, productCardCells } = useInitProductsCells();
 
   const {

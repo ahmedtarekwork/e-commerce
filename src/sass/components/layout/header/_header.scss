@@ -6,13 +6,13 @@
   left: 0;
   background: #fff;
   box-shadow: var(--bx-shadow);
-  padding: 10px 0;
+  padding: 15px 0;
 
   .container {
     @include flex(space-between);
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 565px) {
     .main-btns-list {
       display: none;
     }
@@ -44,7 +44,7 @@
     }
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 565px) {
     flex: 1;
     justify-content: space-between;
 

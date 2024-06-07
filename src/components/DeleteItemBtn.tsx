@@ -1,12 +1,12 @@
 // react
-import { ComponentProps, useEffect, useRef } from "react";
+import { type ComponentProps, useEffect, useRef } from "react";
 
 // components
 import AreYouSureModal from "./modals/AreYouSureModal";
-import { AppModalRefType } from "./modals/appModal/AppModal"; // type
 
 // types
 import { UseMutateFunction } from "@tanstack/react-query";
+import { type AppModalRefType } from "./modals/appModal/AppModal";
 
 export type DeleteItemBtnProps = Record<"username" | "itemId", string> & {
   deleteLoading: boolean;
@@ -77,7 +77,11 @@ const DeleteItemBtn = ({
         functionToMake={() => deleteItem(itemId)}
         ref={sureModal}
       >
-        Are you sure you want to delete "{username}" user
+        Are you sure you want to delete "
+        <span style={{ color: "var(--dark)", fontWeight: "bold" }}>
+          {username}
+        </span>
+        " user
       </AreYouSureModal>
     </>
   );

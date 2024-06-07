@@ -12,7 +12,12 @@
   $style: solid,
   $clr: var(--main)
 ) {
-  border-radius: $radius;
+  border-radius: $radius or var(--radius);
+
+  $width: $width or 1px;
+  $style: $style or solid;
+  $clr: $clr or var(--main);
+
   border: brdr($width, $style, $clr);
 }
 

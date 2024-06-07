@@ -20,8 +20,12 @@ import SingleProductPage from "../pages/products/SingleProductPage";
 // orders
 import SingleOrderPage from "../pages/orders/SingleOrderPage";
 import OrdersPage from "../pages/orders/OrdersPage";
+// payment
+import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
+import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
+// cart or wishlist
+import CartOrWishlistPage from "../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
 // more pages
-import CartOrWishlistPage from "../pages/e-commerce/CartOrWishlistPage";
 import ErrorPage from "../pages/ErrorPage";
 
 // layouts \\
@@ -31,20 +35,45 @@ import NotAuthLayout from "../layouts/NotAuthLayout";
 import AlreadyLogedInLayout from "../layouts/AlreadyLogedInLayout";
 import NeedLoginLayout from "../layouts/NeedLoginLayout";
 
-const useAppRouter = (checkUserLoading: boolean) =>
-  createBrowserRouter(
+const useAppRouter = (checkUserLoading: boolean) => {
+  return createBrowserRouter(
     createRoutesFromElements(
       <Route element={<MainLayout />}>
-        {/* login isn't neccessery for home page and products page*/}
+        {/* no login nedded for these page*/}
         <Route element={<EcommerceHomePage />} index />
         <Route element={<ProductsPage />} path={"products"} />
         <Route path="product/:id" element={<SingleProductPage />} />
 
+        {/* payment routes */}
+        <Route
+          path="successPayment"
+          element={<PaymentSuccessOrFailPage type="success" />}
+        />
+        <Route
+          path="failedPayment"
+          element={<PaymentSuccessOrFailPage type="failed" />}
+        />
+        {/* donation routes */}
+        <Route path="donate" element={<DonationPage />} />
+        <Route
+          path="successPayment/donate"
+          element={<PaymentSuccessOrFailPage type="success" />}
+        />
+        <Route
+          path="failedPayment/donate"
+          element={<PaymentSuccessOrFailPage type="failed" />}
+        />
+
+        {/*
+          if user already loged in => redirect him to home page
+          else => go to login or signup page
+          */}
         <Route element={<AlreadyLogedInLayout />}>
           <Route path="login" element={<LoginOrSignupPage type="login" />} />
           <Route path="signup" element={<LoginOrSignupPage type="signup" />} />
         </Route>
 
+        {/* login necessery for access these routes */}
         <Route element={<NeedLoginLayout />}>
           <Route element={<CartOrWishlistPage />} path="cart" />
           <Route element={<CartOrWishlistPage />} path="wishlist" />
@@ -53,8 +82,11 @@ const useAppRouter = (checkUserLoading: boolean) =>
           <Route path="profile" element={<ProfilePage />} />
           <Route path="orders/:id" element={<SingleOrderPage />} />
           <Route path="product/:id" element={<SingleProductPage />} />
+
+          {/* donation page route */}
         </Route>
 
+        {/* need to be admin to access these routes */}
         <Route
           element={<NotAuthLayout loading={checkUserLoading} />}
           path="/dashboard"
@@ -77,5 +109,6 @@ const useAppRouter = (checkUserLoading: boolean) =>
       </Route>
     )
   );
+};
 
 export default useAppRouter;

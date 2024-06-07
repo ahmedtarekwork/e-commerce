@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "./hooks/useDispatch";
+import useSelector from "./hooks/redux/useSelector";
+import useDispatch from "./hooks/redux/useDispatch";
 // redux actions
 import { setUser } from "./store/fetures/userSlice";
 
@@ -21,7 +21,7 @@ import { axiosWithToken } from "./utiles/axios";
 import SplashScreen from "./components/spinners/SplashScreen";
 
 // types
-import { RootStateType, UserType } from "./utiles/types";
+import type { UserType } from "./utiles/types";
 
 // hooks
 import useAppRouter from "./hooks/useAppRouter";
@@ -39,7 +39,7 @@ const App = () => {
 
   // redux
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
   // react query
   // checkUser

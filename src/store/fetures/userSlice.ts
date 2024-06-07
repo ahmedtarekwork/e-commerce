@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { CartType, UserType } from "../../utiles/types";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { CartType, UserType } from "../../utiles/types";
 import Cookies from "js-cookie";
 
 type InitStateType = {
@@ -7,6 +7,7 @@ type InitStateType = {
   userCart: CartType | null;
   cartMsg: string;
   allUsers: UserType[];
+  cartLoading: boolean;
 };
 
 const initialState: InitStateType = {
@@ -14,6 +15,7 @@ const initialState: InitStateType = {
   userCart: null,
   cartMsg: "",
   allUsers: [],
+  cartLoading: false,
 };
 
 const userSlice = createSlice({
@@ -45,10 +47,15 @@ const userSlice = createSlice({
     setCart: (state, { payload }: PayloadAction<CartType>) => {
       state.userCart = payload;
       state.cartMsg = "";
+      state.cartLoading = false;
     },
     resteCart: (state, { payload }: PayloadAction<string | undefined>) => {
       state.userCart = null;
       state.cartMsg = payload || "you don't have items in your cart";
+      state.cartLoading = false;
+    },
+    setCartLoading: (state, { payload }: PayloadAction<boolean>) => {
+      state.cartLoading = payload;
     },
   },
 });
@@ -56,11 +63,14 @@ const userSlice = createSlice({
 export const {
   setUser,
   removeUser,
+  logoutUser,
+
   setAllUsers,
   resetAllUsers,
-  logoutUser,
+
   setCart,
   resteCart,
+  setCartLoading,
 } = userSlice.actions;
 
 export default userSlice.reducer;

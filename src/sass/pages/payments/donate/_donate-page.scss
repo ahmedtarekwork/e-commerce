@@ -1,0 +1,31 @@
+.donate-cards-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 290px) {
+    grid-template-columns: auto;
+  }
+
+  @media (max-width: 546px) {
+    .popular {
+      margin-top: 20px;
+    }
+  }
+
+  @media (min-width: 547px) {
+    padding-top: 50px;
+  }
+
+  @media (max-width: 991px) {
+    margin-top: 15px;
+  }
+  @media (min-width: 992px) {
+    margin-top: 30px;
+    padding-bottom: 20px;
+  }
+}
+
+.donation-page-danger-zone {
+  margin-top: auto;
+}

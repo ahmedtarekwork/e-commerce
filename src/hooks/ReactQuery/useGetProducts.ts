@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../utiles/axios";
-import { ProductType } from "../utiles/types";
+import { axiosWithToken } from "../../utiles/axios";
+import { ProductType } from "../../utiles/types";
 
 const getProductsQueryFn = async (): Promise<ProductType[]> => {
   return (await axiosWithToken.get("/products")).data;

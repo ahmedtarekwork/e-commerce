@@ -1,7 +1,7 @@
 #app-side-bar {
   position: fixed;
   left: 0;
-  width: 250px;
+  width: 270px;
   max-width: 100%;
   background: #fff;
   box-shadow: bx_shad(0, 10px);
@@ -17,12 +17,13 @@
     li {
       a,
       button {
+        text-transform: capitalize;
         width: 100%;
         padding: 5px 9px;
         color: var(--main);
         @include flex(flex-start);
 
-        svg {
+        .sidebar-item-arrow {
           opacity: 0;
           translate: -10px;
 
@@ -31,12 +32,16 @@
             transition: all 0.3s, color 0.15s, translate 0.3s 70ms; // set delay "translate" property element
           }
         }
+        p {
+          @include flex(center, center, 6px);
+        }
 
+        &.active,
         &:hover {
           p {
             margin-left: 20px;
           }
-          svg {
+          .sidebar-item-arrow {
             opacity: 1;
             translate: 10px;
           }
@@ -58,15 +63,12 @@
     translate: 0;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 565px) {
     width: 100%;
 
     .main-btns-list {
+      margin-block: 15px;
       @include flex(space-between, center, 10px);
     }
   }
-}
-
-#aside-overlay {
-  --index: 999;
 }

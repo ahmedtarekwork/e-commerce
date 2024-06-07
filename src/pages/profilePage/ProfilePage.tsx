@@ -1,16 +1,15 @@
 // react
 import { useEffect, useRef, useState } from "react";
 
+// react router
+import { Link, useLocation, useParams } from "react-router-dom";
+
 // react query
 import { useQuery } from "@tanstack/react-query";
 
-// react router
-import { useLocation, useParams } from "react-router-dom";
-
 // redux
-import { createSelector } from "@reduxjs/toolkit";
-import { useSelector } from "react-redux";
-import useDispatch from "../../hooks/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
 import { logoutUser } from "../../store/fetures/userSlice";
 
@@ -20,19 +19,26 @@ import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
 import CartArea from "../../components/CartArea";
 import Heading from "../../components/Heading";
 import SplashScreen from "../../components/spinners/SplashScreen";
-import TopMessage, { TopMessageRefType } from "../../components/TopMessage";
+import TopMessage, {
+  type TopMessageRefType,
+} from "../../components/TopMessage";
 import TabsList from "../../components/TabsList";
 import WishlistArea from "../../components/WishlistArea";
+import PropCell from "../../components/PropCell";
+
+// icons
+import { FaDonate } from "react-icons/fa";
 
 // hooks
-import useDeleteUserBtn from "../../hooks/useDeleteUserBtn";
+import useDeleteUserBtn from "../../hooks/ReactQuery/useDeleteUserBtn";
 
 // utiles
 import { axiosWithToken } from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 // types
-import { RootStateType, UserType } from "../../utiles/types";
+import type { UserType } from "../../utiles/types";
+import DangerZone from "../../components/dangerZone/DangerZone";
 
 // fetchers
 const getUserQueryFn = async ({
@@ -64,15 +70,10 @@ const ProfilePage = () => {
     enabled: false,
   });
 
-  const { user: appUser } = useSelector((state: RootStateType) => state.user);
+  const { user: appUser } = useSelector((state) => state.user);
 
-  const allUsers = (state: RootStateType) => state.user.allUsers;
-  const userSelector = createSelector<[typeof allUsers], UserType | null>(
-    allUsers,
-    (state: RootStateType["user"]["allUsers"]) =>
-      state.find(({ _id }) => _id === id) || null
-  );
-  const singleUser = useSelector((state: RootStateType) => userSelector(state));
+  const allUsers = useSelector((state) => state.user.allUsers);
+  const singleUser = allUsers.find(({ _id }) => _id === id) || null;
 
   const [user, setUser] = useState<UserType | null>(
     isCurrentUserProfile ? appUser : singleUser
@@ -121,83 +122,108 @@ const ProfilePage = () => {
   const { username, email, _id } = user;
 
   const DeleteBtn = () =>
-    deleteBtn({ itemId: _id, username, children: "delete your account" });
+    deleteBtn({
+      itemId: _id,
+      username,
+      children: "delete your account",
+    });
 
   return (
-    user && (
-      <>
-        <div className="section">
-          <Heading
-            content={isCurrentUserProfile ? "Your Profile" : "Profile Page"}
-          />
-        </div>
+    <>
+      <div className="section">
+        <Heading
+          content={isCurrentUserProfile ? "Your Profile" : "Profile Page"}
+        />
+      </div>
 
-        <ProfilePageCell user={user} propName={"username"} content={username} />
-        <ProfilePageCell user={user} propName={"email"} content={email} />
+      <ProfilePageCell user={user} propName={"username"} content={username} />
+      <ProfilePageCell user={user} propName={"email"} content={email} />
 
-        {user?.address ? (
-          <ProfilePageCell
-            user={user}
-            propName={"address"}
-            content={user?.address}
-          />
-        ) : (
-          <ProfilePageCell
-            user={user}
-            propName={"address"}
-            content={"not address has found!"}
-          />
-        )}
+      <ProfilePageCell
+        user={user}
+        propName={"address"}
+        content={user?.address || "no address found!"}
+      />
+      <PropCell
+        name={"donationPlan"}
+        val={
+          <p className="profile-page-donation-cell">
+            {user?.donationPlan ? (
+              <>
+                {isCurrentUserProfile ? "you are" : "this user"} subscriped to
+                <strong className="plan-name">{user.donationPlan}</strong>
+              </>
+            ) : (
+              `${
+                isCurrentUserProfile ? "you aren't" : "this user doesn't"
+              } subscriped to any donation plan`
+            )}
 
-        <hr style={{ marginBottom: 15 }} />
+            {isCurrentUserProfile && (
+              <Link className="btn" to="/donate" relative="path">
+                {user.donationPlan ? (
+                  "change plan"
+                ) : (
+                  <>
+                    <FaDonate />
+                    Go to Donate
+                  </>
+                )}
+              </Link>
+            )}
+          </p>
+        }
+      />
 
-        {!isCurrentUserProfile && (
-          <TabsList
-            lists={[
-              {
-                tabName: "User Cart",
-                tabContent: <CartArea {...withId} />,
-              },
-              {
-                tabName: "User Orders",
-                tabContent: (
-                  <ProfilePageOrdersArea
-                    user={user}
-                    isCurrentUserProfile={isCurrentUserProfile}
-                  />
-                ),
-              },
-              {
-                tabName: "User wishlist",
-                tabContent: (
-                  <WishlistArea
-                    wishlist={user.wishlist}
-                    isCurrentUserProfile={isCurrentUserProfile}
-                  />
-                ),
-              },
-            ]}
-          />
-        )}
+      <hr style={{ marginBlock: 15 }} />
 
-        {isCurrentUserProfile && (
-          <>
-            <WishlistArea
-              wishlist={user.wishlist}
-              isCurrentUserProfile={isCurrentUserProfile}
-            />
-          </>
-        )}
+      {!isCurrentUserProfile ? (
+        <TabsList
+          lists={[
+            {
+              tabName: "User Cart",
+              tabContent: <CartArea {...withId} />,
+            },
+            {
+              tabName: "User Orders",
+              tabContent: (
+                <ProfilePageOrdersArea
+                  user={user}
+                  isCurrentUserProfile={isCurrentUserProfile}
+                />
+              ),
+            },
+            {
+              tabName: "User wishlist",
+              tabContent: (
+                <WishlistArea
+                  wishlist={user.wishlist}
+                  isCurrentUserProfile={isCurrentUserProfile}
+                />
+              ),
+            },
+          ]}
+        />
+      ) : (
+        <WishlistArea
+          wishlist={user.wishlist}
+          isCurrentUserProfile={isCurrentUserProfile}
+        />
+      )}
 
-        <hr style={{ marginBlock: 15 }} />
+      <hr style={{ marginBlock: 15 }} />
 
-        <div className="delete-user-btn-holder">
-          <DeleteBtn />
-        </div>
+      <DangerZone
+        content="delete your account, you can't restore your account after delete it."
+        title="Danger Zone"
+        deleteBtn={{
+          type: "custom",
+          deleteBtn: <DeleteBtn />,
+        }}
+      />
 
-        <TopMessage ref={msgRef} />
-      </>
-    )
+      <TopMessage ref={msgRef} />
+    </>
   );
 };
 

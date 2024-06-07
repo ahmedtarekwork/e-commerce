@@ -8,8 +8,8 @@ import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "../../hooks/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
 // actions
 import { addProduct } from "../../store/fetures/productsSlice";
 
@@ -29,7 +29,7 @@ import handleError from "../../utiles/functions/handleError";
 import { axiosWithToken } from "../../utiles/axios";
 
 // types
-import { ProductType, RootStateType } from "../../utiles/types";
+import type { ProductType } from "../../utiles/types";
 
 export type ProductFormValues = Omit<
   ProductType,
@@ -68,7 +68,7 @@ const NewProductPage = () => {
 
   // redux
   const disaptch = useDispatch();
-  const product = useSelector((state: RootStateType) =>
+  const product = useSelector((state) =>
     state.products.products.find((prd) => prd._id === (id || ""))
   );
 

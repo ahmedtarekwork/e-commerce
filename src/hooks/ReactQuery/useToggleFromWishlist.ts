@@ -2,13 +2,13 @@
 import { useMutation } from "@tanstack/react-query";
 
 // redux
-import { useSelector } from "react-redux";
+import useSelector from "../redux/useSelector";
 
 // utiles
-import { axiosWithToken } from "../utiles/axios";
+import { axiosWithToken } from "../../utiles/axios";
 
 // types
-import { UserType, RootStateType } from "../utiles/types";
+import type { UserType } from "../../utiles/types";
 
 const addToWishlistMutationFn = async ({
   userId,
@@ -21,7 +21,7 @@ const addToWishlistMutationFn = async ({
 };
 
 const useToggleFromWishlist = (prdId: string) => {
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
   const mutateHook = useMutation({
     mutationKey: ["addProductToWishlist", prdId],

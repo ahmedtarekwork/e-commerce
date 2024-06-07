@@ -143,7 +143,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
 
             {imgsList.map((img, i) => (
               <li key={nanoid()} className="img-preview-cell">
-                <img src={img} alt={"product image"} />
+                <img src={img} alt="product image" width="100%" height="100%" />
                 <button
                   className="red-btn"
                   onClick={() =>

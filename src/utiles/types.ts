@@ -13,10 +13,28 @@ export type UserType = {
   isAdmin: boolean;
   address?: string;
   wishlist: string[];
+  donationPlan?: "pro" | "premium pro" | "standard";
 };
 
 export type OrderProductType = Omit<ProductType, "quantity"> & {
   count: number;
+};
+
+export type LineItemType = {
+  quantity: number;
+  price_data: {
+    recurring?: {
+      interval: "day" | "month" | "week" | "year";
+      interval_count: number;
+    };
+    currency: string;
+    unit_amount: number;
+    product_data: {
+      name: string;
+      description: string;
+      images?: [string];
+    };
+  };
 };
 
 export type CartType = {
@@ -31,7 +49,6 @@ export type OrderType = {
 
   orderStatus:
     | "Not Processed"
-    | "Cash on Delivery"
     | "Processing"
     | "Dispatched"
     | "Cancelled"
@@ -47,6 +64,7 @@ export type OrderType = {
   };
 
   products: OrderProductType[];
+  createdAt: string;
 };
 
 export type ProductType = {
@@ -69,9 +87,7 @@ export type ProductType = {
   }[];
 };
 
-// main app reducer \\
 // components \\
-
 export type InputPropsType = ComponentProps<"input"> & {
   label?: string;
   errorMsg?: string;

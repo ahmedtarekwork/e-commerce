@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // redux
-import { useSelector } from "react-redux";
+import useSelector from "../../hooks/redux/useSelector";
 
 // react query
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ import ProductCard from "../../components/ProductCard";
 import { axiosWithToken } from "../../utiles/axios";
 
 // types
-import { OrderType, RootStateType } from "../../utiles/types";
+import { OrderType } from "../../utiles/types";
 
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
@@ -40,10 +40,10 @@ const getOrderQueryFn = async ({
 
 const SingleOrderPage = () => {
   const { id } = useParams();
-  const appStateOrder = useSelector((state: RootStateType) =>
+  const appStateOrder = useSelector((state) =>
     state.orders.orders.find((order) => order._id === id)
   );
-  const [order, setOrder] = useState<OrderType>();
+  const [order, setOrder] = useState<OrderType | undefined>(appStateOrder);
 
   const { listCell, productCardCells } = useInitProductsCells();
 
@@ -62,7 +62,6 @@ const SingleOrderPage = () => {
 
   useEffect(() => {
     if (id && !appStateOrder) getOrder();
-    else setOrder(appStateOrder);
   }, []);
 
   useEffect(() => {
@@ -70,19 +69,22 @@ const SingleOrderPage = () => {
   }, [resOrder]);
 
   if (orderLoading && fetchStatus !== "idle")
-    return <SplashScreen>Loading The Order...</SplashScreen>;
+    return <SplashScreen>Loading Order...</SplashScreen>;
 
   if (orderErr) return <DisplayError error={orderErrData} />;
-  if (!id) return <h1>can't find the order Id</h1>;
+  if (!id) return <h1>order Id is required!</h1>;
   if (!order) return <h1>can't get order with id "{id}"</h1>;
 
   const {
     _id,
     orderStatus,
-    paymentIntent: { amount },
+    paymentIntent: { amount, currency, method },
     products,
     orderby,
+    createdAt,
   } = order;
+
+  console.log(order);
 
   return (
     <>
@@ -91,7 +93,12 @@ const SingleOrderPage = () => {
       </div>
 
       <h3>order informations</h3>
-      <ul className="single-order-info">
+      <ul
+        className="single-order-info"
+        style={{
+          marginBottom: 15,
+        }}
+      >
         <li>
           <PropCell name="order id" val={_id} />
         </li>
@@ -100,6 +107,15 @@ const SingleOrderPage = () => {
         </li>
         <li>
           <PropCell name="total price" val={amount + "$"} />
+        </li>
+        <li>
+          <PropCell name="currency" val={currency} />
+        </li>
+        <li>
+          <PropCell name="payment method" val={method} />
+        </li>
+        <li>
+          <PropCell name="orderd at" val={new Date(createdAt).toDateString()} />
         </li>
         {orderby && (
           <li>
@@ -113,23 +129,23 @@ const SingleOrderPage = () => {
             />
           </li>
         )}
-
-        <GridList
-          initType="row"
-          isChanging={false}
-          cells={listCell.map((cell) => (cell === "quantity" ? "count" : cell))}
-        >
-          {products.map((prd) => (
-            <ProductCard
-              key={prd._id}
-              cells={productCardCells.map((cell) =>
-                cell === "quantity" ? "count" : cell
-              )}
-              product={prd}
-            />
-          ))}
-        </GridList>
       </ul>
+
+      <GridList
+        initType="row"
+        isChanging={false}
+        cells={listCell.map((cell) => (cell === "quantity" ? "count" : cell))}
+      >
+        {products.map((prd) => (
+          <ProductCard
+            key={prd._id}
+            cells={productCardCells.map((cell) =>
+              cell === "quantity" ? "count" : cell
+            )}
+            product={prd}
+          />
+        ))}
+      </GridList>
     </>
   );
 };

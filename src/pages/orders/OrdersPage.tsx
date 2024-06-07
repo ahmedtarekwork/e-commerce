@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 // redux
-import useDispatch from "../../hooks/useDispatch";
+import useDispatch from "../../hooks/redux/useDispatch";
 import { setOrders } from "../../store/fetures/ordersSlice";
 
 // components
@@ -16,11 +16,11 @@ import Heading from "../../components/Heading";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import OrdersArea from "../../components/orders/OrdersArea";
 
-// utiles
+// utils
 import { axiosWithToken } from "../../utiles/axios";
 
 // types
-import { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utiles/types";
 
 // fetchers
 const getOrdersQueryFn = async ({
@@ -34,7 +34,9 @@ const getOrdersQueryFn = async ({
   }`;
 
   const res = (await axiosWithToken(endpoint + "?withUser=true")).data;
-  return res.orders || res;
+  const finalRes = (res.orders || res).reverse();
+
+  return finalRes;
 };
 
 const OrdersPage = () => {
@@ -76,7 +78,7 @@ const OrdersPage = () => {
         isError={isError}
         loading={isLoading}
         orders={orders || []}
-        withId={true}
+        withId
         noOrdersMsg={
           pathname.includes("dashboard")
             ? "this user hasn't any orders yet"

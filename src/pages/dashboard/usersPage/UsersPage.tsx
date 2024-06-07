@@ -2,7 +2,7 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
 // redux
-import useDispatch from "../../../hooks/useDispatch";
+import useDispatch from "../../../hooks/redux/useDispatch";
 import { setAllUsers } from "../../../store/fetures/userSlice";
 
 // react-query

@@ -1,6 +1,18 @@
+// react
+import { useEffect } from "react";
+
+// react query
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../../utiles/axios";
-import { CartType, ProductType } from "../../utiles/types";
+
+// redux
+import useDispatch from "../../redux/useDispatch";
+import { setCartLoading } from "../../../store/fetures/userSlice";
+
+// types
+import type { CartType, ProductType } from "../../../utiles/types";
+
+// utils
+import { axiosWithToken } from "../../../utiles/axios";
 
 // we know the user that's will get his cart with token
 type CartResponseType = Omit<CartType, "products"> & {
@@ -43,11 +55,23 @@ const getCartQueryFn = async ({
   return cart as unknown as CartType | { msg: string };
 };
 
-const useGetUserCart = (id?: string, enabled: boolean = false) =>
-  useQuery({
+const useGetUserCart = (id?: string, enabled: boolean = false) => {
+  const dispatch = useDispatch();
+  const cartQuery = useQuery({
     queryKey: ["getCart", id || ""],
     queryFn: getCartQueryFn,
     enabled,
   });
+
+  const { isPending, isFetching } = cartQuery;
+
+  useEffect(() => {
+    if (isPending || isFetching) {
+      dispatch(setCartLoading(true));
+    } else dispatch(setCartLoading(false));
+  }, [isPending, isFetching, dispatch]);
+
+  return cartQuery;
+};
 
 export default useGetUserCart;

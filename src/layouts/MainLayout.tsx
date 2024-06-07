@@ -7,7 +7,7 @@ import { Outlet, useLocation } from "react-router-dom";
 // components
 import Header from "../components/layout/appHeader/Header";
 import Footer from "../components/layout/Footer";
-import TopMessage, { TopMessageRefType } from "../components/TopMessage";
+import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
 
 const MainLayout = () => {
   const { pathname } = useLocation();
@@ -16,6 +16,11 @@ const MainLayout = () => {
     pathname.includes(path)
   );
 
+  const makePageFullHeight = ["profile", "singleUser", "cart", "donate"].some(
+    (path) => pathname.includes(path)
+  );
+
+  // refs
   const headerRef = useRef<HTMLElement>(null);
   const mainElRef = useRef<HTMLElement>(null);
   const footerRef = useRef<HTMLElement>(null);
@@ -53,53 +58,32 @@ const MainLayout = () => {
     const msgData = msgRef.current;
 
     if (msgData) {
-      window.addEventListener("offline", () => {
-        console.log("offline");
-
+      const offlineFn = () => {
         msgData.setMessageData?.({
           show: true,
           clr: "red",
           content: "you are offline, check your internet connection",
           remove: false,
         });
-      });
-
-      window.addEventListener("online", () => {
-        console.log("online");
-
+      };
+      const onlineFn = () => {
         msgData.setMessageData?.({
           show: true,
           clr: "green",
           content: "you back online again",
           time: 2500,
         });
-      });
+      };
+
+      window.addEventListener("offline", offlineFn);
+      window.addEventListener("online", onlineFn);
 
       return () => {
-        window.removeEventListener("offline", () => {
-          console.log("offline");
-
-          msgData.setMessageData?.({
-            show: true,
-            clr: "red",
-            content: "you are offline, check your internet connection",
-            remove: false,
-          });
-        });
-
-        window.removeEventListener("online", () => {
-          console.log("online");
-
-          msgData.setMessageData?.({
-            show: true,
-            clr: "green",
-            content: "you back online again",
-            time: 2500,
-          });
-        });
+        window.removeEventListener("offline", offlineFn);
+        window.removeEventListener("online", onlineFn);
       };
     }
-  });
+  }, []);
 
   return (
     <>
@@ -108,11 +92,7 @@ const MainLayout = () => {
       <main
         ref={mainElRef}
         className={`app-holder${!showHeader ? " login-page" : ""}${
-          ["profile", "singleUser", "cart"].some((path) =>
-            pathname.includes(path)
-          )
-            ? " grid-page"
-            : ""
+          makePageFullHeight ? " grid-page" : ""
         }`}
       >
         <div className="container">

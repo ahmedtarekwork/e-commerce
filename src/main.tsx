@@ -13,6 +13,7 @@ import App from "./App";
 // css
 import "./sass/main.css";
 
+// prepair react query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

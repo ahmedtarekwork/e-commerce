@@ -1,10 +1,25 @@
-.cart-or-wishlist-down-btns-holder {
+.cart-or-wishlist-down-holder {
   flex: 1;
   display: flex;
-  align-items: flex-end;
-  gap: 15px;
+  flex-direction: column;
 
-  > * {
+  .cart-or-wishlist-btns {
+    display: flex;
     flex: 1;
+    align-items: flex-end;
+    gap: 15px;
+    min-width: fit-content;
+    > * {
+      flex: 1;
+    }
+
+    @media (max-width: 275px) {
+      flex-direction: column;
+      justify-content: flex-end;
+      > * {
+        width: 100%;
+        flex: unset;
+      }
+    }
   }
 }

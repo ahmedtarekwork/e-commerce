@@ -15,9 +15,16 @@
       flex-wrap: wrap;
       overflow-wrap: anywhere;
 
-      button {
+      span {
         flex: 1;
+        width: 100%;
         margin-top: 5px;
+
+        button,
+        a {
+          width: 100%;
+          text-align: center;
+        }
       }
     }
   }
@@ -33,13 +40,20 @@
 }
 
 // .columns-list | .rows-list \\
-.grid-list-switcher-btns .btn {
-  &:hover:not(.active) {
-    background-color: var(--dark-trans);
+
+.grid-list-switcher-btns {
+  @media (max-width: 630px) {
+    display: none !important;
   }
 
-  &.active {
-    background-color: var(--dark);
+  .btn {
+    &:hover:not(.active) {
+      background-color: var(--dark-trans);
+    }
+
+    &.active {
+      background-color: var(--dark);
+    }
   }
 }
 
@@ -119,6 +133,18 @@
       }
       &:nth-of-type(even) {
         background: var(--dark-trans);
+      }
+
+      span {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+
+        button,
+        a {
+          width: 100%;
+        }
       }
     }
     > * + * {

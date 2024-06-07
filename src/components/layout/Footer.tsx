@@ -7,10 +7,12 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
         made by
         <a
           className="link white"
-          href="https://github.com/ahmedtarekwork"
+          href="https://ahmed-profile.netlify.app"
           target="_blank"
+          rel="nofollow"
+          title="maker profile link"
         >
-          ahmed tarek
+          Ahmed Tarek
         </a>
       </div>
     </footer>

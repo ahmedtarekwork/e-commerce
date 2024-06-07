@@ -42,7 +42,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
       activeIndex.current = nextIndex;
 
       setActiveImg(nextIndex);
-    }, withTimer?.time);
+    }, withTimer?.time) as unknown as number;
   };
 
   // play the interval for sliding imgs if "withTimer.value = true" in intial render || when the props.withTimer is changing to "true"
@@ -71,7 +71,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
             className="slider-img-holder"
             ref={imgsHoldersRefs[i]}
           >
-            <img src={img} alt="prodcut image" />
+            <img width="100%" height="100%" src={img} alt="prodcut image" />
           </div>
         ))}
       </div>

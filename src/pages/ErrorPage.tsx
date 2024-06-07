@@ -21,14 +21,20 @@ const ErrorPage = () => {
   });
 
   return (
-    <div className="error-page">
+    <div
+      className="error-page"
+      style={{
+        display: "grid",
+        placeContent: "center",
+      }}
+    >
       <MdOutlineSearchOff />
       <p>
         sorry, can't find the following path:
         <br />"{pathname}"
       </p>
 
-      <Link to="/" className="btn">
+      <Link to="/" className="btn" style={{ width: "100%" }}>
         Go to home
         <MdHome />
       </Link>

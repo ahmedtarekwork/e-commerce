@@ -5,8 +5,9 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 // redux
-import { useSelector } from "react-redux";
-import useDispatch from "../../../hooks/useDispatch";
+import useSelector from "../../../hooks/redux/useSelector";
+import useDispatch from "../../../hooks/redux/useDispatch";
+// redux actions
 import { logoutUser, setCart } from "../../../store/fetures/userSlice";
 
 // icons
@@ -14,12 +15,14 @@ import { FaUserAlt, FaShoppingCart } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 
 // types
-import { OrderProductType, RootStateType } from "../../../utiles/types";
-import useGetUserCart from "../../../hooks/CartRequest/useGetUserCart";
+import type { OrderProductType } from "../../../utiles/types";
+
+// hooks
+import useGetUserCart from "../../../hooks/ReactQuery/CartRequest/useGetUserCart";
 
 const MainBtnsList = () => {
   const dispatch = useDispatch();
-  const { user, userCart } = useSelector((state: RootStateType) => state.user);
+  const { user, userCart } = useSelector((state) => state.user);
 
   const { refetch: getCart, data: cart } = useGetUserCart();
 
@@ -52,11 +55,14 @@ const MainBtnsList = () => {
         <>
           <li>
             <Link to="/cart" relative="path" id="header-cart-icon">
-              <span id="cart-products-length">{productsLength}</span>
+              <span id="cart-products-length">
+                {productsLength > 9 ? "9+" : productsLength}
+              </span>
               <FaShoppingCart />
               your cart
             </Link>
           </li>
+
           <li>
             <Link to="/profile" className="close-side">
               <FaUserAlt />
@@ -65,6 +71,7 @@ const MainBtnsList = () => {
               </span>
             </Link>
           </li>
+
           <li>
             <button
               onClick={() => dispatch(logoutUser())}

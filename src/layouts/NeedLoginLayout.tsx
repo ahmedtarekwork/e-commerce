@@ -1,10 +1,9 @@
 import { Link, Outlet } from "react-router-dom";
 
-import { useSelector } from "react-redux";
-import { RootStateType } from "../utiles/types";
+import useSelector from "../hooks/redux/useSelector";
 
 const NeedLoginLayout = () => {
-  const isLogedIn = useSelector((state: RootStateType) => state.user.user);
+  const isLogedIn = useSelector((state) => state.user.user);
 
   if (!isLogedIn)
     return (

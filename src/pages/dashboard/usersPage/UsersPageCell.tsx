@@ -5,13 +5,13 @@ import { Dispatch, RefObject, SetStateAction, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 // redux
-import useDispatch from "../../../hooks/useDispatch";
+import useDispatch from "../../../hooks/redux/useDispatch";
 import { logoutUser } from "../../../store/fetures/userSlice";
-import { useSelector } from "react-redux";
+import useSelector from "../../../hooks/redux/useSelector";
 
 // components
 import GridListItem from "../../../components/gridList/GridListItem";
-import useDeleteUserBtn from "../../../hooks/useDeleteUserBtn";
+import useDeleteUserBtn from "../../../hooks/ReactQuery/useDeleteUserBtn";
 
 // utiles
 import handleError from "../../../utiles/functions/handleError";
@@ -20,7 +20,6 @@ import handleError from "../../../utiles/functions/handleError";
 import { AppModalRefType } from "../../../components/modals/appModal/AppModal";
 import { TopMessageRefType } from "../../../components/TopMessage";
 import { OrderType, UserType } from "../../../utiles/types";
-import { RootStateType } from "../../../utiles/types";
 
 type Props = {
   user: UserType & { orders: OrderType[] };
@@ -79,7 +78,7 @@ const UsersPageCell = ({
   msgRef,
   cells,
 }: Props) => {
-  const { user } = useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
 

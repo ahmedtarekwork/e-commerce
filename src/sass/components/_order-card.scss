@@ -27,6 +27,7 @@
     opacity: 0;
     display: grid;
     place-content: center;
+    pointer-events: none;
   }
 
   &.loading {
@@ -34,11 +35,16 @@
 
     &::after {
       opacity: 1;
+      pointer-events: unset;
     }
   }
 
   &:hover {
     background: var(--dark-trans);
+
+    .cell-prop-name + span {
+      color: #003375;
+    }
   }
 
   span {

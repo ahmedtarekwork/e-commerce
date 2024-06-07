@@ -5,6 +5,7 @@
 
   .container {
     @include flex(center, center, 7px);
+    flex-wrap: wrap;
   }
 
   &-white-logo {

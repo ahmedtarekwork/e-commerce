@@ -4,10 +4,10 @@ import {
   useRef,
   useImperativeHandle,
   forwardRef,
-  ReactNode,
-  ComponentProps,
-  Dispatch,
-  SetStateAction,
+  type ReactNode,
+  type ComponentProps,
+  type Dispatch,
+  type SetStateAction,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -40,12 +40,7 @@ const toggleModals = async (
 ): Promise<unknown> => {
   document.body.classList.toggle("block-scroll", open);
 
-  if (!overlay || !modal || !closeBtn) {
-    // const msg = "there are some elements required, but it's undefined";
-    // console.error(msg);
-    // throw new Error(msg);
-    return;
-  }
+  if (!overlay || !modal || !closeBtn) return;
 
   if (open) {
     return new Promise((res) => {

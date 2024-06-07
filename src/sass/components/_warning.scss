@@ -1,0 +1,31 @@
+.warning {
+  background: rgb(255 187 0 / 36%);
+  border-radius: var(--radius);
+  padding: 7px;
+  color: #796701;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: bold;
+
+  @media (max-width: 545px) {
+    flex-direction: column;
+  }
+
+  p {
+    width: fit-content;
+    text-align: center;
+  }
+
+  &::before {
+    content: "!";
+    border: 3px solid #796701;
+    height: 18px;
+    width: 18px;
+    display: inline-grid;
+    place-content: center;
+    font-weight: bolder;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}

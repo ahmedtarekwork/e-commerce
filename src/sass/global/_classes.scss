@@ -32,7 +32,7 @@ a.btn,
   cursor: pointer;
   user-select: none;
 
-  padding: 5px 10px;
+  padding: 7px 10px;
   border-radius: 3px;
   color: #fff !important;
 
@@ -123,8 +123,38 @@ $status: (
 }
 strong.cell-prop-name {
   color: var(--dark);
+  text-transform: capitalize;
 }
 
 .selected {
   background: var(--selected) !important;
+}
+
+.danger-zone {
+  @include cardBorder(null, 2px, null, var(--danger));
+  padding: 20px 10px;
+  color: rgb(209 16 16);
+  background: rgb(255 13 13 / 6%);
+
+  &-title {
+    font-size: 25px;
+    line-height: 30px;
+
+    @media (max-width: 300px) {
+      font-size: 19px;
+    }
+  }
+
+  &-content {
+    margin: 5px 0 10px;
+
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
+
+  &-btn {
+    margin-inline: auto;
+    display: block;
+  }
 }

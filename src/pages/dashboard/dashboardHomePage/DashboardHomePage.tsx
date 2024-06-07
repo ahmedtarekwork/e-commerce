@@ -1,12 +1,15 @@
 // react
 import { useEffect } from "react";
 
+// react router dom
+import { Link } from "react-router-dom";
+
 // react query
 import { useQuery } from "@tanstack/react-query";
 
 // redux
-import useDispatch from "../../../hooks/useDispatch";
-import { useSelector } from "react-redux";
+import useDispatch from "../../../hooks/redux/useDispatch";
+import useSelector from "../../../hooks/redux/useSelector";
 // redux actions
 import { setAllUsers } from "../../../store/fetures/userSlice";
 
@@ -16,17 +19,13 @@ import DashboardSquare, { DashboardSqaureProps } from "./DashboardSquare";
 import GridList from "../../../components/gridList/GridList";
 import GridListItem from "../../../components/gridList/GridListItem";
 
-// utiles
+// utils
 import { nanoid } from "@reduxjs/toolkit";
 import { axiosWithToken } from "../../../utiles/axios";
 
 // icons
-import { FaUser, FaListAlt } from "react-icons/fa";
-import { MdOutlineProductionQuantityLimits } from "react-icons/md";
-
-// types
-import { RootStateType } from "../../../utiles/types";
-import { Link } from "react-router-dom";
+import { FaUser, FaListAlt, FaArrowAltCircleLeft } from "react-icons/fa";
+import { BiSolidComponent } from "react-icons/bi";
 
 // fetchers
 const getProductsCountQueryFn = async () => {
@@ -44,13 +43,11 @@ const getUsersQueryFn = async () => {
 const DashboardHomePage = () => {
   const dispatch = useDispatch();
   const appProductsCount = useSelector(
-    (state: RootStateType) => state.products.products.length
+    (state) => state.products.products.length
   );
-  const appOrdersCount = useSelector(
-    (state: RootStateType) => state.orders.orders.length
-  );
+  const appOrdersCount = useSelector((state) => state.orders.orders.length);
 
-  const { allUsers } = useSelector((state: RootStateType) => state.user);
+  const { allUsers } = useSelector((state) => state.user);
   const admins = allUsers.filter((user) => user.isAdmin);
   const appUsersCount = allUsers.length;
 
@@ -107,7 +104,7 @@ const DashboardHomePage = () => {
   const squares: DashboardSqaureProps[] = [
     {
       title: "Products",
-      Icon: MdOutlineProductionQuantityLimits,
+      Icon: BiSolidComponent,
       path: "/dashboard/products",
       number: appProductsCount || productsCount,
       loading: productsCountLoading && productsCountStatus !== "idle",
@@ -136,6 +133,11 @@ const DashboardHomePage = () => {
       <div className="section">
         <Heading content="Dashboard" />
       </div>
+
+      <Link to="/" relative="path" className="btn back-to-store-btn">
+        <FaArrowAltCircleLeft />
+        Back To Store
+      </Link>
 
       <ul className="dashboard-squares-list">
         {squares.map((square) => (

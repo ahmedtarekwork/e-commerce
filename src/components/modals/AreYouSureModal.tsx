@@ -1,7 +1,10 @@
 import { forwardRef, useImperativeHandle, useRef, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
-import AppModal, { AppModalRefType, AppModalProps } from "./appModal/AppModal";
+import AppModal, {
+  type AppModalRefType,
+  type AppModalProps,
+} from "./appModal/AppModal";
 
 type SureModalProps = AppModalProps & {
   functionToMake: (e: MouseEvent<HTMLButtonElement>) => void;
@@ -17,13 +20,13 @@ const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
     const acceptBtn = useRef<HTMLButtonElement>(null);
     const modalRef = useRef<AppModalRefType>({ toggleModal: () => {} });
 
-    useImperativeHandle(ref, () => ({ ...modalRef.current }), []);
+    useImperativeHandle(ref, () => modalRef.current, []);
 
     return createPortal(
       <AppModal
         {...attr}
         className={`are-you-sure-modal${
-          attr.className ? " " + attr.className : ""
+          attr.className ? ` ${attr.className}` : ""
         }`}
         toggleClosingFunctions={toggleClosingFunctions}
         ref={modalRef}

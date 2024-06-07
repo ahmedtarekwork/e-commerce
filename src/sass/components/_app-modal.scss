@@ -1,18 +1,18 @@
 // app modal
 .app-modal {
   z-index: 2500;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   gap: 10px;
   flex-direction: column;
   position: fixed;
   transition: 0.3s;
   scale: 0;
-  max-width: 100%;
 
-  top: 50%;
-  left: 50%;
-  translate: -50% -50%;
+  &:not(.are-you-sure-modal) {
+    inset: 10px;
+  }
 
   &.active {
     scale: 1;
@@ -81,16 +81,26 @@
 }
 
 #app-modal-overlay {
-  --index: 2000;
+  z-index: calc(var(--header-index) + 1);
 }
 
 // are you sure modal
-.are-you-sure-modal .btns-holder {
-  margin-top: 10px;
-  @include flex(center, center, 10px);
+.are-you-sure-modal {
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
 
-  > * {
-    flex: 1;
+  @media (max-width: 700px) {
+    width: 95%;
+  }
+
+  .btns-holder {
+    margin-top: 10px;
+    @include flex(center, center, 10px);
+
+    > * {
+      flex: 1;
+    }
   }
 }
 
