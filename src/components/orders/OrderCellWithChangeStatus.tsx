@@ -46,10 +46,6 @@ const statusList: selectListOptionType<OrderType["orderStatus"]>[] = [
   },
   {
     selected: false,
-    text: "Cash on Delivery",
-  },
-  {
-    selected: false,
     text: "Processing",
   },
   {
