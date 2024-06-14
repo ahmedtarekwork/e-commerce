@@ -160,7 +160,12 @@ const ProfilePage = () => {
             )}
 
             {isCurrentUserProfile && (
-              <Link className="btn" to="/donate" relative="path">
+              <Link
+                title="go to donate page btn"
+                className="btn"
+                to="/donate"
+                relative="path"
+              >
                 {user.donationPlan ? (
                   "change plan"
                 ) : (
@@ -178,40 +183,37 @@ const ProfilePage = () => {
       <hr style={{ marginBlock: 15 }} />
 
       {!isCurrentUserProfile ? (
-        <TabsList
-          lists={[
-            {
-              tabName: "User Cart",
-              tabContent: <CartArea {...withId} />,
-            },
-            {
-              tabName: "User Orders",
-              tabContent: (
-                <ProfilePageOrdersArea
-                  user={user}
-                  isCurrentUserProfile={isCurrentUserProfile}
-                />
-              ),
-            },
-            {
-              tabName: "User wishlist",
-              tabContent: (
-                <WishlistArea
-                  wishlist={user.wishlist}
-                  isCurrentUserProfile={isCurrentUserProfile}
-                />
-              ),
-            },
-          ]}
-        />
-      ) : (
-        <WishlistArea
-          wishlist={user.wishlist}
-          isCurrentUserProfile={isCurrentUserProfile}
-        />
-      )}
+        <>
+          <TabsList
+            lists={[
+              {
+                tabName: "User Cart",
+                tabContent: <CartArea {...withId} />,
+              },
+              {
+                tabName: "User Orders",
+                tabContent: (
+                  <ProfilePageOrdersArea
+                    user={user}
+                    isCurrentUserProfile={isCurrentUserProfile}
+                  />
+                ),
+              },
+              {
+                tabName: "User wishlist",
+                tabContent: (
+                  <WishlistArea
+                    wishlist={user.wishlist}
+                    isCurrentUserProfile={isCurrentUserProfile}
+                  />
+                ),
+              },
+            ]}
+          />
 
-      <hr style={{ marginBlock: 15 }} />
+          <hr style={{ marginBlock: 15 }} />
+        </>
+      ) : null}
 
       <DangerZone
         content="delete your account, you can't restore your account after delete it."

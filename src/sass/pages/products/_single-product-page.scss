@@ -1,3 +1,8 @@
+.go-to-edit-product-btn {
+  margin-block: 10px;
+  @include flex(center, center, 10px);
+}
+
 .single-product-wrapper {
   @include flex(space-between, flex-start, 10px);
 
@@ -43,11 +48,15 @@
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  flex-wrap: wrap;
 
   > * {
     @include flex(center, center, 10px);
+    text-transform: capitalize;
+    flex: 1;
+    min-width: max-content;
 
-    svg path {
+    svg {
       font-size: 20px;
     }
 
@@ -55,7 +64,5 @@
       weight: bold;
       size: 16px;
     }
-
-    width: 100%;
   }
 }

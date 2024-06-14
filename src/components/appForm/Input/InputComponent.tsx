@@ -1,5 +1,13 @@
-import { forwardRef } from "react";
-import { InputPropsType } from "../../../utiles/types";
+import { type ComponentProps, forwardRef } from "react";
+
+export type InputPropsType = ComponentProps<"input"> & {
+  label?: string;
+  errorMsg?: string;
+
+  noSubmit?: boolean;
+  submitFunction?: () => void;
+  inputFunction?: () => void;
+};
 
 // functions \\
 const preventLetters = (e: KeyboardEvent) => {

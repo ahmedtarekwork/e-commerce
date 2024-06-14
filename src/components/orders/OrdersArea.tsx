@@ -2,17 +2,18 @@
 import Spinner from "../spinners/Spinner";
 import OrderCard from "./OrderCard";
 import OrderCellWithChangeStatus from "./OrderCellWithChangeStatus";
-
-// utiles
-import axios from "../../utiles/axios";
+import DisplayError from "../layout/DisplayError";
+import EmptyPage from "../layout/EmptyPage";
 
 // types
-import { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utiles/types";
+
+// SVGs
+import EmptyOrdersListSvg from "../../../imgs/no-orders.svg";
 
 type Props = {
   loading: boolean;
   isError: boolean;
-  error: unknown;
   orders: OrderType[];
   noOrdersMsg: string;
   withId?: boolean;
@@ -22,17 +23,15 @@ type Props = {
 const OrdersArea = ({
   loading,
   isError,
-  error,
   orders,
   noOrdersMsg,
   withId = false,
   withEditStatus = false,
 }: Props) => {
-  console.log(orders);
-
   if (loading)
     return (
       <Spinner
+        fullWidth={true}
         settings={{
           clr: "var(--main)",
         }}
@@ -48,41 +47,37 @@ const OrdersArea = ({
     );
 
   if (isError) {
-    if (axios.isAxiosError(error))
-      return (
-        <h1>
-          {error.response?.data.msg ||
-            error.response?.data ||
-            "something went wrong while getting user orders"}
-        </h1>
-      );
+    return (
+      <DisplayError
+        error={null}
+        initMsg="Can't get your orders at the moment"
+      />
+    );
   }
 
   if (orders.length === 0)
     return (
-      <strong
-        style={{
-          fontSize: 20,
+      <EmptyPage
+        content={noOrdersMsg}
+        svg={EmptyOrdersListSvg}
+        withBtn={{
+          type: "GoToHome",
         }}
-      >
-        {noOrdersMsg}
-      </strong>
+      />
     );
 
   return (
-    <>
-      <ul className="orders-list">
-        {orders.map((order) => (
-          <li key={order._id} className="orders-page-order-cell">
-            {withEditStatus ? (
-              <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
-            ) : (
-              <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
-            )}
-          </li>
-        ))}
-      </ul>
-    </>
+    <ul className="orders-list">
+      {orders.map((order) => (
+        <li key={order._id} className="orders-page-order-cell">
+          {withEditStatus ? (
+            <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
+          ) : (
+            <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
+          )}
+        </li>
+      ))}
+    </ul>
   );
 };
 export default OrdersArea;

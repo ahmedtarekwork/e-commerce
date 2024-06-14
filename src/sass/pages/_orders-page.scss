@@ -1,11 +1,11 @@
 .orders-page-order-cell {
   @include flex(null, null, 10px);
 
-  .select-list-holder {
-    flex-basis: 20%;
+  .list-wrapper {
+    flex-basis: 30%;
   }
 
-  @media (max-width: 385px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     @include cardBorder(var(--radius));
     padding: 10px;

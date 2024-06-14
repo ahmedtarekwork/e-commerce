@@ -16,9 +16,13 @@ const MainLayout = () => {
     pathname.includes(path)
   );
 
-  const makePageFullHeight = ["profile", "singleUser", "cart", "donate"].some(
-    (path) => pathname.includes(path)
-  );
+  const makePageFullHeight = [
+    "profile",
+    "singleUser",
+    "cart",
+    "donate",
+    "products",
+  ].some((path) => pathname.includes(path));
 
   // refs
   const headerRef = useRef<HTMLElement>(null);

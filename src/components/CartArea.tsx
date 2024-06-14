@@ -1,9 +1,10 @@
 // react
-import { CSSProperties, useEffect } from "react";
+import { type CSSProperties, useEffect } from "react";
 
 // redux
 import useDispatch from "../hooks/redux/useDispatch";
 import useSelector from "../hooks/redux/useSelector";
+// redux actions
 import { resteCart, setCart } from "../store/fetures/userSlice";
 
 // hooks
@@ -12,23 +13,34 @@ import useInitProductsCells from "../hooks/useInitProductsCells";
 
 // components
 import Spinner from "./spinners/Spinner";
-import ProductCard, { type ProductCardDeleteBtn } from "./ProductCard";
 import GridList from "./gridList/GridList";
+import PropCell from "./PropCell";
+import DisplayError from "./layout/DisplayError";
+import EmptyPage from "./layout/EmptyPage";
+import ProductCard, {
+  type ProductCardDeleteBtn,
+} from "./productCard/ProductCard";
 
-// utils
-import axios from "../utiles/axios";
+// SVGs
+import cartSvg from "../../imgs/cart.svg";
 
 type Props = ProductCardDeleteBtn & {
   userId?: string;
   withAddMore?: boolean;
+  showTotal?: boolean;
+  withTitle?: boolean;
 };
-
-const errMsg = "something went wrong while getting your cart items";
 
 const replaceQty = (arr: string[]) =>
   arr.map((cell) => (cell === "quantity" ? "count" : cell));
 
-const CartArea = ({ userId, withDeleteBtn, withAddMore }: Props) => {
+const CartArea = ({
+  userId,
+  withDeleteBtn,
+  withAddMore,
+  withTitle = true,
+  showTotal = true,
+}: Props) => {
   const dispatch = useDispatch();
   const { userCart, cartMsg } = useSelector((state) => state.user);
   const { listCell, productCardCells } = useInitProductsCells();
@@ -48,42 +60,41 @@ const CartArea = ({ userId, withDeleteBtn, withAddMore }: Props) => {
     }
   }, [cart, dispatch]);
 
-  if (cartLoading)
+  if (cartLoading) {
     return (
       <Spinner
+        fullWidth={true}
         content="Loading Cart Items..."
         style={{
           color: "var(--main)",
           fontWeight: "bold",
+          marginInline: "auto",
         }}
         settings={{ clr: "var(--main)" }}
       />
     );
-
-  if (cartErr) {
-    if (axios.isAxiosError(cartErrData))
-      <h1>
-        {cartErrData.response?.data.msg || cartErrData.response?.data || errMsg}
-      </h1>;
   }
 
-  if (!cart) return <strong>{errMsg}</strong>;
-  if (cartMsg)
-    return (
-      <strong
-        style={{
-          fontSize: 20,
-        }}
-      >
-        {cartMsg}
-      </strong>
-    );
+  if (cartErr || !cart || (!userCart && !cartMsg)) {
+    userCart?.products.length ? dispatch(resteCart()) : null;
 
-  if (!userCart && !cartMsg) return <h1>can't find the cart</h1>;
+    return (
+      <DisplayError
+        error={cartErrData!}
+        initMsg="Can't get your cart items at the moment"
+      />
+    );
+  }
+
+  if (cartMsg) {
+    userCart?.products.length ? dispatch(resteCart()) : null;
+
+    return <EmptyPage svg={cartSvg} content={cartMsg} />;
+  }
 
   return (
     <>
-      <h2>Cart items List</h2>
+      {withTitle && <h2>Cart items List</h2>}
 
       {!cartLoading && cartFetching && (
         <div
@@ -114,14 +125,15 @@ const CartArea = ({ userId, withDeleteBtn, withAddMore }: Props) => {
           })}
         </GridList>
 
-        <p
-          style={{
-            marginBlock: 10,
-          }}
-        >
-          <strong className="cell-prop-name">cart total price: </strong>
-          {userCart?.cartTotal}$
-        </p>
+        {showTotal && (
+          <PropCell
+            style={{
+              marginBlock: 10,
+            }}
+            name="cart total price"
+            val={`${userCart?.cartTotal || 0}$`}
+          />
+        )}
       </div>
     </>
   );

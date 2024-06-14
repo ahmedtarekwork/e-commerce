@@ -1,17 +1,25 @@
-import axios from "axios";
+// components
+import EmptyPage from "./EmptyPage";
 
-const DisplayError = ({
-  error,
-  initMsg,
-}: {
-  error: Error;
+// utils
+import { isAxiosError } from "axios";
+
+// SVGs
+import ErrorSvg from "../../../imgs/error.svg";
+
+type Props = {
+  error: Error | null;
   initMsg?: string;
-}) => {
+};
+
+const DisplayError = ({ error, initMsg }: Props) => {
   let msg = initMsg || "something went wrong!";
 
-  if (axios.isAxiosError(error))
+  if (isAxiosError(error))
     msg = error.response?.data.msg || error.response?.data;
 
-  return <h1>{msg}</h1>;
+  return (
+    <EmptyPage content={msg} svg={ErrorSvg} withBtn={{ type: "GoToHome" }} />
+  );
 };
 export default DisplayError;

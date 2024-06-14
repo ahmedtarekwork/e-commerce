@@ -1,5 +1,5 @@
 // react
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // router
 import { Link } from "react-router-dom";
@@ -20,11 +20,24 @@ import type { OrderProductType } from "../../../utiles/types";
 // hooks
 import useGetUserCart from "../../../hooks/ReactQuery/CartRequest/useGetUserCart";
 
-const MainBtnsList = () => {
+const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
   const dispatch = useDispatch();
   const { user, userCart } = useSelector((state) => state.user);
 
   const { refetch: getCart, data: cart } = useGetUserCart();
+
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    [
+      listRef.current,
+      ...((listRef.current?.querySelectorAll(
+        "*"
+      ) as unknown as HTMLElement[]) || []),
+    ].forEach((el) => {
+      if (el) el.dataset.type = type;
+    });
+  }, []);
 
   useEffect(() => {
     if (cart && !("msg" in cart)) dispatch(setCart(cart));
@@ -44,17 +57,29 @@ const MainBtnsList = () => {
 
   return (
     <ul className="main-btns-list">
-      {!user && (
-        <>
-          <Link to="/login">login</Link>
-          <Link to="/signup">signup</Link>
-        </>
-      )}
-
-      {user && (
+      {!user ? (
         <>
           <li>
-            <Link to="/cart" relative="path" id="header-cart-icon">
+            <Link title="go to login page btn" to="/login">
+              login
+            </Link>
+          </li>
+
+          <li>
+            <Link title="go to signup page btn" to="/signup">
+              signup
+            </Link>
+          </li>
+        </>
+      ) : (
+        <>
+          <li>
+            <Link
+              title="go to your cart btn"
+              to="/cart"
+              relative="path"
+              id="header-cart-icon"
+            >
               <span id="cart-products-length">
                 {productsLength > 9 ? "9+" : productsLength}
               </span>
@@ -64,7 +89,7 @@ const MainBtnsList = () => {
           </li>
 
           <li>
-            <Link to="/profile" className="close-side">
+            <Link title="go to profile page btn" to="/profile">
               <FaUserAlt />
               <span id="header-userName">
                 {user?.username || "Unknwon User"}
@@ -73,10 +98,7 @@ const MainBtnsList = () => {
           </li>
 
           <li>
-            <button
-              onClick={() => dispatch(logoutUser())}
-              className="close-side"
-            >
+            <button title="logout btn" onClick={() => dispatch(logoutUser())}>
               <IoLogOut className="logOut-icon" />
               signout
             </button>

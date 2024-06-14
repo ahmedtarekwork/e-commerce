@@ -30,7 +30,7 @@ export default (
   msgRef.current?.setMessageData?.({
     show: true,
     clr: "red",
-    time: timeout || 3000,
+    time: timeout || 4500,
     content: msg || "something went wrong",
   });
 };

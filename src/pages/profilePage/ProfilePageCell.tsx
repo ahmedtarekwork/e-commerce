@@ -102,6 +102,7 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
 
         <div className="profile-cell-btns-holder">
           <button
+            title="edit specific profile property btn"
             className={`${editMode ? "red-" : ""}btn`}
             disabled={isLoading}
             onClick={() => {
@@ -114,6 +115,7 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
 
           {editMode && (
             <button
+              title="save profile property new changes btn"
               ref={saveBtnRef}
               className={`${
                 isLoading ? "center fade scale spinner-pseudo-after " : ""

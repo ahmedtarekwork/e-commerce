@@ -37,7 +37,7 @@ const getCartQueryFn = async ({
   queryKey: string[];
 }): Promise<CartType | { msg: string }> => {
   const cart: CartResponseType | { msg: string } = (
-    await axiosWithToken("carts/get-user-cart" + (id ? "/" + id : ""))
+    await axiosWithToken(`carts/get-user-cart${id ? `/${id}` : ""}`)
   ).data;
 
   const emptyMsg = id

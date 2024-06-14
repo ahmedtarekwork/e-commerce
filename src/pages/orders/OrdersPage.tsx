@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
+// redux actions
 import { setOrders } from "../../store/fetures/ordersSlice";
 
 // components
@@ -32,7 +33,6 @@ const getOrdersQueryFn = async ({
   const endpoint = `orders${
     pathname.includes("dashboard") ? "" : "/user-orders"
   }`;
-
   const res = (await axiosWithToken(endpoint + "?withUser=true")).data;
   const finalRes = (res.orders || res).reverse();
 
@@ -47,7 +47,6 @@ const OrdersPage = () => {
   // get orders
   const {
     data: orders,
-    error,
     isError,
     isPending: isLoading,
   } = useQuery({
@@ -68,13 +67,14 @@ const OrdersPage = () => {
 
   return (
     <>
-      <div className="section">
-        <Heading content={isDashboard ? "Orders Page" : "Your Orders"} />
-      </div>
+      {!isError && (
+        <div className="section">
+          <Heading content={isDashboard ? "Orders Page" : "Your Orders"} />
+        </div>
+      )}
 
       <OrdersArea
         withEditStatus={isDashboard}
-        error={error}
         isError={isError}
         loading={isLoading}
         orders={orders || []}

@@ -82,6 +82,7 @@ const DonatePlanCard = ({
         <p className="donate-plan-card-description">{description}</p>
 
         <button
+          title="subscripe to this donate plan"
           disabled={isCurrentPlan || isPending}
           onClick={() => {
             if (user) {

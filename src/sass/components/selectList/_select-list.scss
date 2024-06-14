@@ -1,122 +1,162 @@
-.select-list-holder {
-  height: 100%;
-  @include flex(null, null);
-  flex-direction: column;
-}
-
-.select-list-holder.out-of-flow .select-list-list-holder {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  top: 100%;
-  --max-height: unset;
-  max-height: var(--max-height);
-  overflow-y: scroll;
-}
-
 .select-list {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-
-  button {
+  &-opt {
     width: 100%;
-  }
-  &-summary {
-    @include flex(space-between);
-    flex: 1;
-    background: #fff;
-
-    &.disabled {
-      cursor: not-allowed;
-    }
-
-    p {
-      pointer-events: none;
-      flex: 1;
-      text-align: left;
-    }
-    .app-arrow {
-      flex-basis: 12px;
-    }
-
-    border: var(--brdr) {
-      top: {
-        left-radius: var(--radius);
-        right-radius: var(--radius);
-      }
-      bottom: {
-        left-radius: var(--radius);
-        right-radius: var(--radius);
-      }
-    }
-
-    svg {
-      fill: var(--main);
-    }
-  }
-
-  &-list-holder {
-    transition: 0.3s;
-    height: 0;
-    overflow: hidden;
-    width: 100%;
-    background: #fff;
-  }
-
-  &-list {
-    border: var(--brdr) // color and width
- {
-      top: {
-        // radius
-        left-radius: 0;
-        right-radius: 0;
-      }
-
-      bottom: {
-        // radius
-        left-radius: 3px;
-        right-radius: 3px;
-      }
-    }
 
     button {
-      padding: 5px;
-      text-align: left;
+      text-align-last: left;
+      padding: 5px 7px;
+      width: 100%;
 
       &[data-selected="true"] {
-        background: var(--main);
+        background: var(--dark);
         color: #fff;
-      }
 
-      &:hover {
-        padding-right: 15px;
-
-        &[data-selected="true"] {
-          background: var(--dark);
-        }
-
-        &:not([data-selected="true"]) {
-          background: var(--trans);
-        }
-      }
-    }
-  }
-
-  &.active {
-    .select-list-summary {
-      border: {
-        bottom: {
-          color: transparent;
-          left-radius: 0;
-          right-radius: 0;
+        &:hover {
+          background: var(--main);
         }
       }
 
-      svg {
-        rotate: 180deg;
+      &:hover:not([data-selected="true"]) {
+        background: var(--trans);
       }
     }
   }
 }
+
+// @mixin setBorders($borderVal, $radius) {
+//   $borderTopRadius: map-get($radius, "top");
+//   $borderBottomRadius: map-get($radius, "bottom");
+
+//   border: $borderVal {
+//     top: {
+//       left-radius: $borderTopRadius;
+//       right-radius: $borderTopRadius;
+//     }
+//     bottom: {
+//       left-radius: $borderBottomRadius;
+//       right-radius: $borderBottomRadius;
+//     }
+//   }
+// }
+
+// .select-list-holder {
+//   height: 100%;
+//   @include flex(null, null);
+//   flex-direction: column;
+// }
+
+// .select-list.out-of-flow .select-list-list-holder {
+//   position: absolute;
+//   z-index: 1;
+//   left: 0;
+//   top: 100%;
+//   --max-height: unset;
+//   max-height: var(--max-height);
+//   border-bottom-right-radius: var(--radius);
+//   border-bottom-left-radius: var(--radius);
+
+//   &.custom-width {
+//     width: max-content !important;
+//   }
+// }
+// .select-list {
+//   position: relative;
+//   display: flex;
+//   flex-direction: column;
+//   flex: 1;
+//   height: 100%;
+
+//   button {
+//     width: 100%;
+//   }
+
+//   &-summary {
+//     @include flex(space-between, center, 10px);
+//     flex: 1;
+//     background: #fff;
+
+//     &.disabled {
+//       cursor: not-allowed;
+//     }
+
+//     p {
+//       pointer-events: none;
+//       flex: 1;
+//       text-align: left;
+//     }
+//     .app-arrow {
+//       flex-basis: 12px;
+//     }
+
+//     @include setBorders(
+//       var(--brdr),
+//       (
+//         "top": var(--radius),
+//         "bottom": var(--radius),
+//       )
+//     );
+
+//     svg {
+//       fill: var(--main);
+//     }
+//   }
+
+//   &-list-holder {
+//     transition: grid-template-rows 0.3s;
+//     display: grid;
+//     grid-template-rows: 0fr;
+//     overflow: hidden;
+//     background: #fff;
+//     width: 100%;
+//   }
+
+//   &-list {
+//     @include setBorders(
+//       var(--brdr),
+//       (
+//         "top": 0,
+//         "bottom": 3px,
+//       )
+//     );
+
+//     button {
+//       padding: 5px;
+//       text-align: left;
+
+//       &[data-selected="true"] {
+//         background: var(--main);
+//         color: #fff;
+//       }
+
+//       &:hover {
+//         &[data-selected="true"] {
+//           background: var(--dark);
+//         }
+
+//         &:not([data-selected="true"]) {
+//           background: var(--trans);
+//         }
+//       }
+//     }
+//   }
+
+//   &.active {
+//     .select-list-list-holder {
+//       grid-template-rows: 1fr;
+//     }
+
+//     .select-list-summary {
+//       border: {
+//         bottom: {
+//           color: transparent;
+//           left-radius: 0;
+//           right-radius: 0;
+//         }
+//       }
+
+//       svg {
+//         rotate: 180deg;
+//       }
+//     }
+//   }
+// }

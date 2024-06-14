@@ -29,12 +29,15 @@
   .logo {
     color: var(--main);
     transition: 0.3s;
+    padding: 5px;
     font : {
       size: 21px;
       weight: 800;
     }
+    @include flex(center, center, 10px);
+    flex-wrap: wrap;
+    text-align: center;
 
-    padding: 5px;
     &:hover {
       color: var(--dark);
     }

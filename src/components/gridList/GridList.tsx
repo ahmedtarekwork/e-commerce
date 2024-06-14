@@ -1,8 +1,16 @@
 // react
-import { CSSProperties, ComponentProps, ReactNode, useState } from "react";
+import {
+  useState,
+
+  // types
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 // components
 import FillIcon from "../FillIcon";
+import GridListSearch, { type GridListSearchProps } from "./GridListSearch";
 
 // icons
 import { TfiLayoutGrid3, TfiLayoutGrid3Alt } from "react-icons/tfi";
@@ -19,7 +27,8 @@ type Props = {
   initType: ListType;
   isChanging?: boolean;
   withMargin?: boolean;
-};
+  withSearch?: GridListSearchProps;
+} & ComponentProps<"ul">;
 
 const GridList = ({
   children,
@@ -27,10 +36,11 @@ const GridList = ({
   initType,
   isChanging = true,
   withMargin,
+  withSearch,
+  ...attr
 }: Props) => {
   const [type, setType] = useState<ListType>(initType);
 
-  const attr = {} as ComponentProps<"ul">;
   if (type === "row")
     attr.style = {
       "--list-item-cell-width": 100 / cells.length + "%",
@@ -39,30 +49,40 @@ const GridList = ({
 
   return (
     <>
-      {isChanging && (
-        <div className="grid-list-switcher-btns">
-          <button
-            onClick={() => setType("column")}
-            className={`btn ${type === "column" ? "active" : ""}`}
-          >
-            <FillIcon
-              stroke={<TfiLayoutGrid3 />}
-              fill={<TfiLayoutGrid3Alt />}
-            />
-          </button>
+      {(isChanging || withSearch) && (
+        <div className="grid-list-extensions-holder">
+          {withSearch && <GridListSearch {...withSearch} />}
 
-          <button
-            onClick={() => setType("row")}
-            className={`btn ${type === "row" ? "active" : ""}`}
-          >
-            <FillIcon stroke={<PiRowsBold />} fill={<PiRowsFill />} />
-          </button>
+          {isChanging && (
+            <div className="grid-list-switcher-btns">
+              <button
+                title="switch list to columns type btn"
+                onClick={() => setType("column")}
+                className={`btn ${type === "column" ? "active" : ""}`}
+              >
+                <FillIcon
+                  stroke={<TfiLayoutGrid3 />}
+                  fill={<TfiLayoutGrid3Alt />}
+                />
+              </button>
+
+              <button
+                title="switch list to rows type btn"
+                onClick={() => setType("row")}
+                className={`btn ${type === "row" ? "active" : ""}`}
+              >
+                <FillIcon stroke={<PiRowsBold />} fill={<PiRowsFill />} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       <ul
-        className={`${type}s-list grid-list${withMargin ? " with-margin" : ""}`}
         {...attr}
+        className={`${type}s-list grid-list${withMargin ? " with-margin" : ""}${
+          attr.className ? ` ${attr.className}` : ""
+        }`}
       >
         {type !== "column" && (
           <li className="rows-list-header">

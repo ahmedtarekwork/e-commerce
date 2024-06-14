@@ -39,8 +39,14 @@
   }
 }
 
-// .columns-list | .rows-list \\
+// grid list extensions
+.grid-list-extensions-holder {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
+// switch list type btns
 .grid-list-switcher-btns {
   @media (max-width: 630px) {
     display: none !important;
@@ -53,6 +59,35 @@
 
     &.active {
       background-color: var(--dark);
+    }
+  }
+}
+
+// grid list search holder
+.grid-list-search-holder {
+  display: flex;
+  flex: 1;
+  .input-holder {
+    flex: 1;
+  }
+
+  @mixin removeRadius($dir) {
+    border : {
+      top-#{$dir}-radius: 0 !important;
+      bottom-#{$dir}-radius: 0 !important;
+    }
+  }
+  &.remove-borders {
+    .input-holder {
+      input {
+        height: 100%;
+        @include removeRadius(right);
+      }
+    }
+
+    .select-list-summary {
+      border-left: 0;
+      @include removeRadius(left);
     }
   }
 }
@@ -121,9 +156,6 @@
       > *:not(:has(.select-list-holder.out-of-flow), .delete-product-btn) {
         display: flex;
         justify-content: center;
-        overflow: hidden;
-        overflow-wrap: break-word;
-        text-align: center;
       }
     }
 

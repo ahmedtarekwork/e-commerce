@@ -23,6 +23,7 @@ const OrderCard = ({
     paymentIntent: { amount, method },
     createdAt,
     orderby,
+    removedProductsCount,
   },
   withId = false,
   loading = false,
@@ -32,6 +33,7 @@ const OrderCard = ({
 
   return (
     <Link
+      title="go to single order page btn"
       to={`${pathname.includes("dashboard") ? "/dashboard" : ""}/orders/${_id}`}
       relative="path"
       className={`order-card${loading ? " loading" : ""}`}
@@ -48,10 +50,10 @@ const OrderCard = ({
         <li>
           <PropCell
             name="Items Count"
-            val={products
-              .map((p) => p.count)
-              .reduce((a, b) => a + b)
-              .toString()}
+            val={
+              products.map((p) => p.count).reduce((a, b) => a + b, 0) +
+              removedProductsCount
+            }
           />
         </li>
         <li>

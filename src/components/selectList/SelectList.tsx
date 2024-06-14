@@ -1,7 +1,13 @@
-import { useState, useEffect, useRef, MouseEvent, CSSProperties } from "react";
+import {
+  useState,
+  useRef,
+
+  // types
+  type MouseEvent,
+} from "react";
 
 // components
-import Arrow from "./Arrow";
+import ListWrapper, { type ListWrapperRefType } from "../ListWrapper";
 
 // utiles
 import { nanoid } from "@reduxjs/toolkit";
@@ -10,117 +16,217 @@ export type selectListOptionType<T extends string = string> = {
   selected: boolean;
   text: T;
 };
-type props = {
+
+export type SelectListComponentProps = {
   disabled?: {
     value: boolean;
     text?: string;
   };
   listOptsArr: selectListOptionType[];
   optClickFunc: (e: MouseEvent<HTMLButtonElement>) => void;
-  label: string;
+  label?: string;
   id: string;
-  outOfFlow?: boolean;
+  outOfFlow?:
+    | {
+        value: true;
+        fullWidth: boolean;
+      }
+    | {
+        value: false;
+      };
 };
 
 const SelectList = ({
   listOptsArr,
   label,
-  id,
+  // id,
   optClickFunc,
   disabled,
   outOfFlow,
-}: props) => {
-  // Refs
-  const theList = useRef<HTMLUListElement>(null);
-  const toggleListBtn = useRef<HTMLButtonElement>(null);
-
-  // useStates
-  const [toggleList, setToggleList] = useState(false);
+}: SelectListComponentProps) => {
+  // states
   const [list, setList] = useState(listOptsArr);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clickFunc = (e: any) =>
-      e.target !== toggleListBtn.current && setToggleList(false);
+  const listWrapperRef = useRef<ListWrapperRefType>(null);
 
-    const keyDownFunc = (e: KeyboardEvent) =>
-      e.key === "Escape" && setToggleList(false);
+  // Refs
+  // const toggleListBtnRef = useRef<HTMLButtonElement>(null);
+  // const theListRef = useRef<HTMLUListElement>(null);
 
-    // closeing selectList
-    window.addEventListener("click", clickFunc);
-    window.addEventListener("keydown", keyDownFunc);
+  // useEffect(() => {
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const clickFunc = (e: any) =>
+  //     setToggleList(toggleListBtnRef.current?.isEqualNode(e.target) || false);
 
-    return () => {
-      window.removeEventListener("click", clickFunc);
-      window.removeEventListener("keydown", keyDownFunc);
-    };
-  }, []);
+  //   const keyDownFunc = (e: KeyboardEvent) => setToggleList(e.key === "Escape");
 
-  useEffect(() => {
-    const theListEl = theList.current;
+  //   // closeing selectList
+  //   window.addEventListener("click", clickFunc);
+  //   window.addEventListener("keydown", keyDownFunc);
 
-    if (theListEl?.parentElement) {
-      if (toggleList)
-        theListEl.parentElement.style.height = `${theListEl.offsetHeight}px`;
-      else theListEl.parentElement.style.removeProperty("height");
-    }
-  }, [toggleList]);
+  //   const list = theListRef.current;
+  //   const btn = toggleListBtnRef.current;
+
+  //   if (outOfFlow?.value && !outOfFlow.fullWidth) {
+  //     if (list && btn) {
+  //       const btnStyles = getComputedStyle(btn);
+  //       const additionWidth = [
+  //         btnStyles.gap,
+  //         btnStyles.paddingLeft,
+  //         btnStyles.paddingRight,
+  //       ]
+  //         .map((style) => +style.replace("px", ""))
+  //         .reduce((a, c) => a + c);
+
+  //       [btn, list].forEach(
+  //         (el) => (el.style.width = `${list.offsetWidth + additionWidth}px`)
+  //       );
+  //     }
+  //   }
+
+  //   return () => {
+  //     window.removeEventListener("click", clickFunc);
+  //     window.removeEventListener("keydown", keyDownFunc);
+
+  //     if (outOfFlow && list && btn) {
+  //       [btn, list].forEach((el) => el.style.removeProperty("width"));
+  //     }
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   const theListEl = theListRef.current;
+  //   const listHolder = theListEl?.parentElement;
+
+  //   if (listHolder) {
+  //     const timeToOpen =
+  //       parseFloat(getComputedStyle(listHolder).transitionDuration) * 1000;
+
+  //     if (toggleList) {
+  //       listHolder.style.height = `${theListEl.offsetHeight}px`;
+
+  //       setTimeout(() => (listHolder.style.overflowY = "auto"), timeToOpen);
+  //     } else {
+  //       listHolder.style.removeProperty("height");
+  //       listHolder.style.removeProperty("overflow-y");
+  //     }
+  //   }
+  // }, [toggleList]);
+
+  // let additionalClssNames = outOfFlow?.value ? " out-of-flow" : "";
+  // if (outOfFlow?.value && !outOfFlow.fullWidth) {
+  //   additionalClssNames += " custom-width";
+  // }
 
   return (
-    <div className={`select-list-holder${outOfFlow ? " out-of-flow" : ""}`}>
-      <div id={id} className={`select-list ${toggleList ? "active" : ""}`}>
-        <button
-          disabled={disabled?.value}
-          type="button"
-          className={`select-list-summary${disabled?.value ? " disabled" : ""}`}
-          onClick={() => setToggleList(!toggleList)}
-          ref={toggleListBtn}
-        >
+    <ListWrapper
+      ref={listWrapperRef}
+      outOfFlow={outOfFlow}
+      disabled={disabled}
+      btnData={{
+        children: (
           <p className="select-list-selected-opt">
             {(disabled?.value ? disabled.text : "") ||
               list.find((o) => o.selected)?.text ||
               label}
           </p>
-          <Arrow active={toggleList} />
-        </button>
+        ),
+      }}
+    >
+      <ul className="select-list">
+        {list.map((opt) => (
+          <li className="select-list-opt" key={nanoid()}>
+            <button
+              title="select list option"
+              data-selected={opt.selected}
+              data-opt={opt.text} // it's necessary to can access it when calling the component and set the "optClickFunc"
+              onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                optClickFunc?.(e);
 
-        <div
-          className="select-list-list-holder"
-          style={
-            {
-              "--max-height": `calc(100vh - (${
-                theList.current?.parentElement?.getBoundingClientRect().top || 0
-              }px))`,
-            } as CSSProperties
-          }
-        >
-          <ul className="select-list-list" ref={theList}>
-            {list.map((opt) => (
-              <li className="select-list-opt" key={nanoid()}>
-                <button
-                  data-selected={opt.selected}
-                  data-opt={opt.text} // it's neccessary to can access it when calling the component and set the "optClickFunc"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    optClickFunc?.(e);
-                    setToggleList(false);
-                    setList((prev) =>
-                      prev.map((o) =>
-                        o.text === opt.text
-                          ? { ...o, selected: true }
-                          : { ...o, selected: false }
-                      )
-                    );
-                  }}
-                  type="button"
-                >
-                  {opt.text}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
+                listWrapperRef.current?.setToggleList(false);
+
+                setList((prev) =>
+                  prev.map((o) =>
+                    o.text === opt.text
+                      ? { ...o, selected: true }
+                      : { ...o, selected: false }
+                  )
+                );
+              }}
+              type="button"
+            >
+              {opt.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </ListWrapper>
+
+    // <div
+    //   className={`select-list${additionalClssNames}${
+    //     toggleList ? " active" : ""
+    //   }`}
+    // >
+    //   <button
+    //     title="select list open btn"
+    //     disabled={disabled?.value}
+    //     type="button"
+    //     className={`select-list-summary${disabled?.value ? " disabled" : ""}`}
+    //     onClick={() => setToggleList(!toggleList)}
+    //     ref={toggleListBtnRef}
+    //   >
+    //     <p className="select-list-selected-opt">
+    //       {(disabled?.value ? disabled.text : "") ||
+    //         list.find((o) => o.selected)?.text ||
+    //         label}
+    //     </p>
+    //     <Arrow active={toggleList} />
+    //   </button>
+
+    //   <div
+    //     className="select-list-list-holder"
+    //     style={
+    //       {
+    //         "--max-height": `calc(100vh - (${
+    //           theListRef.current?.parentElement?.getBoundingClientRect().top ||
+    //           0
+    //         }px + 10px))`,
+    //       } as CSSProperties
+    //     }
+    //   >
+    //     <ul
+    //       className="select-list-list"
+    //       ref={theListRef}
+    //       style={{
+    //         overflow: "hidden",
+    //       }}
+    //     >
+    //       {list.map((opt) => (
+    //         <li className="select-list-opt" key={nanoid()}>
+    //           <button
+    //             title="select list option"
+    //             data-selected={opt.selected}
+    //             data-opt={opt.text} // it's necessary to can access it when calling the component and set the "optClickFunc"
+    //             onClick={(e: MouseEvent<HTMLButtonElement>) => {
+    //               optClickFunc?.(e);
+    //               setToggleList(false);
+    //               setList((prev) =>
+    //                 prev.map((o) =>
+    //                   o.text === opt.text
+    //                     ? { ...o, selected: true }
+    //                     : { ...o, selected: false }
+    //                 )
+    //               );
+    //             }}
+    //             type="button"
+    //           >
+    //             {opt.text}
+    //           </button>
+    //         </li>
+    //       ))}
+    //     </ul>
+    //   </div>
+    // </div>
   );
 };
 

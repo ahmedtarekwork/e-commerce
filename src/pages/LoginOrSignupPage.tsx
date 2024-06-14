@@ -1,5 +1,5 @@
 // react
-import { CSSProperties, useRef, useEffect, useState } from "react";
+import { type CSSProperties, useRef, useEffect, useState } from "react";
 
 // react-router-dom
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { setUser } from "../store/fetures/userSlice";
 // components
 import FormInput from "../components/appForm/Input/FormInput";
 import FormList from "../components/appForm/FormList";
-import TopMessage, { TopMessageRefType } from "../components/TopMessage";
+import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
 
 // react-hook-form
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -257,6 +257,7 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
         )}
 
         <button
+          title="login or signup btn"
           ref={submitBtnRef}
           className={`btn ${
             loginLoading || registerLoading
@@ -276,11 +277,17 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
       <p className="auth-msg">
         {type === "login" ? (
           <>
-            you don't have an account? <Link to="/signup">signup</Link>
+            you don't have an account?{" "}
+            <Link title="go to signup page btn" to="/signup">
+              signup
+            </Link>
           </>
         ) : (
           <>
-            you have an account already? <Link to="/login">login</Link>
+            you have an account already?{" "}
+            <Link title="go to login page btn" to="/login">
+              login
+            </Link>
           </>
         )}
       </p>

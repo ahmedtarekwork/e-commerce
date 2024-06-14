@@ -1,10 +1,11 @@
-import { ComponentProps } from "react";
 import { store } from "../store/store";
 
 export type getArrayType<T> = T extends (infer U)[] ? U : T;
 
 // redux
 export type RootStateType = ReturnType<typeof store.getState>;
+
+export type HomePageSliderImgType = { _id: string; image: string };
 
 export type UserType = {
   username: string;
@@ -63,6 +64,7 @@ export type OrderType = {
     currency: string;
   };
 
+  removedProductsCount: number;
   products: OrderProductType[];
   createdAt: string;
 };
@@ -85,14 +87,4 @@ export type ProductType = {
     comments: string;
     postedby: string;
   }[];
-};
-
-// components \\
-export type InputPropsType = ComponentProps<"input"> & {
-  label?: string;
-  errorMsg?: string;
-
-  noSubmit?: boolean;
-  submitFunction?: () => void;
-  inputFunction?: () => void;
 };

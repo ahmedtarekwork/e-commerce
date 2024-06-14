@@ -1,13 +1,19 @@
 // react
-import { Dispatch, RefObject, SetStateAction, useEffect } from "react";
+import {
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+  useEffect,
+} from "react";
 
 // react-router-dom
 import { Link } from "react-router-dom";
 
 // redux
 import useDispatch from "../../../hooks/redux/useDispatch";
-import { logoutUser } from "../../../store/fetures/userSlice";
 import useSelector from "../../../hooks/redux/useSelector";
+// redux actions
+import { logoutUser } from "../../../store/fetures/userSlice";
 
 // components
 import GridListItem from "../../../components/gridList/GridListItem";
@@ -17,9 +23,9 @@ import useDeleteUserBtn from "../../../hooks/ReactQuery/useDeleteUserBtn";
 import handleError from "../../../utiles/functions/handleError";
 
 // types
-import { AppModalRefType } from "../../../components/modals/appModal/AppModal";
-import { TopMessageRefType } from "../../../components/TopMessage";
-import { OrderType, UserType } from "../../../utiles/types";
+import type { AppModalRefType } from "../../../components/modals/appModal/AppModal";
+import type { TopMessageRefType } from "../../../components/TopMessage";
+import type { OrderType, UserType } from "../../../utiles/types";
 
 type Props = {
   user: UserType & { orders: OrderType[] };
@@ -58,6 +64,7 @@ const ShowOrdersBtn = ({
   modalRef: Props["modalRef"];
 }) => (
   <button
+    title="show user orders btn"
     className="btn"
     onClick={() => {
       modalRef.current?.toggleModal(true);
@@ -136,6 +143,7 @@ const UsersPageCell = ({
         email,
         username: (
           <Link
+            title="go to single user page btn"
             className="btn"
             style={{ width: "100%" }}
             to={"/dashboard/singleUser/" + _id}

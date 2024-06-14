@@ -1,5 +1,5 @@
 // react
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // react-router-dom
 import { useLocation, useParams, useNavigate } from "react-router-dom";
@@ -11,25 +11,33 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import useSelector from "../../hooks/redux/useSelector";
 import useDispatch from "../../hooks/redux/useDispatch";
 // actions
-import { addProduct } from "../../store/fetures/productsSlice";
+import { addProducts } from "../../store/fetures/productsSlice";
 
 // react query
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 // components
 import FormInput from "../../components/appForm/Input/FormInput";
 import ErrorDiv from "../../components/appForm/Input/ErrorDiv";
+import SplashScreen from "../../components/spinners/SplashScreen";
+import EmptyPage from "../../components/layout/EmptyPage";
+import DisplayError from "../../components/layout/DisplayError";
+import TopMessage, {
+  type TopMessageRefType,
+} from "../../components/TopMessage";
 import ImgInputPreview, {
-  ImgInputPreviewRefType,
+  type ImgInputPreviewRefType,
 } from "../../components/appForm/ImgInputPreview";
-import TopMessage, { TopMessageRefType } from "../../components/TopMessage";
 
 // utiles
 import handleError from "../../utiles/functions/handleError";
-import { axiosWithToken } from "../../utiles/axios";
+import axios, { axiosWithToken } from "../../utiles/axios";
 
 // types
 import type { ProductType } from "../../utiles/types";
+
+// SVGs
+import IdRequiredSvg from "../../../imgs/ID_required.svg";
 
 export type ProductFormValues = Omit<
   ProductType,
@@ -44,6 +52,15 @@ export type requestProductType = Omit<
 >;
 
 // fetchers
+const getSingleProductQueryFn = async ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  queryKey: [_key, productId],
+}: {
+  queryKey: [string, string];
+}) => {
+  return (await axios.get(`products/${productId}`)).data;
+};
+
 const addProductMutationFn = async (productData: requestProductType) => {
   return (await axiosWithToken.post("/products", productData)).data;
 };
@@ -68,15 +85,31 @@ const NewProductPage = () => {
 
   // redux
   const disaptch = useDispatch();
-  const product = useSelector((state) =>
+  const appProduct = useSelector((state) =>
     state.products.products.find((prd) => prd._id === (id || ""))
   );
+
+  const [product, setProduct] = useState<ProductType | undefined>(appProduct);
 
   // refs
   const submitBtnRef = useRef<HTMLButtonElement>(null);
   const imgsList = useRef<ImgInputPreviewRefType>(null);
   const msgRef = useRef<TopMessageRefType>(null);
+
   // react query
+  const {
+    refetch: getResProduct,
+    data: resProduct,
+    isError: resProductErr,
+    error: resProductErrData,
+    isPending: resProductLoading,
+    fetchStatus: resProductFetchStatus,
+  } = useQuery({
+    queryKey: ["getSingleProduct", id || ""],
+    queryFn: getSingleProductQueryFn,
+    enabled: false,
+  });
+
   // make a new product
   const {
     data: productData,
@@ -86,7 +119,7 @@ const NewProductPage = () => {
     isError: productErr,
     error: productErrData,
   } = useMutation({
-    mutationKey: ["addProduct"],
+    mutationKey: ["s"],
     mutationFn: addProductMutationFn,
   });
   // edit existing product
@@ -140,6 +173,14 @@ const NewProductPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!product && id) getResProduct();
+  }, [id, product]);
+
+  useEffect(() => {
+    if (resProduct) setProduct(resProduct);
+  }, [resProduct]);
+
   // if the page is edit product => fill in form inputs with product data
   useEffect(() => {
     if (isEditMode) {
@@ -181,7 +222,7 @@ const NewProductPage = () => {
           show: true,
           time: 3500,
         });
-        disaptch(addProduct(productData));
+        disaptch(addProducts([productData]));
         reset();
         imgsList.current?.setImgsList([]);
       }
@@ -200,7 +241,7 @@ const NewProductPage = () => {
   useEffect(() => {
     if (editStatus !== "idle") {
       if (editSuccess) {
-        navigate("/products", { relative: "path" });
+        navigate("/dashboard/products", { relative: "path" });
       }
 
       if (editErr) {
@@ -214,9 +255,36 @@ const NewProductPage = () => {
     }
   }, [editStatus, editErr, editErrData, editSuccess, navigate]);
 
+  if (isEditMode && resProductLoading && resProductFetchStatus !== "idle") {
+    return <SplashScreen children="Loading The Product..." />;
+  }
+
+  if (isEditMode && !id) {
+    return (
+      <EmptyPage
+        svg={IdRequiredSvg}
+        content="Product Id is required!"
+        withBtn={{ type: "GoToHome" }}
+      />
+    );
+  }
+
+  if (isEditMode && resProductErr) {
+    return (
+      <DisplayError
+        error={resProductErrData}
+        initMsg="Can't get the product at the moment"
+      />
+    );
+  }
+
   return (
     <>
-      <h1>make a new product</h1>
+      <h1 className="product-form-page-title">
+        {isEditMode
+          ? `Edit ${product?.title ? `"${product.title}"` : "The Product"}`
+          : "make a new product"}
+      </h1>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormInput
@@ -244,7 +312,7 @@ const NewProductPage = () => {
         />
         <FormInput
           errorMsg={brandErr?.message}
-          placeholder="product brand name"
+          placeholder="brand name"
           {...register("brand", {
             required: "brand name is required",
           })}
@@ -290,6 +358,7 @@ const NewProductPage = () => {
         />
 
         <button
+          title="add product or save it's new changes btn"
           ref={submitBtnRef}
           disabled={productLoading || editLoading}
           className={`btn ${

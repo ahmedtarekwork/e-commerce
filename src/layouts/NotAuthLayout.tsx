@@ -1,25 +1,30 @@
-// react
-import * as reactRedux from "react-redux";
 // react-router-dom
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+
+// redux
+import useSelector from "../hooks/redux/useSelector";
+
 // components
 import SplashScreen from "../components/spinners/SplashScreen";
-// types
-import { RootStateType } from "../utiles/types";
+import EmptyPage from "../components/layout/EmptyPage";
+
+// SVGs
+import notAllowedSvg from "../../imgs/not_allowed.svg";
 
 const NotAuthLayout = ({ loading }: { loading: boolean }) => {
-  const { user } = reactRedux.useSelector((state: RootStateType) => state.user);
+  const { user } = useSelector((state) => state.user);
 
   if (loading) return <SplashScreen />;
 
   if (!user?.isAdmin) {
     return (
-      <>
-        <h1>you don't have access to dashboard</h1>
-        <Link className="btn" to="/" relative="path">
-          Go to Home page
-        </Link>
-      </>
+      <EmptyPage
+        content="You don't have access to the dashboard!"
+        svg={notAllowedSvg}
+        withBtn={{
+          type: "GoToHome",
+        }}
+      />
     );
   }
 

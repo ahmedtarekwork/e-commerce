@@ -11,31 +11,38 @@ import WishlistArea from "../../../components/WishlistArea";
 import CartOrWishlistPageBtns from "./CartOrWishlistPageComponents/CartOrWishlistPageBtns";
 
 const CartOrWishlistPage = () => {
-  const { user } = useSelector((state) => state.user);
+  const { user, userCart } = useSelector((state) => state.user);
 
   const { pathname } = useLocation();
   const isCartPage = pathname.includes("cart");
 
+  let title = isCartPage && userCart?.products.length ? "Your Cart" : "";
+  if (!isCartPage && user?.wishlist.length) title = "Your Wishlist";
+
   return (
-    <>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <div className="section">
-        <Heading content={isCartPage ? "Your Cart" : "Your Wishlist"} />
+        <Heading content={title} />
       </div>
 
       {isCartPage ? (
-        <CartArea withAddMore withDeleteBtn="cart" />
+        <CartArea
+          withTitle={false}
+          withAddMore
+          withDeleteBtn="cart"
+          showTotal={false}
+        />
       ) : (
         <WishlistArea
           withDeleteBtn="wishlist"
           isCurrentUserProfile
           wishlist={user?.wishlist || []}
+          withTitle={false}
         />
       )}
 
-      <hr style={{ marginBlock: 15 }} />
-
       <CartOrWishlistPageBtns isCartPage={isCartPage} />
-    </>
+    </div>
   );
 };
 export default CartOrWishlistPage;

@@ -5,42 +5,49 @@ import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 // react query
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  // , useQuery
+} from "@tanstack/react-query";
 
 // redux
-import useSelector from "../hooks/redux/useSelector";
-import useDispatch from "../hooks/redux/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
 import {
   setUser,
+
   // user cart
   setCart,
   resteCart,
-} from "../store/fetures/userSlice";
+} from "../../store/fetures/userSlice";
 
 // components
-import ImgsSlider from "./ImgsSlider";
-import PropCell from "./PropCell";
-import TopMessage, { TopMessageRefType } from "./TopMessage";
-import FillIcon from "./FillIcon";
-import EmptySpinner from "./spinners/EmptySpinner";
-import SelectList, { selectListOptionType } from "./selectList/SelectList";
+import ImgsSlider from "../ImgsSlider";
+import PropCell from "../PropCell";
+import TopMessage, { type TopMessageRefType } from "../TopMessage";
+import FillIcon from "../FillIcon";
+import EmptySpinner from "../spinners/EmptySpinner";
+// import SelectList, {
+//   type selectListOptionType,
+// } from "../selectList/SelectList";
 
 // icons
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { AiOutlineDelete, AiFillDelete } from "react-icons/ai";
 
 // utils
-import handleError from "../utiles/functions/handleError";
-import { axiosWithToken } from "../utiles/axios";
+import handleError from "../../utiles/functions/handleError";
+import { axiosWithToken } from "../../utiles/axios";
 
 // types
-import type { OrderProductType, ProductType } from "../utiles/types";
+import type { OrderProductType, ProductType } from "../../utiles/types";
 
 // hooks
-import useInitProductsCells from "../hooks/useInitProductsCells";
-import useAddToCart from "../hooks/ReactQuery/CartRequest/useAddToCart";
-import useToggleFromWishlist from "../hooks/ReactQuery/useToggleFromWishlist";
+import useInitProductsCells from "../../hooks/useInitProductsCells";
+import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
+import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
+import ProductCardQtyList from "./ProductCardQtyList";
 
 export type ProductCardDeleteBtn = {
   withDeleteBtn?: "cart" | "wishlist";
@@ -53,20 +60,14 @@ type Props = ProductCardDeleteBtn & {
   withAddToWishList?: boolean;
   withAddMore?: boolean;
   imgWidth?: `${number}px`;
+  TagName?: "div" | "li";
+  withQty?: boolean;
+  className?: string;
 };
 
 // fetchers
 const removeItemFromCartMutationFn = async (prdId: string) => {
   return (await axiosWithToken.delete("/carts/cartProduct/" + prdId)).data;
-};
-
-const getProductQtyQueryFn = async ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  queryKey: [_key, prdId],
-}: {
-  queryKey: string[];
-}) => {
-  return (await axiosWithToken("products/" + prdId)).data.quantity;
 };
 
 const ProductCard = ({
@@ -77,6 +78,9 @@ const ProductCard = ({
   withDeleteBtn,
   withAddMore,
   imgWidth,
+  withQty = true,
+  TagName = "li",
+  className,
 }: Props) => {
   const dispatch = useDispatch();
   const { _id, imgs, title } = product;
@@ -84,12 +88,19 @@ const ProductCard = ({
   const { pathname } = useLocation();
   const { productCardCells } = useInitProductsCells();
 
-  const itemRef = useRef<HTMLLIElement>(null);
+  const filterdCells = (cells || productCardCells).filter((prop) => {
+    if (withQty) return prop;
+    if (!withQty && prop === "quantity") return;
+    return prop;
+  });
+
   const msgRef = useRef<TopMessageRefType>(null);
   const deleteProductBtnRef = useRef<HTMLButtonElement>(null);
 
   const { userCart, user } = useSelector((state) => state.user);
   const isInStock = +((product as ProductType).quantity || 0) > 0;
+
+  // react query \\
 
   // add to cart
   const {
@@ -120,17 +131,7 @@ const ProductCard = ({
     isPending: wishlistLoading,
   } = useToggleFromWishlist(_id);
 
-  // get product qty
-  const {
-    refetch: getProductQty,
-    data: resProductQty,
-    isPending: productQtyLoading,
-    isError: productQtyErr,
-  } = useQuery({
-    queryKey: ["getProductQty", _id],
-    queryFn: getProductQtyQueryFn,
-    enabled: false,
-  });
+  // useEffects \\
 
   useEffect(() => {
     if (wishlistErr)
@@ -181,21 +182,38 @@ const ProductCard = ({
 
   return (
     <>
-      <li ref={itemRef} key={_id} className="product-card">
+      <TagName
+        key={_id}
+        className={`product-card${className ? ` ${className}` : ""}`}
+      >
         {withAddToWishList && (
-          <button
-            disabled={wishlistLoading}
-            className={`add-to-wishlist${
-              user?.wishlist.find((prdId) => prdId === _id) ? " active" : ""
-            }`}
-            onClick={toggleFromWishlist}
-          >
-            {wishlistLoading ? (
-              <EmptySpinner settings={{ diminsions: "12px" }} />
+          <>
+            {user ? (
+              <button
+                title="add to wishlist btn"
+                disabled={wishlistLoading}
+                className={`add-to-wishlist${
+                  user?.wishlist.find((prdId) => prdId === _id) ? " active" : ""
+                }`}
+                onClick={toggleFromWishlist}
+              >
+                {wishlistLoading ? (
+                  <EmptySpinner settings={{ diminsions: "20px" }} />
+                ) : (
+                  <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
+                )}
+              </button>
             ) : (
-              <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
+              <Link
+                title="add product to wishlist btn"
+                className="add-to-wishlist"
+                to="/login"
+                relative="path"
+              >
+                <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
+              </Link>
             )}
-          </button>
+          </>
         )}
 
         <ImgsSlider imgWidth={imgWidth || "150px"} imgs={imgs} />
@@ -203,56 +221,15 @@ const ProductCard = ({
         <div className="product-data-big-holder">
           <strong className="product-card-title">{title}</strong>
 
-          {(cells || productCardCells).map((prop) => {
+          {filterdCells.map((prop) => {
             if (withAddMore && prop === "count") {
-              getProductQty();
-
-              if (productQtyLoading)
-                return (
-                  <EmptySpinner key={prop} settings={{ diminsions: "10px" }} />
-                );
-              if (productQtyErr)
-                return (
-                  <PropCell
-                    key={prop}
-                    name={prop}
-                    val={product[prop as keyof typeof product]?.toString()}
-                  />
-                );
-
-              const list = Array.from({
-                length: resProductQty,
-              }).map((_, i) => ({
-                selected: (product as OrderProductType).count === i + 1,
-                text: i + 1,
-              })) as unknown as selectListOptionType<`${number}`>[];
-
               return (
-                <PropCell
+                <ProductCardQtyList
+                  addToCart={addToCart}
+                  cartLoading={cartLoading}
+                  product={product}
+                  propName={prop}
                   key={prop}
-                  name={prop}
-                  val={
-                    <SelectList
-                      disabled={{
-                        value: cartLoading,
-                        text: "loading...",
-                      }}
-                      outOfFlow
-                      optClickFunc={(e) => {
-                        const value = e.currentTarget.dataset.opt;
-
-                        if (value)
-                          addToCart({
-                            productId: _id,
-                            count:
-                              +value - +(product as OrderProductType).count,
-                          });
-                      }}
-                      id={_id}
-                      label=""
-                      listOptsArr={list}
-                    />
-                  }
                 />
               );
             }
@@ -271,6 +248,7 @@ const ProductCard = ({
 
           <div className="product-card-btns-holder">
             <Link
+              title="go to single product page btn"
               relative="path"
               to={`${
                 pathname.includes("dashboard") ? "/dashboard" : ""
@@ -283,6 +261,7 @@ const ProductCard = ({
             {/* if user not loged in and wan't to put item into cart => redirect him to login page */}
             {withAddToCart && !user && (
               <Link
+                title="go to login before add to cart btn"
                 to="/login"
                 className="btn"
                 relative="path"
@@ -295,11 +274,17 @@ const ProductCard = ({
             {withAddToCart &&
               user &&
               (userCart?.products.find((prd) => prd._id === _id) ? (
-                <Link className="btn" to="/cart" relative="path">
+                <Link
+                  title="go to your cart btn"
+                  className="btn"
+                  to="/cart"
+                  relative="path"
+                >
                   show cart
                 </Link>
               ) : (
                 <button
+                  title="add to cart btn"
                   onClick={() =>
                     addToCart({
                       productId: product._id,
@@ -319,6 +304,7 @@ const ProductCard = ({
 
         {withDeleteBtn && (
           <button
+            title="remove product from cart red btn"
             ref={deleteProductBtnRef}
             disabled={wishlistLoading || removeFromCartLoading}
             className="red-btn delete-product-btn"
@@ -334,7 +320,7 @@ const ProductCard = ({
             )}
           </button>
         )}
-      </li>
+      </TagName>
 
       <TopMessage ref={msgRef} />
     </>

@@ -14,6 +14,7 @@ import { resteCart, setUser } from "../../../../store/fetures/userSlice";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // components
+import PropCell from "../../../../components/PropCell";
 import CartCheckoutMethod from "./CartCheckoutMethod";
 import TopMessage, {
   type TopMessageRefType,
@@ -57,9 +58,9 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   const { user, userCart } = useSelector((state) => state.user);
   const [payMethod, setPayMethod] = useState<PayMethods>("Card");
 
-  const showDeleteBtn = isCartPage
-    ? !!userCart?.products.length
-    : !!user?.wishlist.length;
+  const isCartItems = !!userCart?.products.length;
+  const isWishlistItems = !!user?.wishlist?.length;
+  const isShow = isCartPage ? isCartItems : isWishlistItems;
 
   const showCartComponents = isCartPage && userCart?.products.length;
 
@@ -194,42 +195,53 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   }, [clearCartLoading, deleteWishlistLoading]);
 
   return (
-    <>
-      <div className="cart-or-wishlist-down-holder">
-        {showCartComponents && (
-          <CartCheckoutMethod
-            payMethod={payMethod}
-            setPayMethod={setPayMethod}
-          />
-        )}
-
-        <div
-          className="cart-or-wishlist-btns"
-          style={{
-            marginTop: 15,
-          }}
-        >
+    isShow && (
+      <>
+        <div className="cart-or-wishlist-down-holder">
           {showCartComponents && (
-            <button
-              ref={makeOrderBtnRef}
-              className={`btn ${
-                sessionUrlLoading || orderLoading
-                  ? "center spinner-pseudo-after fade scale"
-                  : ""
-              }`}
-              onClick={() => {
-                if (payMethod === "Card")
-                  return handlePayment({ sessionType: "payment" });
-                else if (payMethod === "Cash on Delivery") makeOrder();
-              }}
-              disabled={sessionUrlLoading || clearCartLoading || orderLoading}
-            >
-              {payMethod === "Cash on Delivery" ? "Submit Order" : "Checkout"}
-            </button>
+            <>
+              <CartCheckoutMethod
+                payMethod={payMethod}
+                setPayMethod={setPayMethod}
+              />
+              <PropCell
+                style={{
+                  marginTop: 15,
+                }}
+                name="cart total price"
+                val={`${userCart?.cartTotal || 0}$`}
+              />
+            </>
           )}
 
-          {showDeleteBtn && (
+          <div
+            className="cart-or-wishlist-btns"
+            style={{
+              marginTop: 15,
+            }}
+          >
+            {showCartComponents && (
+              <button
+                title="submit order btn"
+                ref={makeOrderBtnRef}
+                className={`btn ${
+                  sessionUrlLoading || orderLoading
+                    ? "center spinner-pseudo-after fade scale"
+                    : ""
+                }`}
+                onClick={() => {
+                  if (payMethod === "Card")
+                    return handlePayment({ sessionType: "payment" });
+                  else if (payMethod === "Cash on Delivery") makeOrder();
+                }}
+                disabled={sessionUrlLoading || clearCartLoading || orderLoading}
+              >
+                {payMethod === "Cash on Delivery" ? "Submit Order" : "Checkout"}
+              </button>
+            )}
+
             <button
+              title="clear your cart or wishlist btn"
               className={`red-btn ${
                 clearCartLoading || deleteWishlistLoading
                   ? "center spinner-pseudo-after fade scale"
@@ -241,16 +253,15 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
                 if (user) deleteWishlist({ ...user, wishlist: [] });
               }}
               disabled={clearCartLoading || deleteWishlistLoading}
-              // || orderLoading
             >
               Clear Your {isCartPage ? "Cart" : "Wishlist"}
             </button>
-          )}
+          </div>
         </div>
-      </div>
 
-      <TopMessage ref={msgRef} />
-    </>
+        <TopMessage ref={msgRef} />
+      </>
+    )
   );
 };
 export default CartOrWishlistPageBtns;

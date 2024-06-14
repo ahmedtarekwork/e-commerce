@@ -19,6 +19,7 @@ const TabsList = ({ lists }: Props) => {
           {lists.map(({ tabName }, i) => (
             <li key={nanoid()}>
               <button
+                title="tabs list btn"
                 ref={btnsListRef[i]}
                 onClick={(e) => {
                   btnsListRef.forEach((btn) =>

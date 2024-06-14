@@ -1,25 +1,39 @@
 #app-side-bar {
-  position: fixed;
-  left: 0;
-  width: 270px;
-  max-width: 100%;
-  background: #fff;
-  box-shadow: bx_shad(0, 10px);
-  z-index: 1000;
-  transition: 0.3s;
-  translate: -100%;
-
   .main-btns-list {
     display: none;
+
+    @media (max-width: 565px) {
+      margin-block: 15px;
+      @include flex(center, center, 5px);
+    }
+    @media (max-width: 220px) {
+      flex-direction: column;
+    }
+
+    > * {
+      flex: 1;
+      @include flex;
+
+      a,
+      button {
+        padding: 10px;
+      }
+
+      #header-cart-icon #cart-products-length {
+        top: -2%;
+        right: 20%;
+      }
+    }
   }
 
   ul.app-side-bar-list {
+    // sidebar item
     li {
       a,
       button {
         text-transform: capitalize;
         width: 100%;
-        padding: 5px 9px;
+        padding: 12px 9px;
         color: var(--main);
         @include flex(flex-start);
 
@@ -56,19 +70,6 @@
           background: var(--light);
         }
       }
-    }
-  }
-
-  &.active {
-    translate: 0;
-  }
-
-  @media (max-width: 565px) {
-    width: 100%;
-
-    .main-btns-list {
-      margin-block: 15px;
-      @include flex(space-between, center, 10px);
     }
   }
 }

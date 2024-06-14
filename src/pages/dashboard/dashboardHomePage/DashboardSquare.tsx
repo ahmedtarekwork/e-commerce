@@ -26,7 +26,7 @@ const DashboardSquare = ({
 }: DashboardSqaureProps) => {
   return (
     <li className="dashboard-square">
-      <Link to={path} relative="path">
+      <Link to={path} relative="path" title={`go to ${title} square btn`}>
         <div className="square-top">
           <Icon size={28} />
           <h3>{title}</h3>

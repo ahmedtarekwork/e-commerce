@@ -13,4 +13,6 @@ form#auth-form {
 
 .auth-msg {
   @include flex(center, center, 5px);
+  flex-wrap: wrap;
+  text-align: center;
 }

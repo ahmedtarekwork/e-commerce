@@ -16,20 +16,20 @@ import { setAllUsers } from "../../../store/fetures/userSlice";
 // components
 import Heading from "../../../components/Heading";
 import DashboardSquare, { DashboardSqaureProps } from "./DashboardSquare";
-import GridList from "../../../components/gridList/GridList";
-import GridListItem from "../../../components/gridList/GridListItem";
 
 // utils
 import { nanoid } from "@reduxjs/toolkit";
 import { axiosWithToken } from "../../../utiles/axios";
 
 // icons
-import { FaUser, FaListAlt, FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaUser, FaListAlt } from "react-icons/fa";
 import { BiSolidComponent } from "react-icons/bi";
+import storeWithArrow from "../../../../imgs/strore_with_arrow.svg";
+import { TbHomeCog } from "react-icons/tb";
 
 // fetchers
 const getProductsCountQueryFn = async () => {
-  return (await axiosWithToken("products")).data.length;
+  return (await axiosWithToken("products")).data.products.length;
 };
 
 const getOrdersCountQueryFn = async () => {
@@ -48,7 +48,6 @@ const DashboardHomePage = () => {
   const appOrdersCount = useSelector((state) => state.orders.orders.length);
 
   const { allUsers } = useSelector((state) => state.user);
-  const admins = allUsers.filter((user) => user.isAdmin);
   const appUsersCount = allUsers.length;
 
   // get products count
@@ -134,51 +133,46 @@ const DashboardHomePage = () => {
         <Heading content="Dashboard" />
       </div>
 
-      <Link to="/" relative="path" className="btn back-to-store-btn">
-        <FaArrowAltCircleLeft />
-        Back To Store
-      </Link>
+      <ul className="dashboard-page-top-btns">
+        <li>
+          <Link
+            title="go back to store home page btn"
+            to="/"
+            relative="path"
+            className="btn back-to-store-btn"
+          >
+            <img
+              src={storeWithArrow}
+              width="24px"
+              height="24px"
+              alt="store with back arrow icon"
+            />
+            Back To Store
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            title="go to home page settings page btn"
+            to="/dashboard/homePageSettings"
+            relative="path"
+            className="btn"
+          >
+            <TbHomeCog
+              style={{
+                fontSize: 24,
+              }}
+            />
+            Home Page Settings
+          </Link>
+        </li>
+      </ul>
 
       <ul className="dashboard-squares-list">
         {squares.map((square) => (
           <DashboardSquare {...square} key={nanoid()} />
         ))}
       </ul>
-
-      <h2>Admins List</h2>
-
-      <GridList
-        initType="row"
-        isChanging={false}
-        cells={["username", "email", "address", "more info"]}
-      >
-        {admins.slice(0, 5).map(({ _id, username, email, address }) => {
-          return (
-            <GridListItem
-              key={_id}
-              cells={["username", "email", "address", "moreInfo"]}
-              itemData={{
-                username,
-                email,
-                address: address || "--",
-                moreInfo: (
-                  <Link
-                    className="btn"
-                    to={"/dashboard/singleUser/" + _id}
-                    relative="path"
-                  >
-                    more info
-                  </Link>
-                ),
-              }}
-            />
-          );
-        })}
-      </GridList>
-
-      <Link to="/dashboard/users" className="btn see-more-btn">
-        see more
-      </Link>
     </>
   );
 };

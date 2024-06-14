@@ -1,0 +1,19 @@
+.sidebar-wrapper {
+  position: fixed;
+  left: 0;
+  width: 270px;
+  max-width: 100%;
+  background: #fff;
+  box-shadow: bx_shad(0, 10px);
+  z-index: 1000;
+  transition: 0.3s;
+  translate: -100%;
+
+  &.active {
+    translate: 0;
+  }
+
+  @media (max-width: 565px) {
+    width: 100%;
+  }
+}

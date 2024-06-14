@@ -1,0 +1,86 @@
+.home-page-products-slider {
+  @include flex(center, center, 10px);
+  height: 400px;
+  border-radius: 10px;
+  box-shadow: inset -1px 0px 30px 10px #0756bd57;
+
+  background: linear-gradient(to right, var(--trans), transparent);
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    height: 470px;
+  }
+  @media (max-width: 330px) {
+    height: 550px;
+  }
+
+  + * {
+    margin-top: 15px;
+  }
+
+  &-text-side {
+    font: {
+      weight: bold;
+      size: 25px;
+    }
+    color: var(--dark);
+    text-transform: capitalize;
+    padding: 15px 10px;
+    min-width: fit-content;
+  }
+
+  .swiper {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 16px;
+    flex: 1;
+
+    &-wrapper {
+      padding: 10px 0;
+    }
+  }
+
+  .product-card {
+    height: 100%;
+    background: #fff;
+
+    .product-card-title {
+      margin-top: unset !important;
+    }
+    .product-card-btns-holder {
+      margin-top: auto;
+    }
+  }
+
+  // explore more card "final card"
+  &-explore-more-card {
+    height: auto;
+
+    a {
+      display: grid;
+      place-content: center;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius);
+      box-shadow: 2px 3px 11px 0 #6967675c;
+      text-align: center;
+      line-height: 25px;
+      transition: 0.3s;
+      background: #fff;
+      font : {
+        size: 20px;
+        weight: bold;
+      }
+
+      &:hover {
+        background: var(--dark);
+        color: white;
+      }
+
+      .plus-icon {
+        font-size: 30px;
+      }
+    }
+  }
+}

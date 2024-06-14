@@ -16,7 +16,8 @@ import SplashScreen from "../../components/spinners/SplashScreen";
 import Heading from "../../components/Heading";
 import PropCell from "../../components/PropCell";
 import GridList from "../../components/gridList/GridList";
-import ProductCard from "../../components/ProductCard";
+import ProductCard from "../../components/productCard/ProductCard";
+import EmptyPage from "../../components/layout/EmptyPage";
 
 // utiles
 import { axiosWithToken } from "../../utiles/axios";
@@ -26,6 +27,10 @@ import { OrderType } from "../../utiles/types";
 
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
+
+// SVGs
+import IdRequired from "../../../imgs/ID_required.svg";
+import DeletedSvg from "../../../imgs/deleted.svg";
 
 // fetchers
 const getOrderQueryFn = async ({
@@ -71,9 +76,29 @@ const SingleOrderPage = () => {
   if (orderLoading && fetchStatus !== "idle")
     return <SplashScreen>Loading Order...</SplashScreen>;
 
-  if (orderErr) return <DisplayError error={orderErrData} />;
-  if (!id) return <h1>order Id is required!</h1>;
-  if (!order) return <h1>can't get order with id "{id}"</h1>;
+  if (orderErr) {
+    return (
+      <DisplayError
+        error={orderErrData}
+        initMsg="Can't get the order at the moment"
+      />
+    );
+  }
+  if (!id) {
+    return <EmptyPage content="Order Id is required!" svg={IdRequired} />;
+  }
+  if (!order) {
+    return (
+      <EmptyPage
+        content={
+          <>
+            Can't get order with id: <br /> "{id}"
+          </>
+        }
+        svg={IdRequired}
+      />
+    );
+  }
 
   const {
     _id,
@@ -82,9 +107,8 @@ const SingleOrderPage = () => {
     products,
     orderby,
     createdAt,
+    removedProductsCount,
   } = order;
-
-  console.log(order);
 
   return (
     <>
@@ -117,6 +141,16 @@ const SingleOrderPage = () => {
         <li>
           <PropCell name="orderd at" val={new Date(createdAt).toDateString()} />
         </li>
+        <li>
+          <PropCell
+            name="items count"
+            val={
+              removedProductsCount +
+              products.map(({ count }) => count).reduce((a, b) => a + b, 0)
+            }
+          />
+        </li>
+
         {orderby && (
           <li>
             <PropCell
@@ -131,21 +165,51 @@ const SingleOrderPage = () => {
         )}
       </ul>
 
-      <GridList
-        initType="row"
-        isChanging={false}
-        cells={listCell.map((cell) => (cell === "quantity" ? "count" : cell))}
-      >
-        {products.map((prd) => (
-          <ProductCard
-            key={prd._id}
-            cells={productCardCells.map((cell) =>
-              cell === "quantity" ? "count" : cell
-            )}
-            product={prd}
+      {products.length ? (
+        <GridList
+          initType="row"
+          isChanging={false}
+          cells={listCell.map((cell) => (cell === "quantity" ? "count" : cell))}
+        >
+          {products.map((prd) => (
+            <ProductCard
+              key={prd._id}
+              cells={productCardCells.map((cell) =>
+                cell === "quantity" ? "count" : cell
+              )}
+              product={prd}
+            />
+          ))}
+        </GridList>
+      ) : (
+        <div
+          style={{
+            fontWeight: "bold",
+            textAlign: "center",
+            fontSize: "calc(12px + 1vw)",
+            textTransform: "capitalize",
+            color: "var(--dark)",
+          }}
+        >
+          <img
+            src={DeletedSvg}
+            alt="all orders deleted icon image"
+            width="600"
+            style={{
+              maxWidth: "100%",
+            }}
           />
-        ))}
-      </GridList>
+
+          <p>
+            All products that you have orderd in this order has been deleted
+            from the store.
+          </p>
+          <p style={{ marginTop: 15 }}>
+            don't worry, you will receve all produts that you have orders in
+            this order.
+          </p>
+        </div>
+      )}
     </>
   );
 };

@@ -8,13 +8,14 @@ import {
 // Pages \\
 import LoginOrSignupPage from "../pages/LoginOrSignupPage";
 // home
-import EcommerceHomePage from "../pages/e-commerce/EcommerceHomePage";
+import EcommerceHomePage from "../pages/e-commerce/homePage/EcommerceHomePage";
 import DashboardHomePage from "../pages/dashboard/dashboardHomePage/DashboardHomePage";
+import HomePageSettingsPage from "../pages/dashboard/homePageSettings/HomePageSettingsPage";
 // users
 import ProfilePage from "../pages/profilePage/ProfilePage";
 import UsersPage from "../pages/dashboard/usersPage/UsersPage";
 // products
-import ProductsPage from "../pages/products/ProductsPage";
+import ProductsPage from "../pages/products/productsPage/ProductsPage";
 import NewProductPage from "../pages/products/ProductFormPage";
 import SingleProductPage from "../pages/products/SingleProductPage";
 // orders
@@ -26,7 +27,7 @@ import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
 // cart or wishlist
 import CartOrWishlistPage from "../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
 // more pages
-import ErrorPage from "../pages/ErrorPage";
+import EmptyPage from "../components/layout/EmptyPage";
 
 // layouts \\
 import MainLayout from "../layouts/MainLayout";
@@ -34,6 +35,9 @@ import MainLayout from "../layouts/MainLayout";
 import NotAuthLayout from "../layouts/NotAuthLayout";
 import AlreadyLogedInLayout from "../layouts/AlreadyLogedInLayout";
 import NeedLoginLayout from "../layouts/NeedLoginLayout";
+
+// SVGs
+import ErrSvg from "../../imgs/404.svg";
 
 const useAppRouter = (checkUserLoading: boolean) => {
   return createBrowserRouter(
@@ -93,19 +97,26 @@ const useAppRouter = (checkUserLoading: boolean) => {
         >
           <Route index element={<DashboardHomePage />} />
           <Route path="singleUser/:id" element={<ProfilePage />} />
-
           <Route path="users" element={<UsersPage />} />
-
           <Route path="products" element={<ProductsPage />} />
           <Route path="product/:id" element={<SingleProductPage />} />
           <Route path="new-product" element={<NewProductPage />} />
           <Route path="edit-product/:id" element={<NewProductPage />} />
-
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:id" element={<SingleOrderPage />} />
+          <Route path="homePageSettings" element={<HomePageSettingsPage />} />
         </Route>
 
-        <Route path="*" element={<ErrorPage />} />
+        <Route
+          path="*"
+          element={
+            <EmptyPage
+              content={"This Page Not Found!"}
+              svg={ErrSvg}
+              withBtn={{ type: "GoToHome" }}
+            />
+          }
+        />
       </Route>
     )
   );

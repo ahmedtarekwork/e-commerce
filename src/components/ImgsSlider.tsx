@@ -1,4 +1,7 @@
-import { CSSProperties, createRef, useEffect, useRef } from "react";
+// react
+import { type CSSProperties, createRef, useEffect, useRef } from "react";
+
+// utils
 import { nanoid } from "@reduxjs/toolkit";
 
 type Props = {
@@ -8,9 +11,10 @@ type Props = {
     value: boolean;
     time: number;
   };
+  isHomeSlider?: boolean;
 };
 
-const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
+const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
   const imgsHoldersRefs = imgs.map(() => createRef<HTMLDivElement>());
   const SliderBtnsRefs = imgs.map(() => createRef<HTMLButtonElement>());
 
@@ -55,7 +59,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
   }, [withTimer]);
 
   return (
-    <div className="slider-big-holder">
+    <div className={`slider-big-holder${isHomeSlider ? " home-slider" : ""}`}>
       <div
         className="slider-real-list"
         style={
@@ -76,11 +80,11 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
         ))}
       </div>
 
-      {imgs.length > 1 && (
+      {(imgs.length || 0) > 1 ? (
         <div className="slider-dots-holder">
           {imgs.map((_, i) => (
             <button
-              ref={SliderBtnsRefs[i]}
+              ref={SliderBtnsRefs?.[i]}
               onClick={() => {
                 setActiveImg(i);
                 if (withTimer) slideImgs();
@@ -90,7 +94,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer }: Props) => {
             ></button>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

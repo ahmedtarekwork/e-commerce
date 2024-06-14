@@ -1,12 +1,14 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ProductType } from "../../utiles/types";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { ProductType } from "../../utiles/types";
 
 type InitStateType = {
   products: ProductType[];
+  pagenatedProducts: Record<number, ProductType[]>;
 };
 
 const initialState: InitStateType = {
   products: [],
+  pagenatedProducts: {},
 };
 
 const productsSlice = createSlice({
@@ -19,8 +21,15 @@ const productsSlice = createSlice({
     resetProducts: (state) => {
       state.products = [];
     },
-    addProduct: (state, { payload }: PayloadAction<ProductType>) => {
-      state.products = [...state.products, payload];
+    addProducts: (state, { payload }: PayloadAction<ProductType[]>) => {
+      const oldProducts = state.products;
+      const newProducts = oldProducts.length
+        ? payload.filter(({ _id }) =>
+            oldProducts.every(({ _id: same }) => same !== _id)
+          )
+        : payload;
+
+      state.products = [...oldProducts, ...newProducts];
     },
     removeProduct: (state, { payload }: PayloadAction<string>) => {
       state.products = state.products.filter(
@@ -32,6 +41,22 @@ const productsSlice = createSlice({
         product._id === payload._id ? payload : product
       );
     },
+
+    addToPaginatedProducts: (
+      state,
+      {
+        payload: { page, products },
+      }: PayloadAction<{ page: number; products: ProductType[] }>
+    ) => {
+      const oldProducts = state.pagenatedProducts[page] || [];
+      const newProducts = oldProducts.length
+        ? products.filter(({ _id }) =>
+            oldProducts.every(({ _id: same }) => same !== _id)
+          )
+        : products;
+
+      state.pagenatedProducts[page] = [...oldProducts, ...newProducts];
+    },
   },
 });
 
@@ -40,7 +65,8 @@ export default productsSlice.reducer;
 export const {
   setProducts,
   resetProducts,
-  addProduct,
+  addProducts,
   removeProduct,
   editProduct,
+  addToPaginatedProducts,
 } = productsSlice.actions;

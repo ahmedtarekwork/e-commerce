@@ -1,7 +1,12 @@
+.products-list-with-border .product-card {
+  border: 2px solid var(--main);
+}
+
 .product-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  justify-content: space-between;
   border-radius: var(--radius);
   padding: 10px;
   transition: 0.3s;
@@ -24,9 +29,26 @@
     padding: 7px;
     @include cardBorder(var(--radius), 2px);
 
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-content: center;
+
+    .empty-spinner {
+      margin: 0 !important;
+    }
+
     svg {
+      font-size: 20px;
       fill: #fff;
     }
+  }
+
+  .product-card-title {
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
   }
 
   .product-card-more-info {
@@ -36,8 +58,10 @@
   &-btns-holder {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 
     > * {
+      min-width: max-content;
       flex: 1;
       text-align: center;
     }
@@ -45,30 +69,50 @@
 }
 
 @mixin product-in-columns-list {
-  background: var(--trans);
-
   // product imgs
   .slider-big-holder {
     display: grid;
-    flex: 1;
+
+    .slider-real-list {
+      height: fit-content;
+    }
   }
 
-  .product-data-big-holder > * + * {
-    margin-top: 7px;
+  .slider-img-holder img {
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    transition: 0.3s;
+  }
+
+  .product-data-big-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+
+    .product-card-title {
+      margin-top: auto;
+    }
+  }
+}
+
+@mixin product-card-hover-effect {
+  .product-card:hover .slider-img-holder {
+    scale: 0.9;
+
+    img {
+      border-color: var(--main);
+    }
   }
 }
 
 .columns-list:not(:has(.select-list-holder)) {
-  .product-card:hover {
-    scale: 0.98;
-  }
+  @include product-card-hover-effect;
 }
 
 .rows-list:not(:has(.select-list-holder)) {
   @media (max-width: 630px) {
-    .product-card:hover {
-      scale: 0.98;
-    }
+    @include product-card-hover-effect;
   }
 }
 
@@ -89,10 +133,6 @@
 
     .slider-real-list {
       width: 100% !important;
-    }
-
-    .slider-img-holder img {
-      border-radius: var(--radius);
     }
 
     .product-data-big-holder {
@@ -128,6 +168,7 @@
   }
 }
 
-.columns-list .product-card {
+.columns-list .product-card,
+.product-card.card-mode {
   @include product-in-columns-list();
 }

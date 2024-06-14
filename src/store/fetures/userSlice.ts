@@ -26,6 +26,9 @@ const userSlice = createSlice({
     setUser: (state, { payload }: PayloadAction<UserType>) => {
       state.user = payload;
     },
+    resetUserWishlist: (state) => {
+      if (state.user?.wishlist) state.user.wishlist = [];
+    },
     removeUser: (state) => {
       state.user = null;
     },
@@ -63,6 +66,7 @@ const userSlice = createSlice({
 export const {
   setUser,
   removeUser,
+  resetUserWishlist,
   logoutUser,
 
   setAllUsers,

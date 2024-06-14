@@ -1,37 +1,24 @@
-import { ComponentProps, forwardRef } from "react";
+// react
+import { type ComponentProps } from "react";
+
+// icons
 import { BsCheckLg } from "react-icons/bs";
 
-interface listType {
-  ListType: "radio-list" | "check-list";
-}
+// utils
+import { nanoid } from "@reduxjs/toolkit";
 
-interface theInputProps extends ComponentProps<"input"> {
+export type FormListType = "radio-list" | "check-list";
+
+export type FromListInputProps = {
   label: string;
   id: string;
-}
+} & ComponentProps<"input">;
 
-const TheInput = forwardRef<HTMLInputElement, theInputProps>(
-  ({ label, ...inputAttr }, ref) => {
-    const { id } = inputAttr;
-
-    return (
-      <>
-        <input {...inputAttr} ref={ref} />
-        <label htmlFor={id}>
-          <button>
-            <BsCheckLg />
-          </button>
-          {label}
-        </label>
-      </>
-    );
-  }
-);
-
-interface Listprops extends listType, ComponentProps<"ul"> {
+type Listprops = {
   sectionTitle?: string;
-  inputsList: theInputProps[];
-}
+  inputsList: FromListInputProps[];
+  ListType: FormListType;
+} & ComponentProps<"ul">;
 
 const FormList = ({
   sectionTitle: title,
@@ -47,14 +34,21 @@ const FormList = ({
       {title && <h3 className="form-secondary-title">{title}</h3>}
       <ul
         {...listAttr}
-        className={`${className ? `${className} ` : ""}form-list`}
+        className={`form-list${className ? ` ${className}` : ""}`}
       >
-        {inputsList.map((input, i) => (
-          <li key={i}>
-            <TheInput
+        {inputsList.map(({ label, ...input }) => (
+          <li key={nanoid()}>
+            <input
               {...input}
               type={ListType === "radio-list" ? "radio" : "checkbox"}
             />
+            <label htmlFor={input.id}>
+              <span>
+                <BsCheckLg />
+              </span>
+
+              {label}
+            </label>
           </li>
         ))}
       </ul>

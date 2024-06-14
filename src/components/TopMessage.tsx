@@ -1,6 +1,6 @@
 import {
-  Dispatch,
-  SetStateAction,
+  type Dispatch,
+  type SetStateAction,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -52,7 +52,13 @@ const TopMessage = forwardRef<TopMessageRefType>((_, ref) => {
 
     if (msgEl)
       if (messageData.show) {
+        const appHeaderEl = document.querySelector(
+          ".app-header"
+        ) as HTMLElement;
+        msgEl.style.top = `${(appHeaderEl?.offsetHeight || 20) + 20}px`;
+
         const { time } = messageData;
+
         // remove previous messages
         (
           [...document.querySelectorAll(".app-top-message")] as HTMLDivElement[]

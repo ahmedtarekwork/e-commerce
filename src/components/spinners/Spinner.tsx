@@ -1,12 +1,12 @@
-import { ComponentProps, ReactNode, useEffect, useRef } from "react";
+import { ComponentProps, Fragment, ReactNode, useEffect, useRef } from "react";
 
 type Content =
   | {
-      content: ReactNode;
+      content?: ReactNode;
       children?: never;
     }
   | {
-      children: ReactNode;
+      children?: ReactNode;
       content?: never;
     };
 
@@ -24,10 +24,19 @@ type Props = Content & {
   settings?: Settings;
   effect?: "fade" | "scale" | "fade scale";
   mainSpinner?: boolean;
+  fullWidth?: boolean;
 };
 
 const Spinner = (props: Props & ComponentProps<"div">) => {
-  const { settings, effect, mainSpinner, content, children, ...attr } = props;
+  const {
+    settings,
+    effect,
+    mainSpinner,
+    content,
+    children,
+    fullWidth,
+    ...attr
+  } = props;
 
   const spinnerEl = useRef<HTMLDivElement>(null);
 
@@ -57,16 +66,24 @@ const Spinner = (props: Props & ComponentProps<"div">) => {
     }
   }, [settings]);
 
+  const Test = fullWidth ? "div" : Fragment;
+
+  const holderAttr: ComponentProps<"div"> = fullWidth
+    ? { className: "spinner-full-width-holder" }
+    : {};
+
   return (
-    <div
-      {...attr}
-      ref={spinnerEl}
-      className={`spinner-el ${mainSpinner ? "main-spinner" : ""} ${
-        effect || ""
-      }`}
-    >
-      {<p>{children || content}</p>}
-    </div>
+    <Test {...holderAttr}>
+      <div
+        {...attr}
+        ref={spinnerEl}
+        className={`spinner-el ${mainSpinner ? "main-spinner" : ""} ${
+          effect || ""
+        }`}
+      >
+        {<p>{children || content}</p>}
+      </div>
+    </Test>
   );
 };
 export default Spinner;

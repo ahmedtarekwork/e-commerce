@@ -4,24 +4,36 @@ import { useEffect } from "react";
 // react query
 import { useQuery } from "@tanstack/react-query";
 
+// redux
+import useDispatch from "../hooks/redux/useDispatch";
+// redux actions
+import { resetUserWishlist } from "../store/fetures/userSlice";
+
 // components
 import DisplayError from "./layout/DisplayError";
 import Spinner from "./spinners/Spinner";
 import GridList from "./gridList/GridList";
-import ProductCard, { ProductCardDeleteBtn } from "./ProductCard";
+import EmptyPage from "./layout/EmptyPage";
+import ProductCard, {
+  type ProductCardDeleteBtn,
+} from "./productCard/ProductCard";
 
 // utiles
 import axios from "axios";
 
 // types
-import { ProductType } from "../utiles/types";
+import type { ProductType } from "../utiles/types";
 
 // hooks
 import useInitProductsCells from "../hooks/useInitProductsCells";
 
+// SVGs
+import wishlistSvg from "../../imgs/wishe-list.svg";
+
 type Props = ProductCardDeleteBtn & {
   isCurrentUserProfile: boolean;
   wishlist: string[];
+  withTitle?: boolean;
 };
 
 const getWishlistProductsQueryFn = async ({
@@ -41,7 +53,10 @@ const WishlistArea = ({
   isCurrentUserProfile,
   wishlist,
   withDeleteBtn,
+  withTitle = true,
 }: Props) => {
+  const dispatch = useDispatch();
+
   // get wishlist products
   const {
     refetch: getWishlistProducts,
@@ -49,6 +64,7 @@ const WishlistArea = ({
     error: wishlistProductsErrData,
     isError: wishlistProductsErr,
     isPending: wishlistLoading,
+    fetchStatus,
   } = useQuery({
     queryKey: ["getWishlistProducts", wishlist],
     queryFn: getWishlistProductsQueryFn,
@@ -62,28 +78,45 @@ const WishlistArea = ({
     if (wishlist) getWishlistProducts();
   }, [wishlist, getWishlistProducts]);
 
-  if (wishlistLoading)
+  if (wishlistLoading && fetchStatus !== "idle")
     return (
-      <Spinner settings={{ clr: "var(--main)" }}>
-        <strong>Loading Wishlist Products...</strong>
+      <Spinner
+        fullWidth={true}
+        settings={{ clr: "var(--main)" }}
+        style={{ color: "var(--main)" }}
+      >
+        <strong>Loading Products...</strong>
       </Spinner>
     );
 
-  if (wishlistProductsErr)
-    return <DisplayError error={wishlistProductsErrData} />;
+  if (wishlistProductsErr) {
+    dispatch(resetUserWishlist());
 
-  if (wishlistProducts?.length === 0) {
     return (
-      <strong>
-        {isCurrentUserProfile
-          ? "you don't have items in your wishlist"
-          : "this user hasn't any products in his wishlist"}
-      </strong>
+      <DisplayError
+        error={wishlistProductsErrData}
+        initMsg="Can't get your wishlist items at the moment."
+      />
+    );
+  }
+
+  if (!wishlistProducts?.length) {
+    return (
+      <EmptyPage
+        content={
+          isCurrentUserProfile
+            ? "you don't have items in your wishlist"
+            : "this user hasn't any products in his wishlist"
+        }
+        svg={wishlistSvg}
+        withBtn={{ type: "GoToHome" }}
+      />
     );
   } else {
     return (
       <>
-        <h3>wishlist</h3>
+        {withTitle && <h3>wishlist</h3>}
+
         <GridList
           withMargin={!!withDeleteBtn}
           cells={listCell}

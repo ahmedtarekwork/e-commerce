@@ -1,14 +1,15 @@
-import { useState, forwardRef, ChangeEvent } from "react";
+import { useState, forwardRef, type ChangeEvent } from "react";
 
 // icons
-import { AiFillEye } from "react-icons/ai";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 
 // components
 import InputComponent from "./InputComponent";
 import ErrorDiv from "./ErrorDiv";
+import IconsSwitcher from "../../IconsSwitcher";
 
 // types
-import { InputPropsType } from "../../../utiles/types";
+import type { InputPropsType } from "./InputComponent";
 
 const FormInput = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {
   const { type, errorMsg } = props;
@@ -35,15 +36,18 @@ const FormInput = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {
           />
 
           <button
-            className="btn"
+            title="show password btn"
+            className="btn icons-switcher-holder-parent"
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             disabled={!inputValue}
           >
-            {showPassword ? "hide" : "show"} password
-            <span>
-              <AiFillEye />
-            </span>
+            <IconsSwitcher
+              firstIcon={<HiEye />}
+              lastIcon={<HiEyeOff />}
+              iconsColor="white"
+              isActive={showPassword}
+            />
           </button>
         </>
       )}

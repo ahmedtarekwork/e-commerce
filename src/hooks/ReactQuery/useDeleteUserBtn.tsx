@@ -1,11 +1,11 @@
 // components
-import DeleteItemBtn, {
-  DeleteItemBtnProps,
-} from "../../components/DeleteItemBtn";
+import DeleteUserBtn, {
+  DeleteUserBtnProps,
+} from "../../components/DeleteUserBtn";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+``;
 // utiles
 import { axiosWithToken } from "../../utiles/axios";
 
@@ -37,8 +37,8 @@ const useDeleteUserBtn = (userId?: string) => {
       itemId: userId,
       username,
       ...attr
-    }: Omit<DeleteItemBtnProps, "deleteLoading" | "deleteItem">) => (
-      <DeleteItemBtn
+    }: Omit<DeleteUserBtnProps, "deleteLoading" | "deleteItem">) => (
+      <DeleteUserBtn
         {...attr}
         {...{ deleteLoading, deleteItem: deleteUser, itemId: userId, username }}
       />

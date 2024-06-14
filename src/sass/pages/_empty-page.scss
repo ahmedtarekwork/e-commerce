@@ -1,0 +1,15 @@
+.empty-page {
+  img {
+    width: 600px;
+    max-width: 100%;
+    display: block;
+    margin-inline: auto;
+  }
+
+  strong {
+    font-size: calc(15px + 2vw);
+    display: block;
+    text-align: center;
+    color: var(--dark);
+  }
+}

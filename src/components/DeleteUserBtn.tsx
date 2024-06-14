@@ -5,10 +5,10 @@ import { type ComponentProps, useEffect, useRef } from "react";
 import AreYouSureModal from "./modals/AreYouSureModal";
 
 // types
-import { UseMutateFunction } from "@tanstack/react-query";
+import { type UseMutateFunction } from "@tanstack/react-query";
 import { type AppModalRefType } from "./modals/appModal/AppModal";
 
-export type DeleteItemBtnProps = Record<"username" | "itemId", string> & {
+export type DeleteUserBtnProps = Record<"username" | "itemId", string> & {
   deleteLoading: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   deleteItem: UseMutateFunction<any, Error, string, unknown>;
@@ -23,7 +23,7 @@ const DeleteItemBtn = ({
   className,
   onClick,
   ...attr
-}: DeleteItemBtnProps) => {
+}: DeleteUserBtnProps) => {
   const sureModal = useRef<AppModalRefType>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -34,6 +34,7 @@ const DeleteItemBtn = ({
   return (
     <>
       <button
+        title="delete user btn"
         ref={btnRef}
         {...attr}
         className={`red-btn${

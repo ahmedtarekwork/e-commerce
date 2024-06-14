@@ -1,0 +1,11 @@
+.go-to-home-btn {
+  @include flex;
+  gap: 5px;
+  margin: 10px auto 0;
+  text-align: center;
+  flex-wrap: wrap;
+
+  svg {
+    font-size: 20px;
+  }
+}

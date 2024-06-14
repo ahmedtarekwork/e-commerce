@@ -143,24 +143,31 @@ input {
     width: 100%;
   }
 
-  &[data-type="button"] input {
-    border-bottom: 0px // width
- {
-      // radius
-      left-radius: 0;
-      right-radius: 0;
-    }
-  }
+  &[data-type="button"] {
+    @include flex;
+    height: 32px;
 
-  button {
-    @include flex(center, center, 7px);
-    border-top: {
-      left-radius: 0;
-      right-radius: 0;
+    > * {
+      height: 100%;
     }
-    span {
-      @include flex;
-      font-size: 20px;
+
+    input {
+      border-radius: var(--radius) 0 0 var(--radius);
+      border-right: 0;
+    }
+
+    button {
+      width: 35px;
+      display: grid;
+      place-content: center;
+
+      border: {
+        radius: 0 var(--radius) var(--radius) 0;
+      }
+
+      svg {
+        font-size: 20px;
+      }
     }
   }
 }

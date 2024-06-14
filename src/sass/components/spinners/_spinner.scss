@@ -10,10 +10,22 @@
   max-width: var(--diminsions);
 }
 
+.spinner-full-width-holder {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  place-content: center;
+}
+
 .spinner-el {
   position: relative;
   display: grid;
   place-content: center;
+  font-size: calc(12px + 1vw);
+
+  @media (max-width: 296px) {
+    font-size: 3.7vw;
+  }
 
   width: max-content;
   aspect-ratio: 1 / 1;

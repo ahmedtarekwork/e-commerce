@@ -19,13 +19,21 @@ import PropCell from "../../components/PropCell";
 import TopMessage, { TopMessageRefType } from "../../components/TopMessage";
 import FillIcon from "../../components/FillIcon";
 import SplashScreen from "../../components/spinners/SplashScreen";
+import DisplayError from "../../components/layout/DisplayError";
+import EmptyPage from "../../components/layout/EmptyPage";
+import AreYouSureModal from "../../components/modals/AreYouSureModal";
 
 // utiles
-import axios, { axiosWithToken } from "../../utiles/axios";
+import { axiosWithToken } from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
+
+// hooks
+import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
+import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
 
 // types
 import type { ProductType } from "../../utiles/types";
+import type { AppModalRefType } from "../../components/modals/appModal/AppModal";
 
 // icons
 import {
@@ -34,10 +42,10 @@ import {
 } from "react-icons/pi";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiBallPenFill, RiBallPenLine } from "react-icons/ri";
+import { BsTrash3, BsTrash3Fill } from "react-icons/bs";
 
-// hooks
-import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
-import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
+// SVGs
+import IdRequired from "../../../imgs/ID_required.svg";
 
 // fetchers
 const getSingleProductQueryFn = async ({
@@ -64,6 +72,7 @@ const SingleProductPage = () => {
 
   // refs
   const msgRef = useRef<TopMessageRefType>(null);
+  const sureToDeleteModalRef = useRef<AppModalRefType>(null);
   const addToCartBtnRef = useRef<HTMLButtonElement>(null);
   const toggleWishlistBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -179,20 +188,35 @@ const SingleProductPage = () => {
     toggleWishlistBtnRef.current?.classList.toggle("active", wishlistLoading);
   }, [wishlistLoading]);
 
-  if (!id) return <h1>id not found !</h1>;
-
   if (prdLoading && fetchStatus !== "idle")
     return <SplashScreen>Loading the Product...</SplashScreen>;
 
   if (prdErr) {
-    let msg = "something went wrong while getting the product";
-    if (axios.isAxiosError(prdErrData))
-      msg = prdErrData.response?.data.message || prdErrData.response?.data;
-
-    return <h1>{msg}</h1>;
+    return (
+      <DisplayError
+        error={prdErrData}
+        initMsg="something went wrong while getting the product"
+      />
+    );
   }
 
-  if (!product) return <h1>product with id: "{id}" not found!</h1>;
+  if (!product || !id) {
+    return (
+      <EmptyPage
+        content={
+          !id ? (
+            "Product Id is required"
+          ) : (
+            <>
+              No Product with Id: <br /> "{id}"
+            </>
+          )
+        }
+        svg={IdRequired}
+        withBtn={{ type: "GoToHome" }}
+      />
+    );
+  }
 
   const {
     brand,
@@ -210,152 +234,188 @@ const SingleProductPage = () => {
 
   return (
     <>
-      <div className="single-product-top-holder">
-        <div className="single-product-wrapper">
-          <ImgsSlider imgWidth="400px" imgs={imgs} />
+      {user?.isAdmin && !isDashboard && (
+        <Link
+          title="edit single product btn"
+          className="btn go-to-edit-product-btn"
+          to={"/dashboard/product/" + product._id}
+          relative="path"
+        >
+          <FillIcon
+            diminsions={20}
+            stroke={<RiBallPenLine />}
+            fill={<RiBallPenFill />}
+          />
+          Edit this product
+        </Link>
+      )}
 
-          <div className="single-product-data">
-            <h3>{title}</h3>
-            <PropCell name="brand" val={brand} />
-            <PropCell name="price" val={price + "$"} />
-            <PropCell
-              className="single-product-color"
-              name="color"
-              val={""}
-              propNameProps={{
-                style: {
-                  background: color,
-                },
-              }}
-            />
-            <PropCell name="category" val={category} />
-            <PropCell
-              className="single-product-description"
-              name="description"
-              val={description}
-            />
-          </div>
-        </div>
+      <div className="single-product-wrapper">
+        <ImgsSlider imgWidth="400px" imgs={imgs} />
 
-        <div className="single-product-insights">
+        <div className="single-product-data">
+          <h3>{title}</h3>
+          <PropCell name="brand" val={brand} />
+          <PropCell name="price" val={price + "$"} />
+          <PropCell
+            className="single-product-color"
+            name="color"
+            val={""}
+            propNameProps={{
+              style: {
+                background: color,
+              },
+            }}
+          />
+          <PropCell
+            name="category"
+            valueAsLink={{
+              path: `/products?category=${category}`,
+            }}
+            val={category}
+          />
           <PropCell name="quantity" val={quantity.toString()} />
-
           {isDashboard && (
             <PropCell name="has solded" val={(sold || 0) + " units"} />
           )}
+
+          <PropCell
+            className="single-product-description"
+            name="description"
+            val={description}
+          />
         </div>
+      </div>
 
-        <div className="single-product-btns">
-          {isDashboard ? (
-            <>
-              <button
-                className="red-btn"
-                disabled={isLoading}
-                onClick={() => deleteProduct(id)}
-              >
-                delete
-              </button>
-              <Link
-                to={`/dashboard/edit-product/${id}`}
-                relative="path"
-                className="btn"
-                data-disabled={isLoading}
-              >
-                edit
-              </Link>
-            </>
-          ) : (
-            <>
-              {user ? (
-                <button
-                  ref={addToCartBtnRef}
-                  className={`btn${
-                    addToCartLoading
-                      ? " center spinner-pseudo-after fade scale"
-                      : ""
-                  }`}
-                  disabled={addToCartLoading || !isInStock}
-                  onClick={() => {
-                    if (!isInCart) {
-                      addToCart({
-                        productId: id,
-                        count: 1,
-                      });
-                    }
-                  }}
-                >
-                  <FillIcon
-                    diminsions={23}
-                    stroke={<PiShoppingCartSimpleLight />}
-                    fill={<PiShoppingCartSimpleFill />}
-                  />
-                  {isInCart
-                    ? "show cart"
-                    : `${!isInStock ? "add to cart" : "sold out"}`}
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  relative="path"
-                  data-disabled={!isInStock}
-                  className="btn"
-                >
-                  {isInStock ? "add to cart" : "sold out"}
-                </Link>
-              )}
+      <div className="single-product-btns">
+        {isDashboard ? (
+          <>
+            <button
+              title="open modal for choosing delete product or not btn"
+              className="red-btn delete-single-product"
+              disabled={isLoading}
+              onClick={() => sureToDeleteModalRef.current?.toggleModal(true)}
+            >
+              <FillIcon stroke={<BsTrash3 />} fill={<BsTrash3Fill />} />
+              delete
+            </button>
 
-              <button
-                className={`btn${
-                  wishlistLoading
-                    ? " center spinner-pseudo-after fade scale"
-                    : ""
-                }`}
-                ref={toggleWishlistBtnRef}
-                onClick={toggleFromWishlist}
-                disabled={wishlistLoading}
-              >
-                {isInWishlist ? (
-                  <>
-                    <FaHeart />
-                    Remove from wishlist
-                  </>
-                ) : (
-                  <>
+            <Link
+              title="go to edit product page btn"
+              to={`/dashboard/edit-product/${id}`}
+              relative="path"
+              className="btn"
+              data-disabled={isLoading}
+            >
+              <FillIcon
+                diminsions={20}
+                stroke={<RiBallPenLine />}
+                fill={<RiBallPenFill />}
+              />
+              edit
+            </Link>
+          </>
+        ) : (
+          <>
+            {user ? (
+              <>
+                {isInCart ? (
+                  <Link
+                    title="go to cart btn"
+                    to="/cart"
+                    relative="path"
+                    className="btn"
+                  >
                     <FillIcon
-                      diminsions={21}
-                      stroke={<FaRegHeart />}
-                      fill={<FaHeart />}
+                      diminsions={23}
+                      stroke={<PiShoppingCartSimpleLight />}
+                      fill={<PiShoppingCartSimpleFill />}
                     />
-                    add to wishlist
-                  </>
+                    show cart
+                  </Link>
+                ) : (
+                  <button
+                    title="add to cart btn"
+                    ref={addToCartBtnRef}
+                    className={`btn${
+                      addToCartLoading
+                        ? " center spinner-pseudo-after fade scale"
+                        : ""
+                    }`}
+                    disabled={addToCartLoading || !isInStock}
+                    onClick={() => {
+                      if (!isInCart) {
+                        addToCart({
+                          productId: id,
+                          count: 1,
+                        });
+                      }
+                    }}
+                  >
+                    <FillIcon
+                      diminsions={23}
+                      stroke={<PiShoppingCartSimpleLight />}
+                      fill={<PiShoppingCartSimpleFill />}
+                    />
+                    {isInStock ? "add to cart" : "sold out"}
+                  </button>
                 )}
-              </button>
-            </>
-          )}
-        </div>
+              </>
+            ) : (
+              <Link
+                title="go to login before add product to cart btn"
+                to="/login"
+                relative="path"
+                data-disabled={!isInStock}
+                className="btn"
+              >
+                {isInStock ? "add to cart" : "sold out"}
+              </Link>
+            )}
 
-        {user?.isAdmin && !isDashboard && (
-          <Link
-            style={{
-              marginTop: 10,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-            className="btn"
-            to={"/dashboard/product/" + product._id}
-            relative="path"
-          >
-            <FillIcon
-              diminsions={20}
-              stroke={<RiBallPenLine />}
-              fill={<RiBallPenFill />}
-            />
-            Edit this product
-          </Link>
+            <button
+              title="toggle product from wishlist"
+              className={`btn${
+                wishlistLoading ? " center spinner-pseudo-after fade scale" : ""
+              }`}
+              ref={toggleWishlistBtnRef}
+              onClick={toggleFromWishlist}
+              disabled={wishlistLoading}
+            >
+              {isInWishlist ? (
+                <>
+                  <FaHeart />
+                  Remove from wishlist
+                </>
+              ) : (
+                <>
+                  <FillIcon
+                    diminsions={21}
+                    stroke={<FaRegHeart />}
+                    fill={<FaHeart />}
+                  />
+                  add to wishlist
+                </>
+              )}
+            </button>
+          </>
         )}
       </div>
 
+      <AreYouSureModal
+        ref={sureToDeleteModalRef}
+        toggleClosingFunctions
+        functionToMake={() => {
+          deleteProduct(id);
+          sureToDeleteModalRef.current?.toggleModal(false);
+        }}
+      >
+        Are You sure you want to delete "
+        <span style={{ color: "var(--danger)", fontWeight: "bold" }}>
+          {product.title}
+        </span>
+        " product ?
+      </AreYouSureModal>
       <TopMessage ref={msgRef} />
     </>
   );

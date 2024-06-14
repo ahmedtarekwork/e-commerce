@@ -13,12 +13,12 @@ import { setUser } from "./store/fetures/userSlice";
 // react query
 import { useQuery } from "@tanstack/react-query";
 
+// components
+import SplashScreen from "./components/spinners/SplashScreen";
+
 // utils
 import cookies from "js-cookie";
 import { axiosWithToken } from "./utiles/axios";
-
-// components
-import SplashScreen from "./components/spinners/SplashScreen";
 
 // types
 import type { UserType } from "./utiles/types";

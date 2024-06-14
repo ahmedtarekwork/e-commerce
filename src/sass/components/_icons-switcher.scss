@@ -1,0 +1,23 @@
+.icons-switcher-holder-parent {
+  overflow: hidden;
+}
+
+.icons-switcher-holder {
+  --icon-color: var(--main);
+  @include flex(space-around, center, null, column);
+
+  height: 200%;
+  transition: 0.3s;
+
+  &.active {
+    translate: 0 -50%;
+  }
+
+  button {
+    display: grid;
+  }
+
+  svg {
+    fill: var(--icon-color);
+  }
+}

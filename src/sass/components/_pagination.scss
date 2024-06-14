@@ -1,0 +1,28 @@
+.pagination-holder {
+  margin-inline: auto;
+  @include flex(center, center);
+  border-radius: var(--radius);
+  overflow: hidden;
+  width: fit-content;
+
+  > * + * {
+    border-left: var(--brdr);
+  }
+
+  button {
+    background: var(--trans);
+    padding: 7px 15px;
+    font-weight: bold;
+    color: var(--dark);
+
+    &:hover {
+      color: #033575;
+      background: var(--dark-trans);
+    }
+
+    &.active {
+      background: var(--dark);
+      color: #fff;
+    }
+  }
+}

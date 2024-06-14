@@ -34,14 +34,15 @@ const PaymentSuccessOrFailedPage = ({
         Payment {type === "success" ? "Successful" : "canceled"}
       </h1>
 
-      {isDonatePath && (
+      {isDonatePath && type === "success" ? (
         <p className="donation-thanks-msg">
           Thank you for subscriping to one of our donation plans, we wish to
           give you some value For what you paid to us.
         </p>
-      )}
+      ) : null}
 
       <Link
+        title="success or failed payment operation action btn"
         to={`/${type === "success" ? "" : isDonatePath ? "donate" : "cart"}`}
         relative="path"
         className="btn success-of-fail-payment-page-btn"

@@ -35,6 +35,7 @@ const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
 
         <div className="btns-holder">
           <button
+            title="are you sude modal accept btn"
             className="btn"
             data-modal-status="accept"
             ref={acceptBtn}
@@ -46,6 +47,7 @@ const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
           </button>
 
           <button
+            title="are you sude modal cencel btn"
             className="red-btn"
             data-modal-status="cancel"
             onClick={() => modalRef.current?.toggleModal(false)}

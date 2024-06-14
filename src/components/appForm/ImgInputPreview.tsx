@@ -3,12 +3,12 @@ import {
   useImperativeHandle,
   useState,
   forwardRef,
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  MouseEvent,
   useEffect,
   useRef,
+  type ChangeEvent,
+  type SetStateAction,
+  type Dispatch,
+  type MouseEvent,
 } from "react";
 
 // react-hook-form
@@ -145,6 +145,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
               <li key={nanoid()} className="img-preview-cell">
                 <img src={img} alt="product image" width="100%" height="100%" />
                 <button
+                  title="remove image from list btn"
                   className="red-btn"
                   onClick={() =>
                     setImgsList((prev) =>
@@ -164,4 +165,5 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
     );
   }
 );
+
 export default ImgInputPreview;

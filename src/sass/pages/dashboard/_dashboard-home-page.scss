@@ -1,6 +1,21 @@
-.back-to-store-btn {
-  margin-bottom: 10px;
-  @include flex(center, center, 5px);
+.dashboard-page-top-btns {
+  margin-bottom: 17px;
+  @include flex(null, center, 10px);
+
+  @media (max-width: 535px) {
+    flex-direction: column;
+
+    li {
+      width: 100%;
+    }
+  }
+
+  button,
+  a {
+    text-align: center;
+    width: 100%;
+    @include flex(center, center, 5px);
+  }
 }
 
 .dashboard-squares-list {
@@ -8,11 +23,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  flex-wrap: wrap;
   margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
 .dashboard-square {
+  min-width: fit-content;
   flex: 1;
   background: var(--main);
 

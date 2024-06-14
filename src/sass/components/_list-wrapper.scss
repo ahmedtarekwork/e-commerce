@@ -1,0 +1,104 @@
+@mixin setBorders($borderVal, $radius) {
+  $borderTopRadius: map-get($radius, "top");
+  $borderBottomRadius: map-get($radius, "bottom");
+
+  border: $borderVal {
+    top: {
+      left-radius: $borderTopRadius;
+      right-radius: $borderTopRadius;
+    }
+    bottom: {
+      left-radius: $borderBottomRadius;
+      right-radius: $borderBottomRadius;
+    }
+  }
+}
+
+.list-wrapper {
+  overflow: hidden;
+
+  &.out-of-flow {
+    position: relative;
+
+    .list-wrapper-first-holder {
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      top: 100%;
+      --max-height: unset;
+      max-height: var(--max-height);
+      border-bottom-right-radius: var(--radius);
+      border-bottom-left-radius: var(--radius);
+
+      &.custom-width {
+        min-width: max-content !important;
+      }
+    }
+  }
+
+  &-btn {
+    @include flex(space-between, center, 10px);
+    width: 100%;
+    background: #fff;
+    padding: 7px;
+
+    * {
+      pointer-events: none;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    .app-arrow {
+      flex-basis: 12px;
+    }
+
+    @include setBorders(
+      var(--brdr),
+      (
+        "top": var(--radius),
+        "bottom": var(--radius),
+      )
+    );
+  }
+
+  &-first-holder {
+    width: 100%;
+    transition: grid-template-rows 0.3s;
+    display: grid;
+    grid-template-rows: 0fr;
+  }
+
+  &-last-holder {
+    overflow: auto;
+    background: #fff;
+
+    @include setBorders(
+      null,
+      (
+        "top": 0,
+        "bottom": var(--radius),
+      )
+    );
+  }
+
+  &.active {
+    .list-wrapper-first-holder {
+      grid-template-rows: 1fr;
+    }
+    .list-wrapper-last-holder {
+      border: var(--brdr);
+    }
+
+    .list-wrapper-btn {
+      border: {
+        bottom: {
+          color: transparent;
+          left-radius: 0;
+          right-radius: 0;
+        }
+      }
+    }
+  }
+}

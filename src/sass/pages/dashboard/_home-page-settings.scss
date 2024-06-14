@@ -1,0 +1,40 @@
+.home-page-slider-settings-imgs-list-preview {
+  margin-bottom: 20px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+
+    img {
+      margin-inline: auto;
+      display: block;
+      width: 200px;
+      max-width: 100%;
+      margin-bottom: 10px;
+      flex: 1;
+      object-fit: contain;
+    }
+
+    button {
+      margin-top: auto;
+    }
+  }
+}
+
+[for="add-first-img-to-home-slider"] {
+  text-align: center;
+}
+
+.home-page-slider-settings-down-btns {
+  @include flex(null, center, 10px);
+  flex-wrap: wrap;
+
+  > * {
+    flex: 1;
+    min-width: fit-content;
+  }
+
+  label {
+    text-align: center;
+  }
+}

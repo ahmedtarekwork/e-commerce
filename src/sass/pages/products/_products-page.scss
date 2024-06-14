@@ -1,0 +1,33 @@
+.products-page-spinner {
+  flex: 1;
+}
+
+.open-filters-btn {
+  width: fit-content;
+  margin-bottom: 10px;
+  @include flex(center, center, 5px);
+}
+
+.products-page-search-input-holder {
+  position: relative;
+
+  .icons-switcher-holder {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    z-index: 2;
+  }
+}
+
+.product-page-products-list {
+  margin-block: 20px;
+}
+
+.updating-products-list-element {
+  @include flex(center, center, 3px);
+  margin-bottom: 10px;
+}
+
+.pagination-holder {
+  margin-top: auto;
+}

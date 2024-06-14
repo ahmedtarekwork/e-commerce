@@ -7,7 +7,6 @@ type Props = {
   propNameProps?: ComponentProps<"span">;
   valueAsLink?: {
     path: string;
-    data: unknown;
   };
 } & ComponentProps<"p">;
 
@@ -32,6 +31,7 @@ const PropCell = ({
       <strong className="cell-prop-name">{name}: </strong>
       {valueAsLink ? (
         <button
+          title="property cell btn"
           className="hov link"
           onClick={() =>
             navigate(valueAsLink.path, {

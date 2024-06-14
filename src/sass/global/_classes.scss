@@ -31,17 +31,18 @@ a.btn,
 .green-btn {
   cursor: pointer;
   user-select: none;
+  transition: 0.3s;
 
   padding: 7px 10px;
   border-radius: 3px;
   color: #fff !important;
 
   &:is([disabled], [data-disabled="true"]) {
-    background: #999;
+    background: #999 !important;
     cursor: not-allowed;
 
     &:hover {
-      background: #888;
+      background: #888 !important;
     }
 
     &:active {
@@ -120,10 +121,15 @@ $status: (
 
 .flex-cell-prop-name {
   @include flex(flex-start, center, 10px);
+  flex-wrap: wrap;
 }
 strong.cell-prop-name {
   color: var(--dark);
   text-transform: capitalize;
+
+  + span {
+    overflow-wrap: anywhere;
+  }
 }
 
 .selected {

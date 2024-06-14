@@ -1,3 +1,8 @@
+.product-form-page-title {
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
 .product-imgs-area {
   @include cardBorder;
   padding: 10px;
@@ -48,6 +53,10 @@
   .add-input-holder {
     display: grid;
     place-content: center;
+
+    label {
+      height: 100%;
+    }
   }
 
   .input-holder {

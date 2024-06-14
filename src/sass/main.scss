@@ -7,20 +7,26 @@
 @import "global/animations";
 
 // pages \\
-// error page
-@import "pages/error-page";
+// empty page
+@import "pages/empty-page";
 
 // login-or-signup page
 @import "pages/login-or-signup-page";
 
 // home page
-@import "pages/dashboard-home-page";
+@import "pages/homepage/e-commerce-home-page";
+@import "pages/homepage/home-page-products-slider";
+
+// dashboard
+@import "pages/dashboard/dashboard-home-page";
+@import "pages/dashboard/home-page-settings";
 
 // orders page
 @import "pages/orders-page";
-@import "components/order-card";
+@import "components/order-card"; // => component
 
 // products pages
+@import "pages/products/products-page";
 @import "pages/products/product-form-page";
 @import "pages/products/single-product-page";
 
@@ -35,31 +41,40 @@
 @import "pages/payments/success-or-failed-payment";
 // donate
 @import "pages/payments/donate/donate-page";
-@import "pages/payments/donate/donate-card";
+@import "pages/payments/donate/donate-card"; // => component
 
 // layouts \\
 
 // app header
 @import "components/layout/header/header";
+
+// sidebar wrapper
+@import "components/layout/sidebar-wrapper";
+
 // app sidebar
-@import "components/layout/header/sider-bar";
+@import "components/layout/header/app-sider-bar";
 @import "components/layout/header/main-btns-list";
 
 // app footer
 @import "components/layout/app-footer";
 
-// some elements \\
-// yellow warning
+// components \\
+// yellow warning paragraph
 @import "components/warning";
 // top msg
 @import "components/top-msg";
+// icons switcher
+@import "components/icons-switcher";
 
 // grid list
 @import "components/layout/grid-list";
+
 // imgs slider
 @import "components/imgs-slider";
+
 // fill icon element
 @import "./components/fill-icon";
+
 // section
 @import "components/section";
 
@@ -70,6 +85,9 @@
 @import "components/form/app-form";
 @import "components/form/form-list";
 @import "components/form/form-table";
+
+// app lists wrapper
+@import "components/list-wrapper";
 
 // selct list
 @import "./components/selectList/select-list";
@@ -84,3 +102,9 @@
 
 // product card
 @import "components/product-card";
+
+// go to home btn
+@import "components/go-to-home-btn";
+
+// pagination component
+@import "components/pagination";

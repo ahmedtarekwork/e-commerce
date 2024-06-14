@@ -157,6 +157,7 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
                 }
               >
                 <button
+                  title="close app modal btn"
                   ref={closeBtnEl}
                   className="modal-close-btn red-btn"
                   onClick={() => toggleModal(false)}
