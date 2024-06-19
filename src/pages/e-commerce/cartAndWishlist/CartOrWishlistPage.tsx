@@ -21,9 +21,7 @@ const CartOrWishlistPage = () => {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div className="section">
-        <Heading content={title} />
-      </div>
+      <Heading>{title}</Heading>
 
       {isCartPage ? (
         <CartArea

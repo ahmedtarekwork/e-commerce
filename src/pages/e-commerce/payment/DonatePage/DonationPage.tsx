@@ -13,24 +13,25 @@ import { setUser } from "../../../../store/fetures/userSlice";
 // components
 import Heading from "../../../../components/Heading";
 import Warning from "../../../../components/Warning";
+import DangerZone from "../../../../components/dangerZone/DangerZone";
+
 import DonatePlanCard, {
   type DonatePlanCardComponentProps,
 } from "./DonatePlanCard";
 import TopMessage, {
-  TopMessageRefType,
+  type TopMessageRefType,
 } from "../../../../components/TopMessage";
 
 // utils
-import { axiosWithToken } from "../../../../utiles/axios";
+import axios from "../../../../utiles/axios";
 import handleError from "../../../../utiles/functions/handleError";
 
 // types
 import { type AppModalRefType } from "../../../../components/modals/appModal/AppModal";
-import DangerZone from "../../../../components/dangerZone/DangerZone";
 
 // fetchers
 const DeleteDonationMutationFn = async () => {
-  return (await axiosWithToken.delete("payment/donate")).data;
+  return (await axios.delete("payment/donate")).data;
 };
 
 const donatePlanArr: Omit<DonatePlanCardComponentProps, "user">[] = [
@@ -92,9 +93,7 @@ const DonationPage = () => {
 
   return (
     <>
-      <div className="section">
-        <Heading content="Donate Us" />
-      </div>
+      <Heading>Donate Us</Heading>
 
       <Warning>
         This page for practise on Stripe Recurring Payments only, It's not a

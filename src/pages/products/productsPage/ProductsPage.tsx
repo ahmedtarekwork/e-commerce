@@ -1,24 +1,17 @@
 // react
-import { type ComponentProps, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // react-router-dom
-import {
-  Link,
-  useLocation,
-  // useSearchParams
-} from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 // react query
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // redux
 import useSelector from "../../../hooks/redux/useSelector";
 import useDispatch from "../../../hooks/redux/useDispatch";
 // redux actions
-import {
-  addProducts,
-  addToPaginatedProducts,
-} from "../../../store/fetures/productsSlice";
+import { addProducts } from "../../../store/fetures/productsSlice";
 
 // components
 import Heading from "../../../components/Heading";
@@ -29,156 +22,204 @@ import Pagination from "../../../components/Pagination";
 import EmptyPage from "../../../components/layout/EmptyPage";
 import Spinner from "../../../components/spinners/Spinner";
 import FillIcon from "../../../components/FillIcon";
-
-import ProductsPageFilterCell, {
-  type ProductsPageFilterCellRefType,
-} from "./components/ProductsPageFilterCell";
-
-import SidebarWrapper, {
-  type SidebarWraperComponentRefType,
-} from "../../../components/layout/SidebarWrapper";
-
 import ProductsPageSearch from "./components/ProductsPageSearch";
+import GoToMakeNewProductsBtn from "./components/GoToMakeNewProductsBtn";
+
+// filters list
+import ProductsPageFiltersList, {
+  type AvailabilityOption,
+  type ProductsPageFiltersListRefType,
+} from "./components/productsPageFilters/ProductsPageFiltersList";
 
 // hooks
 import useInitProductsCells from "../../../hooks/useInitProductsCells";
-import useGetCategories from "../../../hooks/ReactQuery/useGetCategories";
 
 // utils
-import { axiosWithToken } from "../../../utiles/axios";
+import axios from "../../../utiles/axios";
 
 // types
 import type { ProductType } from "../../../utiles/types";
 
 // icons
 import { RiFilterLine, RiFilterFill } from "react-icons/ri";
+import { TbFilterStar } from "react-icons/tb";
 
 // SVGs
 import makeNewProductSvg from "../../../../imgs/make.svg";
 import NoSearchResault from "../../../../imgs/no-search-resault.svg";
+import NoFiltersResault from "../../../../imgs/no_Filters.svg";
+
+export type FiltersListType = {
+  categories?: string[] | undefined;
+  brands?: string[] | undefined;
+  priceRange?: Record<"min" | "max", number> | undefined;
+  availability?: AvailabilityOption;
+};
 
 type getProductsQueryFnType = (params: {
-  queryKey: [string, number, number, string];
-}) => Promise<{ products: ProductType[]; pagesCount: number }>;
+  queryKey: [string, number, number, string, FiltersListType];
+}) => Promise<{
+  products: ProductType[];
+  pagesCount: number;
+  priceRange: Record<"min" | "max", number>;
+}>;
 
 // fetchers
 const getProductsQueryFn: getProductsQueryFnType = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  queryKey: [_key, page, limit, titleStartsWith],
+  queryKey: [_key, page, limit, titleStartsWith, filtersList],
 }) => {
+  const searchOption = titleStartsWith.replaceAll(`\\`, "");
+  const implementedSearchOption = searchOption
+    ? `titleStartsWith=${searchOption}`
+    : "";
+
+  const filtersOption = Object.entries(filtersList)
+    .filter((arr) => {
+      if (Array.isArray(arr[1])) {
+        return !!arr[1].length;
+      } else return !!arr[1];
+    })
+    .map(([query, value]) => {
+      if (query !== "priceRange") {
+        return `${query}=${value}`;
+      }
+      if (query === "priceRange" && value) {
+        return Object.entries(value)
+          .map(
+            ([key, price]) =>
+              `price${key[0].toUpperCase() + key.slice(1)}=${price}`
+          )
+          .join("&");
+      }
+    })
+    .join("&");
+
   return (
-    await axiosWithToken.get(
-      `products?limit=${limit}&page=${page}&titleStartsWith=${titleStartsWith.replaceAll(
-        `\\`,
-        ""
-      )}`
+    await axios.get(
+      `products?limit=${limit}&page=${page}&${implementedSearchOption}&${filtersOption}`
     )
   ).data;
 };
 
-// make new product btn
-const GoToMakeNewBtn = ({ ...attr }: ComponentProps<"a">) => (
-  <Link
-    title="make a new product btn"
-    to="/dashboard/new-product"
-    relative="path"
-    {...attr}
-    className={`btn${attr.className ? ` ${attr.className}` : ""}`}
-  >
-    make a new product
-  </Link>
-);
-
 const ProductsPage = () => {
+  const queryClient = useQueryClient();
+  const { listCell } = useInitProductsCells();
+
   // react router dom
-  // const [searchParams] = useSearchParams();
-  // const category = searchParams.get("category");
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category");
+  const brand = searchParams.get("brand");
+  const initCategories = category ? [category] : undefined;
+  const initBrands = brand ? [brand] : undefined;
+
   const { pathname } = useLocation();
   const isDashboard = pathname.includes("dashboard");
-
-  // console.log(category);
 
   // refs
   const initRender = useRef(true);
   const searchQuery = useRef("");
-  const filtersListRef = useRef<SidebarWraperComponentRefType>(null);
-  const catsListRef = useRef<ProductsPageFilterCellRefType>(null);
+  const pagesCount = useRef<number | undefined>(undefined);
+
+  const filtersListRef = useRef<ProductsPageFiltersListRefType>(null);
+
   const openFiltersBtnRef = useRef<HTMLButtonElement>(null);
 
   // redux and global states
   const dispatch = useDispatch();
-  const { pagenatedProducts: products, products: productsList } = useSelector(
-    (state) => state.products
-  );
+  const { products: productsList } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.user);
-  const { listCell } = useInitProductsCells();
 
   const limit = 3;
+  const [paginatedProducts, setPaginatedProducts] = useState<
+    Record<number, ProductType[]>
+  >({});
   const [page, setPage] = useState(1);
-  const [searchPorducts, setSearchProducts] = useState<ProductType[]>([]);
   const [searchMode, setSearchMode] = useState(false);
-  const [filtersListCloseList, setFiltersListCloseList] = useState<
-    (HTMLElement | null)[]
-  >([]);
+
+  const [filtersList, setFiltersList] = useState<FiltersListType>({
+    categories: initCategories,
+    brands: initBrands,
+  });
 
   // get products
   const {
+    error,
     data: apiProducts,
-    refetch: getProducts,
     isPending: loading,
     isError,
     isSuccess,
     fetchStatus,
   } = useQuery({
-    queryKey: ["getProducts", page, limit, searchQuery.current],
+    queryKey: ["getProducts", page, limit, searchQuery.current, filtersList],
     queryFn: getProductsQueryFn,
   });
-  const noSearchResault = searchMode && !searchPorducts.length && !loading;
 
-  // get categories
-  const { data: categories, isPending: categoriesLoading } = useGetCategories();
+  const noSearchResault =
+    searchMode &&
+    !Object.values(paginatedProducts).flat(Infinity).length &&
+    !loading;
+
+  const noFiltersResault =
+    (filtersList.brands?.length ||
+      filtersList.categories?.length ||
+      filtersList.priceRange) &&
+    !searchMode &&
+    !loading &&
+    !Object.values(paginatedProducts).flat(Infinity).length;
 
   useEffect(() => {
-    setFiltersListCloseList([openFiltersBtnRef.current]);
-  }, []);
-
-  useEffect(() => {
-    getProducts();
-  }, [page, limit, searchMode]); // don't change dependencies array
-
-  useEffect(() => {
-    if (!initRender) setPage(1);
-  }, [searchMode]);
+    if (!initRender.current) {
+      queryClient.prefetchQuery({
+        queryKey: [
+          "getProducts",
+          page,
+          limit,
+          searchQuery.current,
+          filtersList,
+        ],
+      });
+    }
+  }, [queryClient, filtersList, page, limit, searchMode]); // don't change dependencies array
 
   useEffect(() => {
     if (apiProducts) {
       if (initRender.current) initRender.current = false;
+      pagesCount.current = apiProducts.pagesCount || 1;
 
-      if (!searchMode) {
-        dispatch(
-          addToPaginatedProducts({
-            page,
-            products: apiProducts.products,
-          })
-        );
-      } else {
-        setSearchProducts(apiProducts.products);
-      }
+      setPaginatedProducts((prev) => {
+        if (filtersListRef.current?.isResetProductsRef.current) {
+          filtersListRef.current.isResetProductsRef.current = false;
+          return { [page]: apiProducts.products };
+        }
+
+        const oldProducts = prev[page] || [];
+        const newProducts = oldProducts.length
+          ? apiProducts.products.filter(({ _id }) =>
+              oldProducts.every(({ _id: same }) => same !== _id)
+            )
+          : apiProducts.products;
+
+        return {
+          ...prev,
+          [page]: [...oldProducts, ...newProducts],
+        };
+      });
 
       dispatch(addProducts(apiProducts.products));
     }
-  }, [apiProducts, dispatch, page, searchMode]);
+  }, [apiProducts, dispatch, page]);
 
   if (isError)
     return (
       <DisplayError
-        error={null}
+        error={error}
         initMsg="something went wrong while displaying products"
       />
     );
 
   // if no products
-  if (!productsList.length && isSuccess && !searchMode) {
+  if (!productsList.length && isSuccess) {
     return (
       <EmptyPage
         content={
@@ -201,7 +242,9 @@ const ProductsPage = () => {
           isDashboard
             ? {
                 type: "custom",
-                btn: <GoToMakeNewBtn style={{ marginInline: "auto" }} />,
+                btn: (
+                  <GoToMakeNewProductsBtn style={{ marginInline: "auto" }} />
+                ),
               }
             : {
                 type: "GoToHome",
@@ -214,22 +257,25 @@ const ProductsPage = () => {
   const onSearchValueChangeFn = (value: string) => {
     searchQuery.current = value;
     setSearchMode(!!searchQuery.current);
+    setPage(1);
+    setPaginatedProducts({});
   };
 
-  // if there are products
   return (
     <>
-      <div className="section">
-        <Heading content="Products List" />
-        {isDashboard && user?.isAdmin && (
-          <GoToMakeNewBtn style={{ marginBottom: 10 }} />
-        )}
-      </div>
+      <Heading>Products List</Heading>
+
+      {isDashboard && user?.isAdmin && (
+        <GoToMakeNewProductsBtn style={{ marginBottom: 10 }} />
+      )}
 
       <button
+        disabled={loading}
         title="open products filters list btn"
         className="btn open-filters-btn"
-        onClick={() => filtersListRef.current?.setToggleSidebar(true)}
+        onClick={() =>
+          filtersListRef.current?.sidebarRef.current?.setToggleSidebar?.(true)
+        }
         ref={openFiltersBtnRef}
       >
         <FillIcon stroke={<RiFilterLine />} fill={<RiFilterFill />} />
@@ -253,60 +299,78 @@ const ProductsPage = () => {
         </div>
       ) : (
         <>
-          {noSearchResault ? (
+          {noFiltersResault && (
+            <EmptyPage
+              centerPage={false}
+              content="No products with your Filters"
+              svg={NoFiltersResault}
+              withBtn={{
+                type: "custom",
+                btn: (
+                  <button
+                    className="btn no-filters-resault-sidebar-toggler"
+                    onClick={() =>
+                      filtersListRef.current?.sidebarRef.current?.setToggleSidebar(
+                        true
+                      )
+                    }
+                  >
+                    <TbFilterStar />
+                    Edit Your Filters
+                  </button>
+                ),
+              }}
+            />
+          )}
+
+          {noSearchResault && (
             <EmptyPage
               centerPage={false}
               content="No products with your search"
               svg={NoSearchResault}
             />
-          ) : (
+          )}
+
+          {!noFiltersResault && !noSearchResault && (
             <GridList
               isChanging={false}
               cells={listCell}
               initType="column"
               className="product-page-products-list"
             >
-              {(searchMode ? searchPorducts : products[page])?.map(
-                (product) => (
-                  <ProductCard
-                    withAddToWishList
-                    key={product._id}
-                    product={product}
-                    withAddToCart={!isDashboard}
-                  />
-                )
-              )}
+              {paginatedProducts[page]?.map((product) => (
+                <ProductCard
+                  withAddToWishList
+                  key={product._id}
+                  product={product}
+                  withAddToCart={!isDashboard}
+                />
+              ))}
             </GridList>
           )}
         </>
       )}
 
-      {!noSearchResault && (
+      {!!apiProducts?.products.length && !loading && (
         <Pagination
           activePage={page}
-          pagesCount={apiProducts?.pagesCount}
+          pagesCount={pagesCount.current}
           setActivePage={setPage}
         />
       )}
 
-      <SidebarWrapper
-        insideClose={false}
+      <ProductsPageFiltersList
         ref={filtersListRef}
-        closeList={{
-          reversedList: filtersListCloseList,
-        }}
-        id="filters-list-sidebar"
-      >
-        <ul className="products-page-filters-list">
-          <ProductsPageFilterCell
-            ref={catsListRef}
-            optionsList={categories}
-            title="Categories"
-            type="check-list"
-            loading={true}
-          />
-        </ul>
-      </SidebarWrapper>
+        setPage={setPage}
+        sidebarCloseList={[
+          openFiltersBtnRef.current,
+          document.querySelector(".no-filters-resault-sidebar-toggler"),
+        ]}
+        apiPriceRange={apiProducts?.priceRange}
+        setFiltersList={setFiltersList}
+        initCategories={initCategories}
+        initBrands={initBrands}
+      />
     </>
   );
 };

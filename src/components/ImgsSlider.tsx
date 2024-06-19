@@ -1,8 +1,14 @@
-// react
-import { type CSSProperties, createRef, useEffect, useRef } from "react";
-
 // utils
 import { nanoid } from "@reduxjs/toolkit";
+
+// swiper.js
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Autoplay } from "swiper/modules";
+// swiper.css
+import "swiper/css";
+import "swiper/css/pagination";
+// swiper types
+import type { SwiperOptions } from "swiper/types";
 
 type Props = {
   imgs: string[];
@@ -15,87 +21,50 @@ type Props = {
 };
 
 const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
-  const imgsHoldersRefs = imgs.map(() => createRef<HTMLDivElement>());
-  const SliderBtnsRefs = imgs.map(() => createRef<HTMLButtonElement>());
+  const swiperConfig: SwiperOptions = {};
 
-  const activeIndex = useRef<number>(0);
+  if (imgs.length > 1) {
+    swiperConfig.modules = [...(swiperConfig.modules || []), Pagination];
+    swiperConfig.pagination = {
+      dynamicBullets: true,
+    };
+  }
 
-  let interval: number = 0;
-
-  const setActiveImg = (activeIndex: number) => {
-    SliderBtnsRefs.forEach((btn, index) =>
-      btn.current?.classList.toggle("active", index === activeIndex)
-    );
-
-    imgsHoldersRefs.forEach((holder) => {
-      if (holder.current)
-        holder.current.style.translate = `calc(${activeIndex * -100}% - ${
-          activeIndex * 10
-        }px)`;
-    });
-  };
-
-  const slideImgs = () => {
-    clearInterval(interval);
-
-    interval = setInterval(() => {
-      const maxLength = imgsHoldersRefs.length;
-
-      const nextIndex =
-        activeIndex.current + 1 === maxLength ? 0 : activeIndex.current + 1;
-      activeIndex.current = nextIndex;
-
-      setActiveImg(nextIndex);
-    }, withTimer?.time) as unknown as number;
-  };
-
-  // play the interval for sliding imgs if "withTimer.value = true" in intial render || when the props.withTimer is changing to "true"
-  // --> "don't change dependinces array!"
-  useEffect(() => {
-    if (withTimer?.value) {
-      slideImgs();
-      return () => clearInterval(interval);
-    }
-  }, [withTimer]);
+  if (withTimer?.value) {
+    swiperConfig.modules = [...(swiperConfig.modules || []), Autoplay];
+    swiperConfig.autoplay = {
+      delay: withTimer?.time,
+    };
+  }
 
   return (
-    <div className={`slider-big-holder${isHomeSlider ? " home-slider" : ""}`}>
-      <div
-        className="slider-real-list"
-        style={
-          {
-            "--img-width": imgWidth,
-            width: imgs.length * 100 + "%",
-          } as CSSProperties
-        }
-      >
-        {imgs.map((img, i) => (
-          <div
-            key={nanoid()}
-            className="slider-img-holder"
-            ref={imgsHoldersRefs[i]}
-          >
-            <img width="100%" height="100%" src={img} alt="prodcut image" />
-          </div>
-        ))}
-      </div>
-
-      {(imgs.length || 0) > 1 ? (
-        <div className="slider-dots-holder">
-          {imgs.map((_, i) => (
-            <button
-              ref={SliderBtnsRefs?.[i]}
-              onClick={() => {
-                setActiveImg(i);
-                if (withTimer) slideImgs();
-              }}
-              key={nanoid()}
-              className={`slider-dot ${i === 0 ? "active" : ""}`}
-            ></button>
-          ))}
-        </div>
-      ) : null}
-    </div>
+    <Swiper
+      className={isHomeSlider ? "home-slider" : ""}
+      loop={isHomeSlider}
+      slidesPerView={"auto"}
+      {...swiperConfig}
+    >
+      {imgs.map((img) => (
+        <SwiperSlide
+          key={nanoid()}
+          style={{
+            display: "grid",
+            placeContent: "center",
+          }}
+        >
+          <img
+            style={{
+              objectFit: "contain",
+              width: imgWidth,
+            }}
+            width={imgWidth}
+            height={imgWidth}
+            src={img}
+            alt="prodcut image"
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 };
 export default ImgsSlider;

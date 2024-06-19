@@ -1,16 +1,16 @@
 // components
 import DeleteUserBtn, {
-  DeleteUserBtnProps,
+  type DeleteUserBtnProps,
 } from "../../components/DeleteUserBtn";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-``;
+
 // utiles
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 const deleteUserMutationFn = async (userId: string) => {
-  return (await axiosWithToken.delete("users/" + userId)).data;
+  return (await axios.delete("users/" + userId)).data;
 };
 
 const useDeleteUserBtn = (userId?: string) => {

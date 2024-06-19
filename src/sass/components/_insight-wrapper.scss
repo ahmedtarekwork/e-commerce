@@ -1,0 +1,13 @@
+.insight-wrapper .chart-holder {
+  max-width: min(100%, var(--diminsion));
+  margin-inline: auto;
+
+  @media (max-width: 350px) {
+    aspect-ratio: 1/1;
+  }
+
+  canvas {
+    max-width: 100%;
+    width: 100%;
+  }
+}

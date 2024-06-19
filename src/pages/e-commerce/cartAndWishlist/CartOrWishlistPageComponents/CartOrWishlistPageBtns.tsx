@@ -27,7 +27,7 @@ import useGetPaymentSessionURL from "../../../../hooks/ReactQuery/useGetPaymentS
 import type { UserType } from "../../../../utiles/types";
 
 // utils
-import { axiosWithToken } from "../../../../utiles/axios";
+import axios from "../../../../utiles/axios";
 import handleError from "../../../../utiles/functions/handleError";
 
 type Props = {
@@ -36,15 +36,15 @@ type Props = {
 
 // fetchers
 const clearCartMutationFn = async () => {
-  return await axiosWithToken.delete("carts/empty-user-cart");
+  return await axios.delete("carts/empty-user-cart");
 };
 
 const deleteWishlistMutationFn = async (user: UserType) => {
-  return (await axiosWithToken.put("users/" + user._id, user)).data;
+  return (await axios.put("users/" + user._id, user)).data;
 };
 
 const makeOrderMutationFn = async () => {
-  return (await axiosWithToken.post("/orders")).data;
+  return (await axios.post("/orders")).data;
 };
 
 export type PayMethods = "Cash on Delivery" | "Card";
@@ -203,6 +203,7 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
               <CartCheckoutMethod
                 payMethod={payMethod}
                 setPayMethod={setPayMethod}
+                cartBtnRef={makeOrderBtnRef}
               />
               <PropCell
                 style={{

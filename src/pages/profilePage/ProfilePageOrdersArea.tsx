@@ -7,11 +7,11 @@ import { useQuery } from "@tanstack/react-query";
 // components
 import OrdersArea from "../../components/orders/OrdersArea";
 
-// utiles
-import { axiosWithToken } from "../../utiles/axios";
+// utils
+import axios from "../../utiles/axios";
 
 // types
-import { OrderType, UserType } from "../../utiles/types";
+import type { OrderType, UserType } from "../../utiles/types";
 
 type Props = {
   user: UserType;
@@ -25,7 +25,7 @@ const getUserOrdersQueryFn = async ({
   queryKey: string[];
 }): Promise<{ orders: OrderType[]; orderby: string }> => {
   if (!userId) throw new Error("user id is required");
-  return (await axiosWithToken("orders/user-orders/" + userId)).data;
+  return (await axios("orders/user-orders/" + userId)).data;
 };
 
 const ProfilePageOrdersArea = ({ user, isCurrentUserProfile }: Props) => {
@@ -33,7 +33,6 @@ const ProfilePageOrdersArea = ({ user, isCurrentUserProfile }: Props) => {
   const {
     refetch: getUserOrders,
     data: userOrders,
-    error: userOrdersErrData,
     isError: userOrdersErr,
     isPending: userOrdersLoading,
   } = useQuery({
@@ -50,7 +49,6 @@ const ProfilePageOrdersArea = ({ user, isCurrentUserProfile }: Props) => {
     <>
       <h3>orders</h3>
       <OrdersArea
-        error={userOrdersErrData}
         isError={userOrdersErr}
         loading={userOrdersLoading}
         orders={userOrders?.orders || []}

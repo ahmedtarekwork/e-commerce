@@ -1,6 +1,6 @@
 .go-to-edit-product-btn {
-  margin-block: 10px;
-  @include flex(center, center, 10px);
+  margin-bottom: 10px;
+  @include flex(center, center, 5px);
 }
 
 .single-product-wrapper {
@@ -11,6 +11,13 @@
   }
 }
 
+.single-product-title {
+  color: var(--main);
+  font-size: 25px;
+  text-align: center;
+  width: fit-content;
+}
+
 .single-product-color {
   @include flex(flex-start, center, 10px);
   span:last-child {
@@ -19,6 +26,11 @@
     display: block;
     border-radius: var(--radius);
   }
+}
+
+.single-product-quantity-number {
+  color: var(--dark);
+  font-weight: bold;
 }
 
 .single-product-description {
@@ -44,11 +56,16 @@
   }
 }
 
+.single-product-page-insights-list {
+  margin-block: 30px;
+}
+
 .single-product-btns {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
   flex-wrap: wrap;
+  border-top: var(--brdr);
+  padding-top: 10px;
 
   > * {
     @include flex(center, center, 10px);

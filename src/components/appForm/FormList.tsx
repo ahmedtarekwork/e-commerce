@@ -15,13 +15,11 @@ export type FromListInputProps = {
 } & ComponentProps<"input">;
 
 type Listprops = {
-  sectionTitle?: string;
   inputsList: FromListInputProps[];
   ListType: FormListType;
 } & ComponentProps<"ul">;
 
 const FormList = ({
-  sectionTitle: title,
   ListType,
   inputsList,
 
@@ -30,8 +28,7 @@ const FormList = ({
   const { className } = listAttr;
 
   return (
-    <div className="form-list-holder">
-      {title && <h3 className="form-secondary-title">{title}</h3>}
+    <>
       <ul
         {...listAttr}
         className={`form-list${className ? ` ${className}` : ""}`}
@@ -52,7 +49,7 @@ const FormList = ({
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 };
 

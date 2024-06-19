@@ -22,6 +22,7 @@ import ErrorDiv from "../../components/appForm/Input/ErrorDiv";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import EmptyPage from "../../components/layout/EmptyPage";
 import DisplayError from "../../components/layout/DisplayError";
+
 import TopMessage, {
   type TopMessageRefType,
 } from "../../components/TopMessage";
@@ -29,9 +30,9 @@ import ImgInputPreview, {
   type ImgInputPreviewRefType,
 } from "../../components/appForm/ImgInputPreview";
 
-// utiles
+// utils
 import handleError from "../../utiles/functions/handleError";
-import axios, { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
 import type { ProductType } from "../../utiles/types";
@@ -62,7 +63,7 @@ const getSingleProductQueryFn = async ({
 };
 
 const addProductMutationFn = async (productData: requestProductType) => {
-  return (await axiosWithToken.post("/products", productData)).data;
+  return (await axios.post("/products", productData)).data;
 };
 
 const editProductMutationFn = async ({
@@ -72,7 +73,7 @@ const editProductMutationFn = async ({
   productData: requestProductType;
   prdId: string;
 }) => {
-  return (await axiosWithToken.put("products/" + prdId, productData)).data;
+  return (await axios.put("products/" + prdId, productData)).data;
 };
 
 const NewProductPage = () => {

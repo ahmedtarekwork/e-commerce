@@ -8,7 +8,8 @@ import HomePageProductsSlider, {
 import { nanoid } from "@reduxjs/toolkit";
 
 // hooks
-import useGetCategories from "../../../../../hooks/ReactQuery/useGetCategories";
+import useGetCategories from "../../../../../hooks/ReactQuery/products/useGetCategories";
+import Heading from "../../../../../components/Heading";
 
 const HomePageCategoriesLists = () => {
   const { data: categories, isPending: categoriesLoading } =
@@ -29,12 +30,18 @@ const HomePageCategoriesLists = () => {
     const sections: ProductsSliderFilters[] = [{ bestSell: true }];
     categories.map((c) => sections.push({ category: c }));
 
-    return sections.map((slider) => (
-      <HomePageProductsSlider
-        key={nanoid()}
-        filters={{ ...slider, limit: 10 }}
-      />
-    ));
+    return (
+      <>
+        <Heading>Browse Our Collections</Heading>
+
+        {sections.map((slider) => (
+          <HomePageProductsSlider
+            key={nanoid()}
+            filters={{ ...slider, limit: 10 }}
+          />
+        ))}
+      </>
+    );
   }
 };
 export default HomePageCategoriesLists;

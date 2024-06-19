@@ -6,13 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../redux/useDispatch";
+// redux actions
 import { setCartLoading } from "../../../store/fetures/userSlice";
 
 // types
 import type { CartType, ProductType } from "../../../utiles/types";
 
 // utils
-import { axiosWithToken } from "../../../utiles/axios";
+import axios from "../../../utiles/axios";
 
 // we know the user that's will get his cart with token
 type CartResponseType = Omit<CartType, "products"> & {
@@ -37,7 +38,7 @@ const getCartQueryFn = async ({
   queryKey: string[];
 }): Promise<CartType | { msg: string }> => {
   const cart: CartResponseType | { msg: string } = (
-    await axiosWithToken(`carts/get-user-cart${id ? `/${id}` : ""}`)
+    await axios(`carts/get-user-cart${id ? `/${id}` : ""}`)
   ).data;
 
   const emptyMsg = id

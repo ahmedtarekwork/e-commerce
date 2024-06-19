@@ -137,15 +137,17 @@ const HomePageProductsSlider = ({ filters }: Props) => {
             </SwiperSlide>
           ))}
 
-          <SwiperSlide className="home-page-products-slider-explore-more-card">
-            <Link
-              title="go to products page with specific category btn"
-              to={`/products?category=${category}`}
-              relative="path"
-            >
-              <span className="plus-icon">+</span> More
-            </Link>
-          </SwiperSlide>
+          {!bestSell && category && (
+            <SwiperSlide className="home-page-products-slider-explore-more-card">
+              <Link
+                title="go to products page with specific category btn"
+                to={`/products?category=${category}`}
+                relative="path"
+              >
+                <span className="plus-icon">+</span> More
+              </Link>
+            </SwiperSlide>
+          )}
         </Swiper>
       </div>
     )

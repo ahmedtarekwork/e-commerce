@@ -5,6 +5,8 @@
 @import "global/global";
 @import "global/classes";
 @import "global/animations";
+// swiper custom styles
+@import "global/swiper";
 
 // pages \\
 // empty page
@@ -59,6 +61,9 @@
 @import "components/layout/app-footer";
 
 // components \\
+// insight wrapper
+@import "components/insight-wrapper";
+
 // yellow warning paragraph
 @import "components/warning";
 // top msg
@@ -69,14 +74,8 @@
 // grid list
 @import "components/layout/grid-list";
 
-// imgs slider
-@import "components/imgs-slider";
-
 // fill icon element
 @import "./components/fill-icon";
-
-// section
-@import "components/section";
 
 // modal
 @import "components/app-modal";

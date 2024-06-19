@@ -1,4 +1,6 @@
 .empty-page {
+  display: flex;
+  flex-direction: column;
   img {
     width: 600px;
     max-width: 100%;

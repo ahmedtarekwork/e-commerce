@@ -1,9 +1,34 @@
 .form-list {
-  [type="checkbox"] {
+  [type="checkbox"],
+  [type="radio"] {
     display: none;
-    &:checked ~ label svg {
+  }
+
+  [type="checkbox"]:checked ~ label svg {
+    scale: 1;
+    rotate: 0deg;
+  }
+
+  [type="radio"]:checked ~ label span {
+    background: var(--trans);
+    border-radius: 50%;
+
+    &::after {
       scale: 1;
-      rotate: 0deg;
+    }
+  }
+
+  input[disabled] ~ label {
+    color: gray;
+    cursor: not-allowed;
+
+    span {
+      border-color: gray;
+      background: transparent !important;
+
+      &::after {
+        background: gray;
+      }
     }
   }
 
@@ -19,16 +44,28 @@
     }
 
     span {
+      position: relative;
       pointer-events: none;
       border: 1px solid var(--main);
       display: inline-flex;
       cursor: default;
       border-radius: 3px;
+      transition: 0.22s;
 
       svg {
         scale: 0;
         rotate: 45deg;
       }
     }
+  }
+
+  [type="radio"] ~ label span::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--dark);
+    transition: 0.22s;
+    scale: 0;
   }
 }

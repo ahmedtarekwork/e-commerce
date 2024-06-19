@@ -14,10 +14,11 @@ const getCategoriesQueryFn: GetCategoriesQueryFnType = async ({
   ).data;
 };
 
-const useGetCategories = (limit?: number) => {
+const useGetCategories = (limit?: number, enabled = true) => {
   return useQuery({
     queryKey: ["getCategories", limit || ""],
     queryFn: getCategoriesQueryFn,
+    enabled,
   });
 };
 

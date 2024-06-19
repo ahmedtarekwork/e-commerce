@@ -11,7 +11,7 @@ import { removeImgsFromHomeSliderAction } from "../../../../../store/fetures/hom
 
 // utils
 import handleError from "../../../../../utiles/functions/handleError";
-import { axiosWithToken } from "../../../../../utiles/axios";
+import axios from "../../../../../utiles/axios";
 
 // types
 import { type TopMessageRefType } from "../../../../../components/TopMessage";
@@ -23,7 +23,7 @@ type Props = {
 
 const removeImgFromHomeSliderMutationFn = async (imgId: string) => {
   return (
-    await axiosWithToken.delete("dashboard/homepageSliderImgs", {
+    await axios.delete("dashboard/homepageSliderImgs", {
       data: {
         imgId,
       },

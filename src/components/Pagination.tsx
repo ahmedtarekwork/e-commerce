@@ -1,6 +1,8 @@
 import {
   memo,
   useRef,
+
+  // types
   type ComponentProps,
   type Dispatch,
   type MouseEvent,
@@ -19,6 +21,8 @@ const Pagination = memo(
   ({ pagesCount, onClickFn, activePage, setActivePage, ...attr }: Props) => {
     const count = useRef(pagesCount);
 
+    const finalPagesCount = pagesCount || count.current;
+
     return (
       <ul
         {...attr}
@@ -26,22 +30,22 @@ const Pagination = memo(
           attr.className ? ` ${attr.className}` : ""
         }`}
       >
-        {Array.from({ length: pagesCount || count.current || 1 }).map(
-          (_, i) => (
-            <li key={nanoid()}>
-              <button
-                title="pagination btn"
-                className={activePage === i + 1 ? "active" : ""}
-                onClick={(e) => {
-                  setActivePage(i + 1);
-                  onClickFn?.(e);
-                }}
-              >
-                {i + 1}
-              </button>
-            </li>
-          )
-        )}
+        {finalPagesCount
+          ? Array.from({ length: finalPagesCount }).map((_, i) => (
+              <li key={nanoid()}>
+                <button
+                  title="pagination btn"
+                  className={activePage === i + 1 ? "active" : ""}
+                  onClick={(e) => {
+                    setActivePage(i + 1);
+                    onClickFn?.(e);
+                  }}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))
+          : null}
       </ul>
     );
   }

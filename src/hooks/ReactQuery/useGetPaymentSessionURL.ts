@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import useSelector from "../redux/useSelector";
 
 // utils
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
 import type { LineItemType } from "../../utiles/types";
@@ -30,7 +30,7 @@ const getCheckoutSessionUrlMutationFn: GetCheckoutSessionUrlFnType = async ({
     sessionType === "changeDonatePlan" ? "patch" : "post";
 
   return (
-    await axiosWithToken[method](
+    await axios[method](
       `payment${sessionType !== "payment" ? "/donate" : ""}`,
       {
         customer_email,

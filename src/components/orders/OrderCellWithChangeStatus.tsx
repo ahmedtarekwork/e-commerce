@@ -8,16 +8,17 @@ import { useLocation } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // components
-import SelectList, { selectListOptionType } from "../selectList/SelectList";
-import TopMessage, { TopMessageRefType } from "../TopMessage";
+import SelectList, {
+  type selectListOptionType,
+} from "../selectList/SelectList";
+import TopMessage, { type TopMessageRefType } from "../TopMessage";
 import OrderCard from "./OrderCard";
 
 // types
-import { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utiles/types";
 
-// utiles
-import { nanoid } from "@reduxjs/toolkit";
-import { axiosWithToken } from "../../utiles/axios";
+// utils
+import axios from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 type Props = {
@@ -33,7 +34,7 @@ const changeOrderStatusMutationFn = async ({
   newStatus: OrderType["orderStatus"];
 }) => {
   return (
-    await axiosWithToken.patch("orders/" + orderId, {
+    await axios.patch("orders/" + orderId, {
       status: newStatus,
     })
   ).data;
@@ -102,7 +103,7 @@ const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
           value: newOrderLoading,
           text: "loading...",
         }}
-        id={nanoid()}
+        // id={nanoid()}
         label="change status"
         listOptsArr={statusList.map((o) =>
           o.text === order.orderStatus ? { ...o, selected: true } : o

@@ -105,10 +105,6 @@ main.grid-page {
   }
 }
 
-input[type="radio"] {
-  accent-color: var(--dark);
-}
-
 // inputs && select-list-summary
 $elements: ("input", "textarea", ".select-list-summary");
 $selectors: (
@@ -134,49 +130,3 @@ $events: (
   ),
 );
 @include sharedElements($elements, $selectors, $events);
-
-// swiper.js styles
-.swiper {
-  padding-inline: 30px;
-
-  &-slide {
-    height: auto;
-  }
-}
-
-.swiper-button-next,
-.swiper-button-prev {
-  background: var(--main);
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  padding-top: 2px;
-  transition: 0.3s;
-
-  &:hover {
-    background: var(--dark);
-  }
-
-  &::after {
-    font-size: 20px;
-  }
-}
-
-.swiper-button-prev {
-  padding-right: 3px;
-}
-.swiper-button-next {
-  padding-left: 3px;
-}
-
-.swiper-button-disabled {
-  cursor: not-allowed;
-  background: #999;
-  opacity: 0.9 !important;
-  pointer-events: all;
-
-  &:hover {
-    background: #888;
-  }
-}

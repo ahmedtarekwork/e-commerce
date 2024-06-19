@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
+// redux actions
 import { setUser } from "../../store/fetures/userSlice";
 
 // react-query
@@ -10,14 +11,16 @@ import { useMutation } from "@tanstack/react-query";
 
 // component
 import FormInput from "../../components/appForm/Input/FormInput";
-import TopMessage, { TopMessageRefType } from "../../components/TopMessage";
+import TopMessage, {
+  type TopMessageRefType,
+} from "../../components/TopMessage";
 
 // utiles
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 // types
-import { UserType } from "../../utiles/types";
+import type { UserType } from "../../utiles/types";
 
 type Props = {
   propName: keyof UserType;
@@ -29,7 +32,7 @@ type reqParamType = { userId: string; userData: UserType };
 
 // fetchers
 const updateUserMutationFn = async (userId: string, userData: UserType) => {
-  return (await axiosWithToken.put("/users/" + userId, userData)).data;
+  return (await axios.put("/users/" + userId, userData)).data;
 };
 
 const ProfilePageCell = ({ propName, content, user }: Props) => {

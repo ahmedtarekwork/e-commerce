@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosWithToken } from "../../../utiles/axios";
+import axios from "../../../utiles/axios";
 
 const addToCartMutationFn = async (product: {
   productId: string;
   count: number;
 }) => {
   return (
-    await axiosWithToken.post("carts", {
+    await axios.post("carts", {
       cart: [product],
     })
   ).data;

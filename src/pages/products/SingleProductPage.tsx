@@ -16,23 +16,32 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 // components
 import ImgsSlider from "../../components/ImgsSlider";
 import PropCell from "../../components/PropCell";
-import TopMessage, { TopMessageRefType } from "../../components/TopMessage";
+import TopMessage, {
+  type TopMessageRefType,
+} from "../../components/TopMessage";
 import FillIcon from "../../components/FillIcon";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import DisplayError from "../../components/layout/DisplayError";
 import EmptyPage from "../../components/layout/EmptyPage";
 import AreYouSureModal from "../../components/modals/AreYouSureModal";
+import InsightWrapper from "../../components/InsightWrapper";
 
 // utiles
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
+import getAppColors from "../../utiles/functions/getAppColors";
+
+// charts.js
+import { Chart as ChartJS, Legend, Tooltip, ArcElement } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import chartDataLabel from "chartjs-plugin-datalabels";
 
 // hooks
 import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
 import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
 
 // types
-import type { ProductType } from "../../utiles/types";
+import type { ChartDataType, ProductType } from "../../utiles/types";
 import type { AppModalRefType } from "../../components/modals/appModal/AppModal";
 
 // icons
@@ -47,6 +56,8 @@ import { BsTrash3, BsTrash3Fill } from "react-icons/bs";
 // SVGs
 import IdRequired from "../../../imgs/ID_required.svg";
 
+ChartJS.register(Legend, Tooltip, ArcElement);
+
 // fetchers
 const getSingleProductQueryFn = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -55,11 +66,11 @@ const getSingleProductQueryFn = async ({
   queryKey: string[];
 }) => {
   if (!id) throw new Error("product id is required");
-  return (await axiosWithToken("products/" + id)).data;
+  return (await axios("products/" + id)).data;
 };
 
 const deleteProductMutationFn = async (productId: string) => {
-  return (await axiosWithToken.delete("products/" + productId)).data;
+  return (await axios.delete("products/" + productId)).data;
 };
 
 const SingleProductPage = () => {
@@ -232,6 +243,18 @@ const SingleProductPage = () => {
     // totalRating,
   } = product;
 
+  const soldedUnitsData = (): ChartDataType<"doughnut"> => {
+    return {
+      labels: ["Solded", "Not Solded"],
+      datasets: [
+        {
+          backgroundColor: getAppColors(["--dark", "--trans"]),
+          data: [sold, quantity],
+        },
+      ],
+    };
+  };
+
   return (
     <>
       {user?.isAdmin && !isDashboard && (
@@ -254,7 +277,7 @@ const SingleProductPage = () => {
         <ImgsSlider imgWidth="400px" imgs={imgs} />
 
         <div className="single-product-data">
-          <h3>{title}</h3>
+          <h1 className="single-product-title">{title}</h1>
           <PropCell name="brand" val={brand} />
           <PropCell name="price" val={price + "$"} />
           <PropCell
@@ -274,10 +297,17 @@ const SingleProductPage = () => {
             }}
             val={category}
           />
-          <PropCell name="quantity" val={quantity.toString()} />
-          {isDashboard && (
-            <PropCell name="has solded" val={(sold || 0) + " units"} />
-          )}
+          <PropCell
+            name="quantity"
+            val={
+              <>
+                <span className="single-product-quantity-number">
+                  {quantity.toString()}
+                </span>{" "}
+                units
+              </>
+            }
+          />
 
           <PropCell
             className="single-product-description"
@@ -286,6 +316,29 @@ const SingleProductPage = () => {
           />
         </div>
       </div>
+
+      <ul className="single-product-page-insights-list">
+        <InsightWrapper title="Solded Units Count">
+          <Doughnut
+            data={soldedUnitsData()}
+            options={{
+              aspectRatio: 2,
+              plugins: {
+                datalabels: {
+                  color: ["white", getAppColors(["--dark"])[0]],
+                  font: {
+                    weight: "bold",
+                    size: 20,
+                  },
+                },
+              },
+              maintainAspectRatio: false,
+            }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            plugins={[chartDataLabel as any]}
+          />
+        </InsightWrapper>
+      </ul>
 
       <div className="single-product-btns">
         {isDashboard ? (

@@ -18,7 +18,7 @@ import SplashScreen from "../../components/spinners/SplashScreen";
 import OrdersArea from "../../components/orders/OrdersArea";
 
 // utils
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
 import type { OrderType } from "../../utiles/types";
@@ -33,7 +33,7 @@ const getOrdersQueryFn = async ({
   const endpoint = `orders${
     pathname.includes("dashboard") ? "" : "/user-orders"
   }`;
-  const res = (await axiosWithToken(endpoint + "?withUser=true")).data;
+  const res = (await axios(endpoint + "?withUser=true")).data;
   const finalRes = (res.orders || res).reverse();
 
   return finalRes;
@@ -68,9 +68,7 @@ const OrdersPage = () => {
   return (
     <>
       {!isError && (
-        <div className="section">
-          <Heading content={isDashboard ? "Orders Page" : "Your Orders"} />
-        </div>
+        <Heading>{isDashboard ? "Orders Page" : "Your Orders"}</Heading>
       )}
 
       <OrdersArea

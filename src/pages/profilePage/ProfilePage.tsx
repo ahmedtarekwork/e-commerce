@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // react router
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 // react query
 import { useQuery } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ import TopMessage, {
 import TabsList from "../../components/TabsList";
 import WishlistArea from "../../components/WishlistArea";
 import PropCell from "../../components/PropCell";
+import DangerZone from "../../components/dangerZone/DangerZone";
 
 // icons
 import { FaDonate } from "react-icons/fa";
@@ -33,12 +34,11 @@ import { FaDonate } from "react-icons/fa";
 import useDeleteUserBtn from "../../hooks/ReactQuery/useDeleteUserBtn";
 
 // utiles
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 import handleError from "../../utiles/functions/handleError";
 
 // types
 import type { UserType } from "../../utiles/types";
-import DangerZone from "../../components/dangerZone/DangerZone";
 
 // fetchers
 const getUserQueryFn = async ({
@@ -47,7 +47,7 @@ const getUserQueryFn = async ({
 }: {
   queryKey: string[];
 }) => {
-  return (await axiosWithToken("users/" + id)).data;
+  return (await axios("users/" + id)).data;
 };
 
 const ProfilePage = () => {
@@ -55,6 +55,7 @@ const ProfilePage = () => {
 
   const msgRef = useRef<TopMessageRefType>(null);
 
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const { id } = useParams();
   const isCurrentUserProfile = !pathname.includes("singleUser");
@@ -87,8 +88,11 @@ const ProfilePage = () => {
   // useEffects
   // if no user => send request to get user
   useEffect(() => {
+    if (!isCurrentUserProfile && id === user?._id) {
+      navigate("/profile", { relative: "path" });
+    }
     if (!user) getUser();
-  }, []);
+  }, [isCurrentUserProfile, user, navigate, getUser, id]);
 
   useEffect(() => {
     if (resUser) setUser(resUser);
@@ -130,11 +134,9 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="section">
-        <Heading
-          content={isCurrentUserProfile ? "Your Profile" : "Profile Page"}
-        />
-      </div>
+      <Heading>
+        {isCurrentUserProfile ? "Your Profile" : "Profile Page"}
+      </Heading>
 
       <ProfilePageCell user={user} propName={"username"} content={username} />
       <ProfilePageCell user={user} propName={"email"} content={email} />

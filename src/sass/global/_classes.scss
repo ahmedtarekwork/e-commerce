@@ -164,3 +164,25 @@ strong.cell-prop-name {
     display: block;
   }
 }
+
+.sec-heading {
+  margin-bottom: 17px;
+  text-align: center;
+  color: var(--main);
+  position: relative;
+  width: fit-content;
+  user-select: none;
+  text-transform: capitalize;
+  font-size: 27px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    translate: -50%;
+    height: 3px;
+    width: 80%;
+    background: currentColor;
+  }
+}

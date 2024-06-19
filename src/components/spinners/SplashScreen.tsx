@@ -1,12 +1,15 @@
-import { ReactNode } from "react";
+// react
+import type { ReactNode } from "react";
+
+// components
 import Spinner from "./Spinner";
 
-interface props {
+type Props = {
   children?: ReactNode;
   notMain?: boolean;
-}
+};
 
-const SplashScreen = ({ children, notMain }: props) => {
+const SplashScreen = ({ children, notMain }: Props) => {
   return (
     <div className={`splash-screen${notMain ? " not-main" : ""}`}>
       <Spinner settings={{ clr: "var(--main)" }}>

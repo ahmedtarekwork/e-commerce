@@ -5,10 +5,7 @@ import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 // react query
-import {
-  useMutation,
-  // , useQuery
-} from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 // redux
 import useSelector from "../../hooks/redux/useSelector";
@@ -28,9 +25,6 @@ import PropCell from "../PropCell";
 import TopMessage, { type TopMessageRefType } from "../TopMessage";
 import FillIcon from "../FillIcon";
 import EmptySpinner from "../spinners/EmptySpinner";
-// import SelectList, {
-//   type selectListOptionType,
-// } from "../selectList/SelectList";
 
 // icons
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -38,7 +32,7 @@ import { AiOutlineDelete, AiFillDelete } from "react-icons/ai";
 
 // utils
 import handleError from "../../utiles/functions/handleError";
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
 import type { OrderProductType, ProductType } from "../../utiles/types";
@@ -67,7 +61,7 @@ type Props = ProductCardDeleteBtn & {
 
 // fetchers
 const removeItemFromCartMutationFn = async (prdId: string) => {
-  return (await axiosWithToken.delete("/carts/cartProduct/" + prdId)).data;
+  return (await axios.delete("/carts/cartProduct/" + prdId)).data;
 };
 
 const ProductCard = ({

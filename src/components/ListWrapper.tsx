@@ -17,34 +17,51 @@ import {
 // components
 import Arrow from "./selectList/Arrow";
 
-type Props = {
+type CloseOptionsType =
+  | {
+      outsideClose: boolean;
+      insideClose?: boolean;
+    }
+  | {
+      outsideClose?: boolean;
+      insideClose: boolean;
+    };
+
+type OutOfFlowType =
+  | {
+      value: true;
+      fullWidth: boolean;
+    }
+  | {
+      value: false;
+      fullWidth?: never;
+    };
+
+export type ListWrapperComponentsProps = {
   children: ReactNode;
+
   btnData: {
     children: ReactNode;
   } & ComponentProps<"button">;
 
+  closeOptions?: CloseOptionsType;
+
   disabled?: {
     value: boolean;
-    text?: string;
+    text?: ReactNode;
   };
-  outOfFlow?:
-    | {
-        value: true;
-        fullWidth: boolean;
-      }
-    | {
-        value: false;
-        fullWidth?: never;
-      };
+
+  outOfFlow?: OutOfFlowType;
 } & ComponentProps<"div">;
 
 export type ListWrapperRefType = {
   setToggleList: Dispatch<SetStateAction<boolean>>;
 };
 
-const ListWrapper = forwardRef<ListWrapperRefType, Props>(
+const ListWrapper = forwardRef<ListWrapperRefType, ListWrapperComponentsProps>(
   (
     {
+      closeOptions,
       btnData: { children: btnChildren, ...btnAttr },
       children,
       outOfFlow,
@@ -77,12 +94,38 @@ const ListWrapper = forwardRef<ListWrapperRefType, Props>(
     }, [toggleList]);
 
     useEffect(() => {
-      // const list = lastHolderRef.current;
       const btn = btnRef.current;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const clickFunc = (e: any) => {
-        !btn?.isEqualNode(e.target) ? setToggleList(false) : null;
+        if (closeOptions) {
+          const { insideClose, outsideClose } = closeOptions;
+
+          if (!outsideClose && !insideClose) return;
+          if (!insideClose) {
+            const list = [
+              ...(firstHolderRef.current?.querySelectorAll(
+                "*"
+              ) as unknown as HTMLElement[]),
+            ];
+
+            if (![btn, ...list].some((el) => el?.isEqualNode(e.target)))
+              return setToggleList(false);
+          }
+          if (!outsideClose) {
+            const list = [
+              ...(firstHolderRef.current?.querySelectorAll(
+                "*"
+              ) as unknown as HTMLElement[]),
+            ];
+
+            if (
+              list.some((el) => el.isEqualNode(e.target)) ||
+              !btn?.isEqualNode(e.target)
+            )
+              return setToggleList(false);
+          }
+        } else !btn?.isEqualNode(e.target) ? setToggleList(false) : null; // close list when clicked element not the toggeler list btn
       };
 
       const keyDownFunc = (e: KeyboardEvent) =>
@@ -92,30 +135,9 @@ const ListWrapper = forwardRef<ListWrapperRefType, Props>(
       window.addEventListener("click", clickFunc);
       window.addEventListener("keydown", keyDownFunc);
 
-      // if (outOfFlow?.value && !outOfFlow.fullWidth) {
-      //   if (list && btn) {
-      //     const btnStyles = getComputedStyle(btn);
-      //     const additionWidth = [
-      //       btnStyles.gap,
-      //       btnStyles.paddingLeft,
-      //       btnStyles.paddingRight,
-      //     ]
-      //       .map((style) => +style.replace("px", ""))
-      //       .reduce((a, c) => a + c);
-
-      //     [btn, list].forEach(
-      //       (el) => (el.style.width = `${list.offsetWidth + additionWidth}px`)
-      //     );
-      //   }
-      // }
-
       return () => {
         window.removeEventListener("click", clickFunc);
         window.removeEventListener("keydown", keyDownFunc);
-
-        // if (outOfFlow && list && btn) {
-        //   [btn, list].forEach((el) => el.style.removeProperty("width"));
-        // }
       };
     }, []);
 
@@ -145,7 +167,7 @@ const ListWrapper = forwardRef<ListWrapperRefType, Props>(
           }}
           disabled={disabled?.value}
         >
-          {btnChildren}
+          {disabled?.value ? disabled?.text || btnChildren : btnChildren}
           <Arrow active={toggleList} />
         </button>
 

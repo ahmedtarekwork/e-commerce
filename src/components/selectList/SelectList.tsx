@@ -7,7 +7,10 @@ import {
 } from "react";
 
 // components
-import ListWrapper, { type ListWrapperRefType } from "../ListWrapper";
+import ListWrapper, {
+  type ListWrapperRefType,
+  type ListWrapperComponentsProps,
+} from "../ListWrapper";
 
 // utiles
 import { nanoid } from "@reduxjs/toolkit";
@@ -18,28 +21,14 @@ export type selectListOptionType<T extends string = string> = {
 };
 
 export type SelectListComponentProps = {
-  disabled?: {
-    value: boolean;
-    text?: string;
-  };
   listOptsArr: selectListOptionType[];
   optClickFunc: (e: MouseEvent<HTMLButtonElement>) => void;
   label?: string;
-  id: string;
-  outOfFlow?:
-    | {
-        value: true;
-        fullWidth: boolean;
-      }
-    | {
-        value: false;
-      };
-};
+} & Pick<ListWrapperComponentsProps, "disabled" | "closeOptions" | "outOfFlow">;
 
 const SelectList = ({
   listOptsArr,
   label,
-  // id,
   optClickFunc,
   disabled,
   outOfFlow,
@@ -47,6 +36,7 @@ const SelectList = ({
   // states
   const [list, setList] = useState(listOptsArr);
 
+  // refs
   const listWrapperRef = useRef<ListWrapperRefType>(null);
 
   // Refs

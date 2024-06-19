@@ -25,7 +25,7 @@ import {
 import useGetHomePageSliderImgs from "../../../../../hooks/ReactQuery/useGetHomePageSliderImgs";
 
 // utils
-import { axiosWithToken } from "../../../../../utiles/axios";
+import axios from "../../../../../utiles/axios";
 import { nanoid } from "@reduxjs/toolkit";
 import handleError from "../../../../../utiles/functions/handleError";
 import convertFilesToBase64 from "../../../../../utiles/functions/files/convertFilesToBase64";
@@ -37,7 +37,7 @@ import RemoveImgFromSlider from "./RemoveImgFromSlider";
 // fetchers
 const addImageToHomeSliderMutationFn = async (imgs: { image: string }[]) => {
   return (
-    await axiosWithToken.post("dashboard/homepageSliderImgs", {
+    await axios.post("dashboard/homepageSliderImgs", {
       images: imgs,
     })
   ).data.imgs;

@@ -41,22 +41,6 @@ const productsSlice = createSlice({
         product._id === payload._id ? payload : product
       );
     },
-
-    addToPaginatedProducts: (
-      state,
-      {
-        payload: { page, products },
-      }: PayloadAction<{ page: number; products: ProductType[] }>
-    ) => {
-      const oldProducts = state.pagenatedProducts[page] || [];
-      const newProducts = oldProducts.length
-        ? products.filter(({ _id }) =>
-            oldProducts.every(({ _id: same }) => same !== _id)
-          )
-        : products;
-
-      state.pagenatedProducts[page] = [...oldProducts, ...newProducts];
-    },
   },
 });
 
@@ -68,5 +52,4 @@ export const {
   addProducts,
   removeProduct,
   editProduct,
-  addToPaginatedProducts,
 } = productsSlice.actions;

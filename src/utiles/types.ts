@@ -1,6 +1,13 @@
+import type { ChartData } from "chart.js";
 import { store } from "../store/store";
 
 export type getArrayType<T> = T extends (infer U)[] ? U : T;
+
+export type ChartDataType<T extends "bar" | "pie" | "doughnut"> = ChartData<
+  T,
+  (number | [number, number] | null)[],
+  unknown
+>;
 
 // redux
 export type RootStateType = ReturnType<typeof store.getState>;

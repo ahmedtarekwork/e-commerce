@@ -18,7 +18,7 @@ import SplashScreen from "./components/spinners/SplashScreen";
 
 // utils
 import cookies from "js-cookie";
-import { axiosWithToken } from "./utiles/axios";
+import axios from "./utiles/axios";
 
 // types
 import type { UserType } from "./utiles/types";
@@ -30,7 +30,7 @@ import useAppRouter from "./hooks/useAppRouter";
 const checkUserQueryFn = async (): Promise<UserType> => {
   const token = cookies.get("dashboard-jwt-token");
 
-  if (token) return (await axiosWithToken.get("auth/checkUser")).data;
+  if (token) return (await axios.get("auth/checkUser")).data;
   throw new Error("no token");
 };
 

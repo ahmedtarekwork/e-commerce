@@ -31,3 +31,30 @@
 .pagination-holder {
   margin-top: auto;
 }
+
+#filters-list-sidebar {
+  padding: 10px;
+
+  > * + * {
+    margin-top: 10px;
+  }
+
+  .products-page-filters-list > * + * {
+    margin-top: 10px;
+  }
+
+  .filters-list-top-btns-holder {
+    @include flex(center, center, 10px);
+    flex-wrap: wrap;
+
+    > * {
+      flex: 1;
+    }
+  }
+}
+
+.no-filters-resault-sidebar-toggler {
+  margin-inline: auto;
+  margin-top: 10px;
+  @include flex(center, center, 7px);
+}

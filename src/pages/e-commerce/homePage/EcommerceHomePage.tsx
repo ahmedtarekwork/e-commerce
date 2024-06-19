@@ -1,12 +1,14 @@
 // sections
-import BottomBanner from "./sections/BottomBanner";
-import HomePageCategoriesLists from "./sections/categoriesLists/HomePageCategoriesLists";
 import HomePageImgsSlider from "./sections/HomePageImgsSlider";
+import BrandsList from "./sections/BrandsList";
+import HomePageCategoriesLists from "./sections/categoriesLists/HomePageCategoriesLists";
+import BottomBanner from "./sections/BottomBanner";
 
 const HomePage = () => {
   return (
     <>
       <HomePageImgsSlider />
+      <BrandsList />
       <HomePageCategoriesLists />
       <BottomBanner />
     </>

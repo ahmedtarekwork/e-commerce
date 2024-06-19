@@ -1,18 +1,17 @@
 // react-router-dom
 import { Link } from "react-router-dom";
 
-// components
-import EmptySpinner from "../../../components/spinners/EmptySpinner";
-
 // types
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
+
+// icons
+import { BsBoxArrowInUpRight, BsFillXSquareFill } from "react-icons/bs";
 
 export type DashboardSqaureProps = {
-  path: string;
+  path?: string;
   title: string;
   Icon: IconType;
   number: number;
-  loading: boolean;
   noNum: boolean;
 };
 
@@ -21,25 +20,39 @@ const DashboardSquare = ({
   title,
   number,
   Icon,
-  loading,
   noNum,
 }: DashboardSqaureProps) => {
+  const Children = () => (
+    <>
+      <div className="square-top">
+        <Icon size={28} />
+        <strong className="dashboard-square-title">{title}</strong>
+      </div>
+
+      <strong>{number}</strong>
+
+      {number && !noNum && path && <BsBoxArrowInUpRight />}
+      {number && !noNum && !path && <BsFillXSquareFill />}
+
+      {noNum && !number && <strong>unknown</strong>}
+    </>
+  );
+
   return (
     <li className="dashboard-square">
-      <Link to={path} relative="path" title={`go to ${title} square btn`}>
-        <div className="square-top">
-          <Icon size={28} />
-          <h3>{title}</h3>
+      {path ? (
+        <Link
+          to={path || ""}
+          relative="path"
+          title={`go to ${title} square btn`}
+        >
+          <Children />
+        </Link>
+      ) : (
+        <div className="non-anchor-dashbaord-square">
+          <Children />
         </div>
-
-        {loading ? (
-          <EmptySpinner settings={{ diminsions: "18px" }} />
-        ) : (
-          <strong>{number}</strong>
-        )}
-
-        {noNum && !loading && !number && <strong>unknown</strong>}
-      </Link>
+      )}
     </li>
   );
 };

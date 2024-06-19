@@ -5,9 +5,7 @@ import HomePageSliderSettings from "./sections/HomePageImgsSlider/HomePageSlider
 const HomePageSettingsPage = () => {
   return (
     <>
-      <div className="section">
-        <Heading content="Home Page Settings" />
-      </div>
+      <Heading>Home Page Settings</Heading>
 
       <h3 style={{ marginBottom: 15 }}>Home Page Slider Images</h3>
       <HomePageSliderSettings />

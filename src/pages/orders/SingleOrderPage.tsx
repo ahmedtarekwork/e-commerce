@@ -20,10 +20,10 @@ import ProductCard from "../../components/productCard/ProductCard";
 import EmptyPage from "../../components/layout/EmptyPage";
 
 // utiles
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
-import { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utiles/types";
 
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
@@ -40,11 +40,12 @@ const getOrderQueryFn = async ({
   queryKey: string[];
 }) => {
   if (!id) throw new Error("order id required");
-  return (await axiosWithToken("orders/" + id)).data;
+  return (await axios("orders/" + id)).data;
 };
 
 const SingleOrderPage = () => {
   const { id } = useParams();
+  const { user } = useSelector((state) => state.user);
   const appStateOrder = useSelector((state) =>
     state.orders.orders.find((order) => order._id === id)
   );
@@ -112,11 +113,9 @@ const SingleOrderPage = () => {
 
   return (
     <>
-      <div className="section">
-        <Heading content="Order Preview" />
-      </div>
+      <Heading>Order Preview</Heading>
 
-      <h3>order informations</h3>
+      <h2>order informations</h2>
       <ul
         className="single-order-info"
         style={{
@@ -155,10 +154,14 @@ const SingleOrderPage = () => {
           <li>
             <PropCell
               name="ordered by"
-              val={orderby.username}
+              val={
+                orderby.username === user?.username ? "You" : orderby.username
+              }
               valueAsLink={{
-                path: "/dashboard/singleUser/" + orderby._id,
-                data: orderby,
+                path:
+                  orderby.username === user?.username
+                    ? "/profile"
+                    : "/dashboard/singleUser/" + orderby._id,
               }}
             />
           </li>
@@ -182,33 +185,22 @@ const SingleOrderPage = () => {
           ))}
         </GridList>
       ) : (
-        <div
-          style={{
-            fontWeight: "bold",
-            textAlign: "center",
-            fontSize: "calc(12px + 1vw)",
-            textTransform: "capitalize",
-            color: "var(--dark)",
-          }}
-        >
-          <img
-            src={DeletedSvg}
-            alt="all orders deleted icon image"
-            width="600"
-            style={{
-              maxWidth: "100%",
-            }}
-          />
-
-          <p>
-            All products that you have orderd in this order has been deleted
-            from the store.
-          </p>
-          <p style={{ marginTop: 15 }}>
-            don't worry, you will receve all produts that you have orders in
-            this order.
-          </p>
-        </div>
+        <EmptyPage
+          content={
+            <>
+              <p>
+                All products that you have orderd in this order has been deleted
+                from the store.
+              </p>
+              <p style={{ marginTop: 15 }}>
+                don't worry, you will receve all produts that you have orders in
+                this order.
+              </p>
+            </>
+          }
+          svg={DeletedSvg}
+          centerPage={false}
+        />
       )}
     </>
   );

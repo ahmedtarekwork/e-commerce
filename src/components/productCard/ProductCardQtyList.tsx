@@ -12,7 +12,7 @@ import SelectList, {
 } from "../selectList/SelectList";
 
 // utils
-import { axiosWithToken } from "../../utiles/axios";
+import axios from "../../utiles/axios";
 
 // types
 import type { OrderProductType, ProductType } from "../../utiles/types";
@@ -36,7 +36,7 @@ const getProductQtyQueryFn = async ({
 }: {
   queryKey: string[];
 }) => {
-  return (await axiosWithToken("products/" + prdId)).data.quantity;
+  return (await axios("products/" + prdId)).data.quantity;
 };
 
 const ProductCardQtyList = ({
@@ -104,7 +104,7 @@ const ProductCardQtyList = ({
                 count: +value - +(product as OrderProductType).count,
               });
           }}
-          id={_id}
+          // id={_id}
           listOptsArr={list}
         />
       }

@@ -11,9 +11,11 @@ import IconsSwitcher from "../../IconsSwitcher";
 // types
 import type { InputPropsType } from "./InputComponent";
 
-const FormInput = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {
-  const { type, errorMsg } = props;
-
+const FormInput = forwardRef<
+  HTMLInputElement,
+  InputPropsType & { errorMsg?: string }
+>((props, ref) => {
+  const { type, errorMsg, ...attr } = props;
   // states
   const [inputValue, setInputValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +28,8 @@ const FormInput = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {
       {type === "password" && (
         <>
           <InputComponent
-            {...props}
+            {...attr}
+            error={!!errorMsg}
             ref={ref}
             type={showPassword ? "text" : "password"}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -54,16 +57,16 @@ const FormInput = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {
 
       {type === "color" && (
         <div className="color-input-wrapper">
-          <InputComponent ref={ref} {...props} />
+          <InputComponent ref={ref} {...attr} error={!!errorMsg} />
         </div>
       )}
 
       {/* all kinds of inputs instedof password and color inputs */}
       {type !== "password" && type !== "color" ? (
-        <InputComponent ref={ref} {...props} />
+        <InputComponent ref={ref} {...attr} error={!!errorMsg} />
       ) : null}
 
-      {"errorMsg" in props && <ErrorDiv msg={errorMsg} />}
+      {"errorMsg" in attr && <ErrorDiv msg={errorMsg} />}
     </div>
   );
 });
