@@ -57,13 +57,13 @@ const FormInput = forwardRef<
 
       {type === "color" && (
         <div className="color-input-wrapper">
-          <InputComponent ref={ref} {...attr} error={!!errorMsg} />
+          <InputComponent ref={ref} {...attr} error={!!errorMsg} type={type} />
         </div>
       )}
 
       {/* all kinds of inputs instedof password and color inputs */}
       {type !== "password" && type !== "color" ? (
-        <InputComponent ref={ref} {...attr} error={!!errorMsg} />
+        <InputComponent ref={ref} {...attr} type={type} error={!!errorMsg} />
       ) : null}
 
       {"errorMsg" in attr && <ErrorDiv msg={errorMsg} />}

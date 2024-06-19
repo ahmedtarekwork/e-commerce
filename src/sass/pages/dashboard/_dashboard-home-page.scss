@@ -75,6 +75,7 @@
 
   a {
     color: #fff;
+    border-radius: var(--radius);
 
     &:hover {
       background: var(--dark);

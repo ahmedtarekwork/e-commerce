@@ -82,6 +82,10 @@ input[type="color"] {
   }
 }
 
+input[type="file"] {
+  display: none;
+}
+
 // all inputs
 textarea {
   resize: vertical;
