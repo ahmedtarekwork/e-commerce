@@ -130,7 +130,7 @@ const ProductsPage = () => {
   const { products: productsList } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.user);
 
-  const limit = 3;
+  const limit = 10;
   const [paginatedProducts, setPaginatedProducts] = useState<
     Record<number, ProductType[]>
   >({});
