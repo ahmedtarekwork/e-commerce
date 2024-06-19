@@ -115,6 +115,7 @@
   background: radial-gradient(var(--trans), var(--dark-trans));
   display: flex;
   flex-direction: column;
+  @include cardBorder;
 
   img {
     max-width: 100%;
