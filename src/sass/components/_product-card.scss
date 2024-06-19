@@ -12,6 +12,24 @@
   transition: 0.3s;
   position: relative;
 
+  .swiper {
+    width: 100%;
+
+    .swiper-wrapper {
+      transition: 0.25s !important;
+
+      img {
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        transition: 0.2s;
+      }
+    }
+
+    &:has(.swiper-pagination-bullet) .swiper-wrapper {
+      height: calc(100% - 45px);
+    }
+  }
+
   .delete-product-btn {
     position: absolute;
     right: -40px;
@@ -28,6 +46,7 @@
     background: var(--dark-trans);
     padding: 7px;
     @include cardBorder(var(--radius), 2px);
+    z-index: 10;
 
     width: 40px;
     height: 40px;
@@ -69,21 +88,6 @@
 }
 
 @mixin product-in-columns-list {
-  // product imgs
-  .slider-big-holder {
-    display: grid;
-
-    .slider-real-list {
-      height: fit-content;
-    }
-  }
-
-  .slider-img-holder img {
-    border-radius: var(--radius);
-    border: 1px solid transparent;
-    transition: 0.3s;
-  }
-
   .product-data-big-holder {
     display: flex;
     flex-direction: column;
@@ -97,8 +101,9 @@
 }
 
 @mixin product-card-hover-effect {
-  .product-card:hover .slider-img-holder {
+  .product-card:hover .swiper-wrapper {
     scale: 0.9;
+    border-radius: 4px;
 
     img {
       border-color: var(--main);
@@ -121,19 +126,6 @@
     grid-template-columns: var(--list-item-cell-width) calc(
         var(--list-item-cell-width) * calc(var(--cells-length) - 1) - var(--gap)
       );
-
-    .slider-dots-holder {
-      display: none;
-    }
-
-    // show first image only in product card if list type === "row"
-    .slider-img-holder:not(:first-of-type) {
-      display: none;
-    }
-
-    .slider-real-list {
-      width: 100% !important;
-    }
 
     .product-data-big-holder {
       display: flex;

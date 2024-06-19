@@ -9,11 +9,12 @@
   margin-bottom: 30px;
 
   .swiper-wrapper {
-    height: calc(100% - 18px);
+    height: calc(100% - 30px);
   }
 
   .swiper-pagination {
     margin-top: 5px;
+    width: unset !important;
   }
 
   &.no-home-slider-imgs {
