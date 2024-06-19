@@ -1,9 +1,10 @@
 .pagination-holder {
   margin-inline: auto;
-  @include flex(center, center);
+  @include flex(null, center);
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: auto;
   width: fit-content;
+  max-width: 100%;
 
   > * + * {
     border-left: var(--brdr);

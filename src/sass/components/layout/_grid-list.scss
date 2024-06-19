@@ -34,8 +34,8 @@
   }
 
   @media (max-width: 330px) {
-    grid-template-columns: auto;
-    justify-content: unset;
+    display: flex;
+    flex-direction: column;
   }
 }
 

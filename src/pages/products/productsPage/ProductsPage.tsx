@@ -292,6 +292,7 @@ const ProductsPage = () => {
             style={{
               color: "var(--main)",
               height: "100%",
+              margin: 0,
             }}
           >
             <strong> Loading Products...</strong>

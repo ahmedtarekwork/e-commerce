@@ -248,6 +248,7 @@ const SingleProductPage = () => {
       labels: ["Solded", "Not Solded"],
       datasets: [
         {
+          hoverBorderColor: getAppColors(["--dark"]),
           backgroundColor: getAppColors(["--dark", "--trans"]),
           data: [sold, quantity],
         },
@@ -317,28 +318,30 @@ const SingleProductPage = () => {
         </div>
       </div>
 
-      <ul className="single-product-page-insights-list">
-        <InsightWrapper title="Solded Units Count">
-          <Doughnut
-            data={soldedUnitsData()}
-            options={{
-              aspectRatio: 2,
-              plugins: {
-                datalabels: {
-                  color: ["white", getAppColors(["--dark"])[0]],
-                  font: {
-                    weight: "bold",
-                    size: 20,
+      {isDashboard && (
+        <ul className="single-product-page-insights-list">
+          <InsightWrapper title="Solded Units Count" diminsion="900px">
+            <Doughnut
+              data={soldedUnitsData()}
+              options={{
+                aspectRatio: 2,
+                plugins: {
+                  datalabels: {
+                    color: ["white", getAppColors(["--dark"])[0]],
+                    font: {
+                      weight: "bold",
+                      size: 20,
+                    },
                   },
                 },
-              },
-              maintainAspectRatio: false,
-            }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            plugins={[chartDataLabel as any]}
-          />
-        </InsightWrapper>
-      </ul>
+                maintainAspectRatio: false,
+              }}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              plugins={[chartDataLabel as any]}
+            />
+          </InsightWrapper>
+        </ul>
+      )}
 
       <div className="single-product-btns">
         {isDashboard ? (

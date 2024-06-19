@@ -167,6 +167,7 @@ const DashboardHomePage = () => {
       datasets: [
         {
           data: [inStock, outOfStock],
+          hoverBorderColor: colors(["--main", "--danger"]),
           backgroundColor: colors(["--main", "--danger"]),
         },
       ],
@@ -178,17 +179,17 @@ const DashboardHomePage = () => {
       labels: Object.keys(extractData("brands").insights),
       datasets: [
         {
+          hoverBorderColor: colors(),
           backgroundColor: colors(),
           data: Object.values(extractData("brands").insights),
           datalabels: {
             formatter: (_, args) => {
               const index = args.dataIndex;
               const label = args.chart.data.labels?.[index];
-              const count = args.dataset.data[index];
-              return `${label} - ${count}`;
+              return label;
             },
             color: ["white", "white", "black"],
-            backgroundColor: colors(["--dark-trans"]),
+            backgroundColor: colors(),
             font: {
               weight: "bold",
               size: 15,
@@ -234,6 +235,7 @@ const DashboardHomePage = () => {
         {
           rotation: 270,
           circumference: 180,
+          hoverBorderColor: colors(["--dark", "--light"]),
           backgroundColor: colors(["--dark", "--light"]),
           data: Object.values(usersData.insights),
           datalabels: {
@@ -243,7 +245,7 @@ const DashboardHomePage = () => {
 
               return ((count as number) / usersData.all) * 100 + "%";
             },
-            backgroundColor: colors(["--dark-trans"])[0],
+            backgroundColor: colors(["--dark", "--light"]),
             color: ["white", "black"],
             font: {
               weight: "bold",
@@ -362,8 +364,8 @@ const DashboardHomePage = () => {
 
               layout: {
                 padding: {
-                  top: 20,
-                  bottom: 20,
+                  top: 40,
+                  bottom: 40,
                   right: 40,
                   left: 40,
                 },

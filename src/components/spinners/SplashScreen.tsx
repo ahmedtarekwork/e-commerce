@@ -12,7 +12,12 @@ type Props = {
 const SplashScreen = ({ children, notMain }: Props) => {
   return (
     <div className={`splash-screen${notMain ? " not-main" : ""}`}>
-      <Spinner settings={{ clr: "var(--main)" }}>
+      <Spinner
+        settings={{ clr: "var(--main)" }}
+        style={{
+          margin: 0,
+        }}
+      >
         {children || "Loading..."}
       </Spinner>
     </div>

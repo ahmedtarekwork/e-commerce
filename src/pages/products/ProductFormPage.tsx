@@ -22,6 +22,7 @@ import ErrorDiv from "../../components/appForm/Input/ErrorDiv";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import EmptyPage from "../../components/layout/EmptyPage";
 import DisplayError from "../../components/layout/DisplayError";
+import Heading from "../../components/Heading";
 
 import TopMessage, {
   type TopMessageRefType,
@@ -281,11 +282,11 @@ const NewProductPage = () => {
 
   return (
     <>
-      <h1 className="product-form-page-title">
+      <Heading>
         {isEditMode
           ? `Edit ${product?.title ? `"${product.title}"` : "The Product"}`
           : "make a new product"}
-      </h1>
+      </Heading>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormInput
