@@ -27,6 +27,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
     swiperConfig.modules = [...(swiperConfig.modules || []), Pagination];
     swiperConfig.pagination = {
       dynamicBullets: true,
+      clickable: true,
     };
   }
 

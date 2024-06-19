@@ -6,7 +6,24 @@
 .single-product-wrapper {
   @include flex(space-between, flex-start, 10px);
 
-  @media (max-width: 615px) {
+  .swiper {
+    width: 100%;
+    flex: 1;
+
+    &-wrapper {
+      height: calc(100% - 45px);
+    }
+
+    img {
+      max-width: 100%;
+    }
+  }
+
+  .single-product-data {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
     flex-direction: column;
   }
 }
