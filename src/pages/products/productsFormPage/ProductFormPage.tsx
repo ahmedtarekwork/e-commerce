@@ -8,38 +8,48 @@ import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // redux
-import useSelector from "../../hooks/redux/useSelector";
-import useDispatch from "../../hooks/redux/useDispatch";
+import useSelector from "../../../hooks/redux/useSelector";
+import useDispatch from "../../../hooks/redux/useDispatch";
 // actions
-import { addProducts } from "../../store/fetures/productsSlice";
+import { addProducts } from "../../../store/fetures/productsSlice";
 
 // react query
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // components
-import FormInput from "../../components/appForm/Input/FormInput";
-import ErrorDiv from "../../components/appForm/Input/ErrorDiv";
-import SplashScreen from "../../components/spinners/SplashScreen";
-import EmptyPage from "../../components/layout/EmptyPage";
-import DisplayError from "../../components/layout/DisplayError";
-import Heading from "../../components/Heading";
+import FormInput from "../../../components/appForm/Input/FormInput";
+import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
+import SplashScreen from "../../../components/spinners/SplashScreen";
+import EmptyPage from "../../../components/layout/EmptyPage";
+import DisplayError from "../../../components/layout/DisplayError";
+import Heading from "../../../components/Heading";
+import IconAndSpinnerSwitcher from "../../../components/animatedBtns/IconAndSpinnerSwitcher";
 
 import TopMessage, {
   type TopMessageRefType,
-} from "../../components/TopMessage";
+} from "../../../components/TopMessage";
 import ImgInputPreview, {
   type ImgInputPreviewRefType,
-} from "../../components/appForm/ImgInputPreview";
+} from "./ImgInputPreview";
 
 // utils
-import handleError from "../../utiles/functions/handleError";
-import axios from "../../utiles/axios";
+import handleError from "../../../utiles/functions/handleError";
+import axios from "../../../utiles/axios";
+
+// framer motion
+import { motion } from "framer-motion";
 
 // types
-import type { ProductType } from "../../utiles/types";
+import type { ProductType } from "../../../utiles/types";
+
+// icons
+import { IoIosAddCircle } from "react-icons/io";
 
 // SVGs
-import IdRequiredSvg from "../../../imgs/ID_required.svg";
+import IdRequiredSvg from "../../../../imgs/ID_required.svg";
+
+// layouts
+import AnimatedLayout from "../../../layouts/AnimatedLayout";
 
 export type ProductFormValues = Omit<
   ProductType,
@@ -121,7 +131,7 @@ const NewProductPage = () => {
     isError: productErr,
     error: productErrData,
   } = useMutation({
-    mutationKey: ["s"],
+    mutationKey: ["addProduct"],
     mutationFn: addProductMutationFn,
   });
   // edit existing product
@@ -281,7 +291,7 @@ const NewProductPage = () => {
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>
         {isEditMode
           ? `Edit ${product?.title ? `"${product.title}"` : "The Product"}`
@@ -329,7 +339,15 @@ const NewProductPage = () => {
           })}
         />
 
-        <div className="input-holder">
+        <motion.div
+          layout
+          transition={{
+            type: "tween",
+            duration: 0.15,
+            ease: "easeInOut",
+          }}
+          className="input-holder"
+        >
           <textarea
             placeholder="Description"
             className={disErr?.message ? "red" : ""}
@@ -339,7 +357,7 @@ const NewProductPage = () => {
           />
 
           <ErrorDiv msg={disErr?.message} />
-        </div>
+        </motion.div>
 
         <FormInput
           errorMsg={clrErr?.message}
@@ -360,21 +378,28 @@ const NewProductPage = () => {
         />
 
         <button
-          title="add product or save it's new changes btn"
+          title={isEditMode ? "save new changes" : "add product"}
           ref={submitBtnRef}
           disabled={productLoading || editLoading}
-          className={`btn ${
-            productLoading || editLoading
-              ? "center fade scale spinner-pseudo-after"
-              : ""
-          }`}
+          className="btn"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 5,
+          }}
         >
+          <IconAndSpinnerSwitcher
+            spinnerDiminsions="20px"
+            toggleIcon={productLoading || editLoading}
+            icon={<IoIosAddCircle />}
+          />
           {isEditMode ? "Save Changes" : "Add product"}
         </button>
       </form>
 
       <TopMessage ref={msgRef} />
-    </>
+    </AnimatedLayout>
   );
 };
 export default NewProductPage;

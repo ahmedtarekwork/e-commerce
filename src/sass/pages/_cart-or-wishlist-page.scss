@@ -4,6 +4,7 @@
   margin-top: auto;
   padding-top: 30px;
   position: relative;
+  background: white;
 
   &::after {
     content: "";
@@ -21,14 +22,19 @@
     align-items: flex-end;
     gap: 15px;
     min-width: fit-content;
+    flex-wrap: wrap;
 
     > * {
       flex: 1;
       min-width: fit-content;
+      @include flex(center, center, 10px);
+
+      svg {
+        font-size: 20px;
+      }
     }
 
     @media (max-width: 275px) {
-      flex-direction: column;
       justify-content: flex-end;
       > * {
         width: 100%;

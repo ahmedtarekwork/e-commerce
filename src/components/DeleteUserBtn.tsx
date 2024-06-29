@@ -1,17 +1,16 @@
 // react
-import { type ComponentProps, useEffect, useRef } from "react";
+import { type ComponentProps, useRef, useEffect } from "react";
 
 // components
-import AreYouSureModal from "./modals/AreYouSureModal";
+import BtnWithSpinner from "./animatedBtns/BtnWithSpinner";
+import AreYouSureModal, { type SureModalRef } from "./modals/AreYouSureModal";
 
 // types
 import { type UseMutateFunction } from "@tanstack/react-query";
-import { type AppModalRefType } from "./modals/appModal/AppModal";
 
 export type DeleteUserBtnProps = Record<"username" | "itemId", string> & {
   deleteLoading: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deleteItem: UseMutateFunction<any, Error, string, unknown>;
+  deleteItem: UseMutateFunction<unknown, Error, string, unknown>;
 } & ComponentProps<"button">;
 
 const DeleteItemBtn = ({
@@ -24,22 +23,19 @@ const DeleteItemBtn = ({
   onClick,
   ...attr
 }: DeleteUserBtnProps) => {
-  const sureModal = useRef<AppModalRefType>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
+  const sureModal = useRef<SureModalRef>(null);
 
   useEffect(() => {
-    btnRef.current?.classList.toggle("active", deleteLoading);
+    sureModal.current?.setShowYesSpinner(deleteLoading);
   }, [deleteLoading]);
 
   return (
     <>
-      <button
-        title="delete user btn"
-        ref={btnRef}
+      <BtnWithSpinner
+        toggleSpinner={deleteLoading}
+        title="delete user"
         {...attr}
-        className={`red-btn${
-          deleteLoading ? " center fade scale spinner-pseudo-after" : ""
-        }${" " + (className || "")}`}
+        className={`red-btn${className ? ` ${className}` : ""}`}
         disabled={deleteLoading}
         onClick={(e) => {
           onClick?.(e);
@@ -48,31 +44,14 @@ const DeleteItemBtn = ({
         }}
       >
         {children}
-      </button>
+      </BtnWithSpinner>
 
       <AreYouSureModal
         afterMountFn={({ modalEl: modal }) => {
           if (!modal) return;
 
           const allBtns = [...modal.querySelectorAll("button")];
-          const acceptBtn = allBtns.find(
-            (b) => b.dataset.modalStatus === "accept"
-          );
-
           allBtns.forEach((btn) => (btn.disabled = deleteLoading));
-
-          if (acceptBtn) {
-            acceptBtn.classList[deleteLoading ? "add" : "remove"](
-              "center",
-              "fade",
-              "scale",
-              "spinner-pseudo-after"
-            );
-
-            setTimeout(() =>
-              acceptBtn.classList.toggle("active", deleteLoading)
-            );
-          }
         }}
         toggleClosingFunctions={!deleteLoading}
         functionToMake={() => deleteItem(itemId)}

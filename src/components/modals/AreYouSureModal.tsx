@@ -1,6 +1,17 @@
-import { forwardRef, useImperativeHandle, useRef, MouseEvent } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+
+  // types
+  type SetStateAction,
+  type Dispatch,
+  type MouseEvent,
+} from "react";
 import { createPortal } from "react-dom";
 
+import EmptySpinner from "../spinners/EmptySpinner";
 import AppModal, {
   type AppModalRefType,
   type AppModalProps,
@@ -11,16 +22,25 @@ type SureModalProps = AppModalProps & {
   btnsContent?: Record<"yes" | "no", string>;
 };
 
-const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
+export type SureModalRef = AppModalRefType & {
+  setShowYesSpinner: Dispatch<SetStateAction<boolean>>;
+};
+
+const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
   (props: SureModalProps, ref) => {
-    // props
     const { children, toggleClosingFunctions, functionToMake, ...attr } = props;
+
+    const [showYesSpinner, setShowYesSpinner] = useState(false);
 
     // refs
     const acceptBtn = useRef<HTMLButtonElement>(null);
     const modalRef = useRef<AppModalRefType>({ toggleModal: () => {} });
 
-    useImperativeHandle(ref, () => modalRef.current, []);
+    useImperativeHandle(
+      ref,
+      () => ({ ...modalRef.current, setShowYesSpinner }),
+      []
+    );
 
     return createPortal(
       <AppModal
@@ -35,8 +55,8 @@ const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
 
         <div className="btns-holder">
           <button
-            title="are you sude modal accept btn"
-            className="btn"
+            title="accept"
+            className="btn are-you-sure-modal-accept-btn"
             data-modal-status="accept"
             ref={acceptBtn}
             onClick={(e) => {
@@ -44,10 +64,18 @@ const AreYouSureModal = forwardRef<AppModalRefType, SureModalProps>(
             }}
           >
             {props.btnsContent?.yes || "Yes"}
+            {showYesSpinner && (
+              <EmptySpinner
+                settings={{
+                  diminsions: "20px",
+                  clr: "white",
+                }}
+              />
+            )}
           </button>
 
           <button
-            title="are you sude modal cencel btn"
+            title="cencel"
             className="red-btn"
             data-modal-status="cancel"
             onClick={() => modalRef.current?.toggleModal(false)}

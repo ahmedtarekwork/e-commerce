@@ -42,7 +42,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
     <Swiper
       className={isHomeSlider ? "home-slider" : ""}
       loop={isHomeSlider}
-      slidesPerView={"auto"}
+      slidesPerView="auto"
       {...swiperConfig}
     >
       {imgs.map((img) => (

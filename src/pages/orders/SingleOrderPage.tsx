@@ -31,6 +31,7 @@ import useInitProductsCells from "../../hooks/useInitProductsCells";
 // SVGs
 import IdRequired from "../../../imgs/ID_required.svg";
 import DeletedSvg from "../../../imgs/deleted.svg";
+import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 // fetchers
 const getOrderQueryFn = async ({
@@ -112,7 +113,7 @@ const SingleOrderPage = () => {
   } = order;
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>Order Preview</Heading>
 
       <h2>order informations</h2>
@@ -202,7 +203,7 @@ const SingleOrderPage = () => {
           centerPage={false}
         />
       )}
-    </>
+    </AnimatedLayout>
   );
 };
 export default SingleOrderPage;

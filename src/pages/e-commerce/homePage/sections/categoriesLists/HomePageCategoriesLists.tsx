@@ -1,5 +1,6 @@
 // components
 import Spinner from "../../../../../components/spinners/Spinner";
+import Heading from "../../../../../components/Heading";
 import HomePageProductsSlider, {
   type ProductsSliderFilters,
 } from "./components/HomePageProductsSlider";
@@ -9,9 +10,9 @@ import { nanoid } from "@reduxjs/toolkit";
 
 // hooks
 import useGetCategories from "../../../../../hooks/ReactQuery/products/useGetCategories";
-import Heading from "../../../../../components/Heading";
+import { memo } from "react";
 
-const HomePageCategoriesLists = () => {
+const HomePageCategoriesLists = memo(() => {
   const { data: categories, isPending: categoriesLoading } =
     useGetCategories(7);
 
@@ -19,9 +20,9 @@ const HomePageCategoriesLists = () => {
     return (
       <Spinner
         content="Loading Categories..."
-        style={{ fontSize: 14 }}
-        settings={{
-          clr: "var(--main)",
+        style={{
+          marginBlock: "20px",
+          margin: "90px auto",
         }}
       />
     );
@@ -43,5 +44,5 @@ const HomePageCategoriesLists = () => {
       </>
     );
   }
-};
+});
 export default HomePageCategoriesLists;

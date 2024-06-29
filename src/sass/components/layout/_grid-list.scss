@@ -8,23 +8,15 @@
     @include cardBorder(var(--radius), 2px);
     padding: 10px;
 
-    .grid-list-item-content {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      overflow-wrap: anywhere;
+    .prop-cell-holder {
+      + * {
+        margin-top: 7px;
+      }
 
-      span {
-        flex: 1;
+      .red-btn,
+      .btn {
+        text-align: center;
         width: 100%;
-        margin-top: 5px;
-
-        button,
-        a {
-          width: 100%;
-          text-align: center;
-        }
       }
     }
   }
@@ -124,7 +116,7 @@
     --cells-length: 0;
 
     &.with-margin {
-      margin-right: 40px;
+      padding-right: 40px;
     }
 
     .rows-list-header {
@@ -132,7 +124,8 @@
       color: #fff;
     }
 
-    > li {
+    .rows-list-cell,
+    > li:not(.no-grid) {
       --gap: 5px;
       width: 100%;
       display: grid;
@@ -149,7 +142,7 @@
         );
       }
 
-      .cell-prop-name {
+      .prop-cell-name {
         display: none;
       }
 

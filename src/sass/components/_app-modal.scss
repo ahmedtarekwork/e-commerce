@@ -102,6 +102,10 @@
       flex: 1;
     }
   }
+
+  &-accept-btn {
+    @include flex(center, center, 5px);
+  }
 }
 
 .modal-close-btn {

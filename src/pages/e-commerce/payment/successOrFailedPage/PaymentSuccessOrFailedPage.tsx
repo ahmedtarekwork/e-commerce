@@ -8,6 +8,9 @@ import SuccessOrFailIcon from "./SuccessOrFailIcon";
 import { FaCircleCheck, FaCircleXmark, FaStore } from "react-icons/fa6";
 import { FaShoppingCart, FaMap } from "react-icons/fa";
 
+// layouts
+import AnimatedLayout from "../../../../layouts/AnimatedLayout";
+
 export type PaymentSuccessOrFailPageProps = {
   type: "failed" | "success";
 };
@@ -19,7 +22,7 @@ const PaymentSuccessOrFailedPage = ({
   const isDonatePath = pathname.includes("donate");
 
   return (
-    <div
+    <AnimatedLayout
       style={{
         display: "grid",
         placeContent: "center",
@@ -36,7 +39,7 @@ const PaymentSuccessOrFailedPage = ({
 
       {isDonatePath && type === "success" ? (
         <p className="donation-thanks-msg">
-          Thank you for subscriping to one of our donation plans, we wish to
+          Thank you for subscribing to one of our donation plans, we wish to
           give you some value For what you paid to us.
         </p>
       ) : null}
@@ -59,7 +62,7 @@ const PaymentSuccessOrFailedPage = ({
           </>
         )}
       </Link>
-    </div>
+    </AnimatedLayout>
   );
 };
 export default PaymentSuccessOrFailedPage;

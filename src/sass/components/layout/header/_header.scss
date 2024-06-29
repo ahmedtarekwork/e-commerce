@@ -38,6 +38,10 @@
     flex-wrap: wrap;
     text-align: center;
 
+    .logo-text-holder span {
+      display: inline-block;
+    }
+
     &:hover {
       color: var(--dark);
     }

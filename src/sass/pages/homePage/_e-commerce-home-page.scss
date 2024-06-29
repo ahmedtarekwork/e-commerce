@@ -45,12 +45,12 @@
         }
       }
 
-      .spinner-el {
+      .new-empty-spinner {
         margin-inline: auto;
       }
     }
 
-    @media (max-width: 430px) {
+    @media (max-width: 575px) {
       font-size: 16px;
       flex-direction: column;
 
@@ -61,10 +61,11 @@
       div {
         display: flex;
         align-items: center;
-        gap: 5px;
+        flex-wrap: wrap;
+        gap: 20px;
 
-        .spinner-el {
-          margin-inline: auto;
+        .new-empty-spinner {
+          margin: 0 auto 10px;
           padding: 15px !important;
         }
       }
@@ -80,7 +81,6 @@
   flex-wrap: wrap;
   text-align: center;
   margin-bottom: 20px;
-  height: 107px;
 
   strong {
     color: var(--dark);
@@ -91,7 +91,6 @@
   @include flex;
   gap: 10px;
   margin-bottom: 20px;
-  height: 50px;
 }
 
 .home-page-brands-list {

@@ -25,7 +25,7 @@ type Props = {
 
 const DangerZone = ({ title, content, deleteBtn }: Props) => {
   return (
-    <div className="danger-zone donation-page-danger-zone">
+    <div className="danger-zone">
       <h3 className="danger-zone-title">{title}</h3>
       <p className="danger-zone-content">{content}</p>
 

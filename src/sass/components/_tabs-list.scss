@@ -4,24 +4,52 @@
 
   &-left-side {
     flex-basis: 20%;
+    border: var(--brdr);
+
+    li + * {
+      border-top: var(--brdr);
+    }
   }
 
   &-right-side {
     flex: 1;
-    max-height: 350px;
+    max-height: 550px;
     overflow-y: auto;
   }
 
   &-btn {
     width: 100%;
-    text-align-last: left;
-    padding: 5px;
+    text-align: left;
+    padding: 10px 5px;
 
     &:hover {
       background: var(--trans);
     }
     &.active {
       background: var(--dark-trans);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    &-left-side ul {
+      display: flex;
+      height: 100%;
+
+      > li {
+        flex: 1;
+
+        + * {
+          border-top: none;
+          border-left: var(--brdr);
+        }
+      }
+    }
+
+    &-btn {
+      height: 100%;
+      text-align: center;
     }
   }
 }

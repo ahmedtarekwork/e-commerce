@@ -1,46 +1,49 @@
 // react-router-dom
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // redux
 import useSelector from "../../../hooks/redux/useSelector";
 
 // components
 import Heading from "../../../components/Heading";
-import CartArea from "../../../components/CartArea";
+import CartArea from "../../../components/cartArea/CartArea";
 import WishlistArea from "../../../components/WishlistArea";
 import CartOrWishlistPageBtns from "./CartOrWishlistPageComponents/CartOrWishlistPageBtns";
+
+// layouts
+import AnimatedLayout from "../../../layouts/AnimatedLayout";
 
 const CartOrWishlistPage = () => {
   const { user, userCart } = useSelector((state) => state.user);
 
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const isCartPage = pathname.includes("cart");
 
   let title = isCartPage && userCart?.products.length ? "Your Cart" : "";
   if (!isCartPage && user?.wishlist.length) title = "Your Wishlist";
 
+  if (!user) {
+    navigate("/login", { relative: "path" });
+    return;
+  }
+
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <AnimatedLayout>
       <Heading>{title}</Heading>
 
       {isCartPage ? (
-        <CartArea
-          withTitle={false}
-          withAddMore
-          withDeleteBtn="cart"
-          showTotal={false}
-        />
+        <CartArea withAddMore withDeleteBtn="cart" showTotal={false} />
       ) : (
         <WishlistArea
+          userId={user._id}
           withDeleteBtn="wishlist"
           isCurrentUserProfile
-          wishlist={user?.wishlist || []}
-          withTitle={false}
         />
       )}
 
       <CartOrWishlistPageBtns isCartPage={isCartPage} />
-    </div>
+    </AnimatedLayout>
   );
 };
 export default CartOrWishlistPage;

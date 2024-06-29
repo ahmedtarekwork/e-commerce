@@ -16,7 +16,7 @@ import ProfilePage from "../pages/profilePage/ProfilePage";
 import UsersPage from "../pages/dashboard/usersPage/UsersPage";
 // products
 import ProductsPage from "../pages/products/productsPage/ProductsPage";
-import NewProductPage from "../pages/products/ProductFormPage";
+import ProductFormPage from "../pages/products/productsFormPage/ProductFormPage";
 import SingleProductPage from "../pages/products/SingleProductPage";
 // orders
 import SingleOrderPage from "../pages/orders/SingleOrderPage";
@@ -45,7 +45,7 @@ const useAppRouter = (checkUserLoading: boolean) => {
       <Route element={<MainLayout />}>
         {/* no login nedded for these page*/}
         <Route element={<EcommerceHomePage />} index />
-        <Route element={<ProductsPage />} path={"products"} />
+        <Route element={<ProductsPage />} path="products" />
         <Route path="product/:id" element={<SingleProductPage />} />
 
         {/* payment routes */}
@@ -86,8 +86,6 @@ const useAppRouter = (checkUserLoading: boolean) => {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="orders/:id" element={<SingleOrderPage />} />
           <Route path="product/:id" element={<SingleProductPage />} />
-
-          {/* donation page route */}
         </Route>
 
         {/* need to be admin to access these routes */}
@@ -100,8 +98,8 @@ const useAppRouter = (checkUserLoading: boolean) => {
           <Route path="users" element={<UsersPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="product/:id" element={<SingleProductPage />} />
-          <Route path="new-product" element={<NewProductPage />} />
-          <Route path="edit-product/:id" element={<NewProductPage />} />
+          <Route path="new-product" element={<ProductFormPage />} />
+          <Route path="edit-product/:id" element={<ProductFormPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:id" element={<SingleOrderPage />} />
           <Route path="homePageSettings" element={<HomePageSettingsPage />} />

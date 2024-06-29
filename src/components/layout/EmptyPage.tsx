@@ -1,7 +1,13 @@
+// react
 import { type ReactNode, useEffect } from "react";
+
+// components
 import GoToHomeBtn from "../GoToHomeBtn";
 
-type WithBtnType =
+// layouts
+import AnimatedLayout from "../../layouts/AnimatedLayout";
+
+export type WithBtnType =
   | {
       type: "GoToHome";
       btn?: never;
@@ -25,24 +31,24 @@ const EmptyPage = ({ svg, content, withBtn, centerPage = true }: Props) => {
 
       if (main) {
         main!.classList.add("center-content");
-        main!.classList.remove("grid-page");
+        main!.classList.remove("full-page");
 
         return () => {
           main!.classList.remove("center-content");
-          main!.classList.add("grid-page");
+          main!.classList.add("full-page");
         };
       }
     }
   });
 
   return (
-    <div className="empty-page">
+    <AnimatedLayout className="empty-page">
       <img width="600px" height="100%" src={svg} alt="empty svg image" />
 
       <strong>{content}</strong>
 
       {withBtn && (withBtn.type === "GoToHome" ? <GoToHomeBtn /> : withBtn.btn)}
-    </div>
+    </AnimatedLayout>
   );
 };
 export default EmptyPage;

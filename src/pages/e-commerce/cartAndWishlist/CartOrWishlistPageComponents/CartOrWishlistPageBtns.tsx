@@ -14,8 +14,9 @@ import { resteCart, setUser } from "../../../../store/fetures/userSlice";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // components
-import PropCell from "../../../../components/PropCell";
 import CartCheckoutMethod from "./CartCheckoutMethod";
+import CartAreaDownInfo from "../../../../components/cartArea/CartAreaDownInfo";
+import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
 import TopMessage, {
   type TopMessageRefType,
 } from "../../../../components/TopMessage";
@@ -29,6 +30,17 @@ import type { UserType } from "../../../../utiles/types";
 // utils
 import axios from "../../../../utiles/axios";
 import handleError from "../../../../utiles/functions/handleError";
+
+// icons
+import { IoBagCheckOutline } from "react-icons/io5";
+import { MdOutlineRemoveShoppingCart } from "react-icons/md";
+import { IoMdHeartDislike } from "react-icons/io";
+import { FaCreditCard } from "react-icons/fa";
+
+// framer motion
+import { AnimatePresence, motion } from "framer-motion";
+// variants
+import { slideOutVariant } from "../../../../utiles/variants";
 
 type Props = {
   isCartPage: boolean;
@@ -55,11 +67,13 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   const navigate = useNavigate();
 
   // states
-  const { user, userCart } = useSelector((state) => state.user);
+  const { user, userCart, wishlistLoading } = useSelector(
+    (state) => state.user
+  );
   const [payMethod, setPayMethod] = useState<PayMethods>("Card");
 
   const isCartItems = !!userCart?.products.length;
-  const isWishlistItems = !!user?.wishlist?.length;
+  const isWishlistItems = !!user?.wishlist?.length && !wishlistLoading;
   const isShow = isCartPage ? isCartItems : isWishlistItems;
 
   const showCartComponents = isCartPage && userCart?.products.length;
@@ -67,7 +81,6 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   // refs
   const msgRef = useRef<TopMessageRefType>(null);
   const makeOrderBtnRef = useRef<HTMLButtonElement>(null);
-  const clearCartBtnRef = useRef<HTMLButtonElement>(null);
 
   // react query
   const {
@@ -178,91 +191,94 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
     }
   }, [sessionUrlErr, sessionUrlErrData, sessionUrl]);
 
-  // show spinners while loading
-  useEffect(() => {
-    makeOrderBtnRef.current?.classList.toggle(
-      "active",
-      sessionUrlLoading || orderLoading
-    );
-  }, [sessionUrlLoading, orderLoading]);
-  useEffect(() => {
-    setTimeout(() => {
-      clearCartBtnRef.current?.classList.toggle(
-        "active",
-        clearCartLoading || deleteWishlistLoading
-      );
-    });
-  }, [clearCartLoading, deleteWishlistLoading]);
-
   return (
-    isShow && (
-      <>
-        <div className="cart-or-wishlist-down-holder">
-          {showCartComponents && (
-            <>
-              <CartCheckoutMethod
-                payMethod={payMethod}
-                setPayMethod={setPayMethod}
-                cartBtnRef={makeOrderBtnRef}
-              />
-              <PropCell
-                style={{
-                  marginTop: 15,
-                }}
-                name="cart total price"
-                val={`${userCart?.cartTotal || 0}$`}
-              />
-            </>
-          )}
-
-          <div
-            className="cart-or-wishlist-btns"
-            style={{
-              marginTop: 15,
-            }}
+    <AnimatePresence initial={false}>
+      {isShow && (
+        <>
+          <motion.div
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            variants={slideOutVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="cart-or-wishlist-down-holder"
           >
             {showCartComponents && (
-              <button
-                title="submit order btn"
-                ref={makeOrderBtnRef}
-                className={`btn ${
-                  sessionUrlLoading || orderLoading
-                    ? "center spinner-pseudo-after fade scale"
-                    : ""
-                }`}
-                onClick={() => {
-                  if (payMethod === "Card")
-                    return handlePayment({ sessionType: "payment" });
-                  else if (payMethod === "Cash on Delivery") makeOrder();
-                }}
-                disabled={sessionUrlLoading || clearCartLoading || orderLoading}
-              >
-                {payMethod === "Cash on Delivery" ? "Submit Order" : "Checkout"}
-              </button>
+              <>
+                <CartCheckoutMethod
+                  payMethod={payMethod}
+                  setPayMethod={setPayMethod}
+                  cartBtnRef={makeOrderBtnRef}
+                />
+                <CartAreaDownInfo userCart={userCart} />
+              </>
             )}
 
-            <button
-              title="clear your cart or wishlist btn"
-              className={`red-btn ${
-                clearCartLoading || deleteWishlistLoading
-                  ? "center spinner-pseudo-after fade scale"
-                  : ""
-              }`}
-              ref={clearCartBtnRef}
-              onClick={() => {
-                if (isCartPage) return clearCart();
-                if (user) deleteWishlist({ ...user, wishlist: [] });
+            <div
+              className="cart-or-wishlist-btns"
+              style={{
+                marginTop: 15,
               }}
-              disabled={clearCartLoading || deleteWishlistLoading}
             >
-              Clear Your {isCartPage ? "Cart" : "Wishlist"}
-            </button>
-          </div>
-        </div>
+              {showCartComponents && (
+                <button
+                  title="submit order btn"
+                  ref={makeOrderBtnRef}
+                  className="btn submit-user-order-btn"
+                  onClick={() => {
+                    if (payMethod === "Card")
+                      return handlePayment({ sessionType: "payment" });
+                    else if (payMethod === "Cash on Delivery") makeOrder();
+                  }}
+                  disabled={
+                    sessionUrlLoading || clearCartLoading || orderLoading
+                  }
+                >
+                  <IconAndSpinnerSwitcher
+                    toggleIcon={sessionUrlLoading || orderLoading}
+                    icon={
+                      payMethod === "Cash on Delivery" ? (
+                        <IoBagCheckOutline />
+                      ) : (
+                        <FaCreditCard />
+                      )
+                    }
+                  />
 
-        <TopMessage ref={msgRef} />
-      </>
-    )
+                  {payMethod === "Cash on Delivery"
+                    ? "Submit Order"
+                    : "Checkout"}
+                </button>
+              )}
+
+              <button
+                title="clear your cart or wishlist"
+                className="red-btn"
+                onClick={() => {
+                  if (isCartPage) return clearCart();
+                  if (user) deleteWishlist({ ...user, wishlist: [] });
+                }}
+                disabled={clearCartLoading || deleteWishlistLoading}
+              >
+                <IconAndSpinnerSwitcher
+                  toggleIcon={clearCartLoading || deleteWishlistLoading}
+                  icon={
+                    isCartPage ? (
+                      <MdOutlineRemoveShoppingCart />
+                    ) : (
+                      <IoMdHeartDislike />
+                    )
+                  }
+                />
+                Clear Your {isCartPage ? "Cart" : "Wishlist"}
+              </button>
+            </div>
+          </motion.div>
+
+          <TopMessage ref={msgRef} />
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 export default CartOrWishlistPageBtns;

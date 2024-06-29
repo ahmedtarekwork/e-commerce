@@ -10,6 +10,9 @@ import useDispatch from "../../../hooks/redux/useDispatch";
 // redux actions
 import { logoutUser, setCart } from "../../../store/fetures/userSlice";
 
+// components
+import EmptySpinner from "../../spinners/EmptySpinner";
+
 // icons
 import { FaUserAlt, FaShoppingCart } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
@@ -20,11 +23,20 @@ import type { OrderProductType } from "../../../utiles/types";
 // hooks
 import useGetUserCart from "../../../hooks/ReactQuery/CartRequest/useGetUserCart";
 
+// framer motion
+import { AnimatePresence, motion } from "framer-motion";
+// variants
+import { scaleUpDownVariant } from "../../../utiles/variants";
+
 const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
   const dispatch = useDispatch();
-  const { user, userCart } = useSelector((state) => state.user);
+  const { user, userCart, cartLoading } = useSelector((state) => state.user);
 
-  const { refetch: getCart, data: cart } = useGetUserCart();
+  const {
+    refetch: getCart,
+    data: cart,
+    isPending: initCartLoading,
+  } = useGetUserCart();
 
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -81,7 +93,25 @@ const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
               id="header-cart-icon"
             >
               <span id="cart-products-length">
-                {productsLength > 9 ? "9+" : productsLength}
+                <AnimatePresence mode="popLayout">
+                  {initCartLoading || cartLoading ? (
+                    <EmptySpinner
+                      settings={{
+                        clr: "white",
+                        diminsions: "10px",
+                      }}
+                    />
+                  ) : (
+                    <motion.span
+                      variants={scaleUpDownVariant}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      {productsLength > 9 ? "9+" : productsLength}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </span>
               <FaShoppingCart />
               your cart

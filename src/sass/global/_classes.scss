@@ -85,13 +85,13 @@ $btns: (
 }
 
 .overlay {
-  z-index: 999;
+  z-index: calc(var(--header-index) - 1);
   background: rgba(#2b2a2a, 0.85);
   position: fixed;
   inset: 0;
-  transition: 0.3s;
-  opacity: 0;
   pointer-events: none;
+  opacity: 0;
+  transition: 0.3s;
 
   &.active {
     opacity: 1;
@@ -119,21 +119,20 @@ $status: (
   }
 }
 
-.flex-cell-prop-name {
+.prop-cell-holder {
   @include flex(flex-start, center, 10px);
   flex-wrap: wrap;
 }
-strong.cell-prop-name {
+strong.prop-cell-name {
   color: var(--dark);
   text-transform: capitalize;
 
-  + span {
-    overflow-wrap: anywhere;
+  + .prop-cell-value {
+    word-break: break-all;
+    flex: 1;
+    min-width: fit-content;
+    max-width: 100%;
   }
-}
-
-.selected {
-  background: var(--selected) !important;
 }
 
 .danger-zone {
@@ -141,6 +140,7 @@ strong.cell-prop-name {
   padding: 20px 10px;
   color: rgb(209 16 16);
   background: rgb(255 13 13 / 6%);
+  margin-top: auto;
 
   &-title {
     font-size: 25px;
@@ -164,6 +164,9 @@ strong.cell-prop-name {
     display: block;
   }
 }
+.btn-with-spinner {
+  @include flex(center, center, 5px);
+}
 
 .sec-heading {
   margin-bottom: 17px;
@@ -184,5 +187,18 @@ strong.cell-prop-name {
     height: 3px;
     width: 80%;
     background: currentColor;
+  }
+}
+
+.align-content {
+  display: grid;
+  place-content: center;
+}
+
+.add-product-to-cart-btn {
+  overflow: hidden;
+
+  &-content-holder {
+    @include flex(center, center, 7px);
   }
 }

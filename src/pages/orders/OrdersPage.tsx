@@ -14,7 +14,6 @@ import { setOrders } from "../../store/fetures/ordersSlice";
 
 // components
 import Heading from "../../components/Heading";
-import SplashScreen from "../../components/spinners/SplashScreen";
 import OrdersArea from "../../components/orders/OrdersArea";
 
 // utils
@@ -22,6 +21,9 @@ import axios from "../../utiles/axios";
 
 // types
 import type { OrderType } from "../../utiles/types";
+
+// layouts
+import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 // fetchers
 const getOrdersQueryFn = async ({
@@ -58,15 +60,8 @@ const OrdersPage = () => {
     if (orders?.length) dispatch(setOrders(orders));
   }, [orders, dispatch]);
 
-  if (isLoading)
-    return (
-      <SplashScreen>
-        Loading {isDashboard ? "orders" : "your orders"}...
-      </SplashScreen>
-    );
-
   return (
-    <>
+    <AnimatedLayout>
       {!isError && (
         <Heading>{isDashboard ? "Orders Page" : "Your Orders"}</Heading>
       )}
@@ -83,7 +78,7 @@ const OrdersPage = () => {
             : "you don't have any orders yet"
         }
       />
-    </>
+    </AnimatedLayout>
   );
 };
 export default OrdersPage;

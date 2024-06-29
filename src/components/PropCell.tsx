@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 type Props = {
   name: string;
   val: ReactNode;
-  propNameProps?: ComponentProps<"span">;
+  propNameProps?: ComponentProps<"div">;
   valueAsLink?: {
     path: string;
   };
@@ -23,12 +23,9 @@ const PropCell = ({
   return (
     <div
       {...attr}
-      className={
-        (valueAsLink ? "flex-cell-prop-name" : "") +
-        (className ? ` ${className}` : "")
-      }
+      className={"prop-cell-holder" + (className ? ` ${className}` : "")}
     >
-      <strong className="cell-prop-name">{name}: </strong>
+      <strong className="prop-cell-name">{name}: </strong>
       {valueAsLink ? (
         <button
           title="property cell btn"
@@ -39,10 +36,14 @@ const PropCell = ({
             })
           }
         >
-          <span {...propNameProps}>{val}</span>
+          <div className="prop-cell-value" {...propNameProps}>
+            {val}
+          </div>
         </button>
       ) : (
-        <span {...propNameProps}>{val}</span>
+        <div className="prop-cell-value" {...propNameProps}>
+          {val}
+        </div>
       )}
     </div>
   );

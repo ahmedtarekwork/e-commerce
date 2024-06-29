@@ -31,17 +31,16 @@
 
     #cart-products-length {
       position: absolute;
+      width: 23px;
+      height: 23px;
       background: var(--light);
-      font-weight: bold;
       font-size: 12px;
       color: #fff;
-      width: 20px;
-      height: 20px;
       display: grid;
       place-content: center;
       border-radius: 50%;
-      top: -8px;
-      right: 2px;
+      top: -10px;
+      right: 3px;
       pointer-events: none;
     }
   }

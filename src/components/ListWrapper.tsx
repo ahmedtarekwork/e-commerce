@@ -87,7 +87,26 @@ const ListWrapper = forwardRef<ListWrapperRefType, ListWrapperComponentsProps>(
           parseFloat(getComputedStyle(firstHolder).transitionDuration) * 1000;
 
         if (toggleList) {
+          const btnsList = [
+            ...document.querySelectorAll(".list-wrapper > button"),
+          ] as HTMLButtonElement[];
+
+          const closeAllFN = (btn: HTMLButtonElement) => {
+            const currentBtn = btnRef.current;
+
+            if (!currentBtn?.isEqualNode(btn)) setToggleList(false);
+          };
+
+          btnsList.forEach((btn) =>
+            btn?.addEventListener("click", () => closeAllFN(btn))
+          );
           wrapper.style.overflow = "visible";
+
+          return () => {
+            btnsList.forEach((btn) =>
+              btn?.removeEventListener("click", () => closeAllFN(btn))
+            );
+          };
         } else
           setTimeout(() => wrapper.style.removeProperty("overflow"), timeout);
       }

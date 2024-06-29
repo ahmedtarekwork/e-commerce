@@ -1,30 +1,24 @@
-import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const ErrorDiv = ({ msg }: { msg: string | undefined }) => {
-  const divRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const btn = divRef.current;
-
-    if (btn) {
-      btn.style.translate = `0 -${btn.offsetHeight}px`;
-
-      if (msg) {
-        if (btn.parentElement)
-          btn.parentElement.style.paddingBottom = `calc(${
-            btn.offsetHeight
-          }px + ${getComputedStyle(btn.parentElement).paddingBottom})`;
-      } else {
-        if (btn.parentElement)
-          btn.parentElement.style.removeProperty("padding-bottom");
-      }
-    }
-  }, [msg]);
-
   return (
-    <div ref={divRef} className={`error-div${msg ? " active" : ""}`}>
-      {msg}
-    </div>
+    <AnimatePresence mode="popLayout">
+      {msg && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            type: "tween",
+            duration: 0.15,
+          }}
+          layout
+          style={{ color: "var(--danger)" }}
+        >
+          {msg}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 export default ErrorDiv;

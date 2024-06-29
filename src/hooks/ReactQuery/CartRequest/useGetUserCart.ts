@@ -64,13 +64,11 @@ const useGetUserCart = (id?: string, enabled: boolean = false) => {
     enabled,
   });
 
-  const { isPending, isFetching } = cartQuery;
+  const { isPending } = cartQuery;
 
   useEffect(() => {
-    if (isPending || isFetching) {
-      dispatch(setCartLoading(true));
-    } else dispatch(setCartLoading(false));
-  }, [isPending, isFetching, dispatch]);
+    dispatch(setCartLoading(isPending));
+  }, [isPending]);
 
   return cartQuery;
 };

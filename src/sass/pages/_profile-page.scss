@@ -28,6 +28,10 @@
   }
 }
 
+.save-profile-cell-btn {
+  min-width: fit-content;
+}
+
 .profile-page-donation-cell {
   align-items: center;
   display: inline-flex;
@@ -49,26 +53,61 @@
 
 .profile-cell-content {
   flex: 1;
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
 }
 
 .profile-cell-btns-holder {
   @include flex(center, center, 10px);
+  flex-wrap: wrap;
 
   @media (max-width: 525px) {
     > * {
       width: 100%;
     }
   }
+}
 
-  @media (max-width: 335px) {
-    flex-direction: column;
+// specific user tabs list
+
+.specific-user-list-loading {
+  margin: 120px auto;
+
+  @media (max-width: 325px) {
+    display: none;
   }
 }
 
-.delete-user-btn-holder {
-  margin-top: auto;
+.specific-user-list-small-loading {
+  @include flex(center, center, 10px);
+  margin-block: 20px;
+  flex-wrap: wrap;
+  text-align: center;
 
-  button {
-    width: 100%;
+  @media (min-width: 326px) {
+    display: none;
+  }
+}
+
+// cart area
+.no-specific-user-wishlist-holder,
+.no-specific-user-orders-holder,
+.no-specific-user-cart-holder {
+  @include flex(center, center, 10px, column);
+  height: 100%;
+
+  svg {
+    font-size: 40px;
+  }
+
+  &:not(.no-specific-user-orders-holder) svg {
+    fill: var(--dark);
+  }
+
+  strong {
+    color: var(--dark);
+    font-size: 25px;
+    text-align: center;
   }
 }

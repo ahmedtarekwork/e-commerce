@@ -8,8 +8,8 @@ import useSelector from "../../../../hooks/redux/useSelector";
 import { setHomeSliderImgsAction } from "../../../../store/fetures/homePageSliderImgsSlice";
 
 // components
-import Spinner from "../../../../components/spinners/Spinner";
 import ImgsSlider from "../../../../components/ImgsSlider";
+import EmptySpinner from "../../../../components/spinners/EmptySpinner";
 
 // hooks
 import useGetHomePageSliderImgs from "../../../../hooks/ReactQuery/useGetHomePageSliderImgs";
@@ -48,10 +48,21 @@ const HomePageImgsSlider = () => {
           src={welcomePlaceholder}
           alt="welcome placeholder"
         />
-        <div>
+        <div className="align-content">
           <p>Welcome to E-commerce Store</p>
           {homePageSliderImgsLoading && fetchStatus !== "idle" && (
-            <Spinner settings={{ clr: "var(--dark)" }} />
+            <EmptySpinner
+              holderAttr={{
+                style: {
+                  display: "block",
+                  marginInline: "auto",
+                },
+              }}
+              settings={{
+                diminsions: "55px",
+                "brdr-width": "3.5px",
+              }}
+            />
           )}
         </div>
       </div>

@@ -67,6 +67,7 @@ const App = () => {
   }, [checkUserData, dispatch]);
 
   if (checkUserLoading) return <SplashScreen>Loading...</SplashScreen>;
+
   return <RouterProvider router={appRouter} />;
 };
 

@@ -1,16 +1,19 @@
-import { CSSProperties } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
-interface props {
+type Props = {
   stroke: JSX.Element;
   fill: JSX.Element;
   diminsions?: number;
-}
+} & ComponentProps<"div">;
 
-const FillIcon = ({ stroke, fill, diminsions = 18 }: props) => {
+const FillIcon = ({ stroke, fill, diminsions = 18, ...attr }: Props) => {
   return (
     <div
-      className="fill-icon"
-      style={{ "--diminsions": diminsions + "px" } as CSSProperties}
+      {...attr}
+      className={`fill-icon${attr.className ? ` ${attr.className}` : ""}`}
+      style={
+        { "--diminsions": diminsions + "px", ...attr.style } as CSSProperties
+      }
     >
       <div className="stroke">{stroke}</div>
       <div className="fill">{fill}</div>

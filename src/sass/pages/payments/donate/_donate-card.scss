@@ -74,9 +74,8 @@
   }
 
   &-btn {
-    margin-inline: auto;
-    margin-top: auto;
-    display: block;
+    @include flex(center, center, 5px);
+    margin: auto auto 0;
     background: var(--clr);
 
     @media (max-width: 300px) {

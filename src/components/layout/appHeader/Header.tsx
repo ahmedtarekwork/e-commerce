@@ -1,5 +1,6 @@
 import { useRef, forwardRef } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, useAnimationControls } from "framer-motion";
 
 // icons
 import { FaBars } from "react-icons/fa";
@@ -7,15 +8,19 @@ import logo from "../../../../assets/favicon.svg";
 
 // components
 import MainBtnsList from "./MainBtnsList";
-import Sidebar from "./sidebar/AppSidebar";
+import AppSidebar from "../appSidebar/AppSidebar";
+import AppHeaderLogoText from "./AppHeaderLogoText";
 import { type SidebarWraperComponentRefType } from "../SidebarWrapper";
 
 const Header = forwardRef<HTMLElement>((_, ref) => {
   const { pathname } = useLocation();
+  const isDashbaord = pathname.includes("dashboard");
 
   const emergencyRef = useRef<HTMLElement>(null);
   const headerRef = ref || emergencyRef;
   const sidebarRef = useRef<SidebarWraperComponentRefType>(null);
+
+  const controles = useAnimationControls();
 
   return (
     <>
@@ -25,22 +30,40 @@ const Header = forwardRef<HTMLElement>((_, ref) => {
             <button
               title="toggle app sidebar btn"
               id="open-side-bar"
-              onClick={() =>
-                sidebarRef.current?.setToggleSidebar((prev) => !prev)
-              }
+              onClick={() => {
+                sidebarRef.current?.setToggleSidebar((prev) => {
+                  controles.start({
+                    x: !prev ? 0 : "-100%",
+                  });
+
+                  return !prev;
+                });
+              }}
             >
               <FaBars />
             </button>
 
             <Link
               title="go to home page btn"
-              to={!pathname.includes("dashboard") ? "/" : "/dashboard"}
+              to={!isDashbaord ? "/" : "/dashboard"}
               className="logo"
             >
-              <img width="40px" height="40px" src={logo} alt="Logo Icon" />
-              {!pathname.includes("dashboard")
-                ? "E-commerce Store"
-                : "Sales Managment"}
+              <motion.img
+                initial={{
+                  scale: 0,
+                  x: -10,
+                }}
+                animate={{
+                  scale: 1,
+                  x: 0,
+                }}
+                width="40px"
+                height="40px"
+                src={logo}
+                alt="Logo Icon"
+              />
+
+              <AppHeaderLogoText isDashbaord={isDashbaord} />
             </Link>
           </div>
 
@@ -50,7 +73,7 @@ const Header = forwardRef<HTMLElement>((_, ref) => {
         </div>
       </header>
 
-      <Sidebar ref={sidebarRef} />
+      <AppSidebar ref={sidebarRef} sidebarItemControlls={controles} />
     </>
   );
 });

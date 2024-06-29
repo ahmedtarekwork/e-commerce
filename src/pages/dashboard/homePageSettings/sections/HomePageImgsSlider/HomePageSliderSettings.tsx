@@ -2,12 +2,14 @@
 import { useEffect, useState, useRef } from "react";
 
 // components
+import AddImgsToHomeSlidedrBtn from "./AddImgsToHomeSliderBtn";
+import RemoveImgFromSlider from "./RemoveImgFromSlider";
+import BtnWithSpinner from "../../../../../components/animatedBtns/BtnWithSpinner";
 import Spinner from "../../../../../components/spinners/Spinner";
 import GridList from "../../../../../components/gridList/GridList";
 import TopMessage, {
   type TopMessageRefType,
 } from "../../../../../components/TopMessage";
-import AddImgsToHomeSlidedrBtn from "./AddImgsToHomeSliderBtn";
 
 // react query
 import { useMutation } from "@tanstack/react-query";
@@ -30,9 +32,8 @@ import { nanoid } from "@reduxjs/toolkit";
 import handleError from "../../../../../utiles/functions/handleError";
 import convertFilesToBase64 from "../../../../../utiles/functions/files/convertFilesToBase64";
 
-// icons
-import { BiSolidImageAdd } from "react-icons/bi";
-import RemoveImgFromSlider from "./RemoveImgFromSlider";
+// framer motion
+import { motion } from "framer-motion";
 
 // fetchers
 const addImageToHomeSliderMutationFn = async (imgs: { image: string }[]) => {
@@ -50,7 +51,6 @@ const HomePageSliderSettings = () => {
 
   // refs
   const msgRef = useRef<TopMessageRefType>(null);
-  const submitImgsBtnRef = useRef<HTMLButtonElement>(null);
 
   const {
     data: homePageSliderImgs,
@@ -104,26 +104,9 @@ const HomePageSliderSettings = () => {
     }
   }, [newHomePageSliderImgsErrData, newHomePageSliderImgs, dispatch]);
 
-  useEffect(() => {
-    setTimeout(() => submitImgsBtnRef.current?.classList.add("active"));
-  }, [newHomePageSliderImgsLoading]);
-
   // loading
   if (homePageSliderImgsLoading && fetchStatus !== "idle") {
-    return (
-      <Spinner
-        fullWidth={true}
-        settings={{
-          clr: "var(--main)",
-        }}
-        style={{
-          fontWeight: "bold",
-          color: "var(--main)",
-        }}
-      >
-        Loading Images...
-      </Spinner>
-    );
+    return <Spinner fullWidth={true}>Loading Images...</Spinner>;
   }
 
   // no images in home page slider and no image has been selected to upload
@@ -148,7 +131,7 @@ const HomePageSliderSettings = () => {
         className="home-page-slider-settings-imgs-list-preview"
       >
         {imgs.map(({ image, _id }) => (
-          <li key={_id}>
+          <motion.li layout key={_id}>
             <img
               width="100%"
               height="100%"
@@ -157,7 +140,7 @@ const HomePageSliderSettings = () => {
             />
 
             <RemoveImgFromSlider imgId={_id} msgRef={msgRef} />
-          </li>
+          </motion.li>
         ))}
       </GridList>
 
@@ -175,7 +158,7 @@ const HomePageSliderSettings = () => {
               display: "block",
             }}
           >
-            Images Will Added To Home Page Slider
+            Images Will Be Added To The Home Page Slider
           </strong>
 
           <GridList
@@ -195,7 +178,7 @@ const HomePageSliderSettings = () => {
                 />
 
                 <button
-                  title="remove image from list that's will uploaded to home slider images btn"
+                  title="remove image from list"
                   disabled={isImgsRemoved || newHomePageSliderImgsLoading}
                   className="red-btn"
                   onClick={() => {
@@ -211,8 +194,9 @@ const HomePageSliderSettings = () => {
           </GridList>
 
           <div className="home-page-slider-settings-down-btns">
-            <button
-              title="upload selected images to home page iamges slider btn"
+            <BtnWithSpinner
+              toggleSpinner={newHomePageSliderImgsLoading}
+              title="upload selected images to home page iamges slider"
               onClick={async () => {
                 const finalImgs: { image: string }[] = [];
 
@@ -222,16 +206,12 @@ const HomePageSliderSettings = () => {
                 }
                 addImgsToHomeSlider(finalImgs);
               }}
-              ref={submitImgsBtnRef}
-              className={`btn${
-                newHomePageSliderImgsLoading
-                  ? " center spinner-pseudo-after fade scale"
-                  : ""
-              }`}
+              className="btn"
               disabled={newHomePageSliderImgsLoading || isImgsRemoved}
             >
               submit images
-            </button>
+            </BtnWithSpinner>
+
             <AddImgsToHomeSlidedrBtn
               data-disabled={newHomePageSliderImgsLoading || isImgsRemoved}
               setImgsToUpload={setImgsToUpload}
@@ -245,18 +225,10 @@ const HomePageSliderSettings = () => {
           <AddImgsToHomeSlidedrBtn
             setImgsToUpload={setImgsToUpload}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
               width: "fit-content",
               marginInline: "auto",
             }}
           >
-            <BiSolidImageAdd
-              style={{
-                fontSize: 22,
-              }}
-            />
             Add more images
           </AddImgsToHomeSlidedrBtn>
         </>

@@ -1,10 +1,12 @@
 // react
 import {
-  useImperativeHandle,
   useState,
-  forwardRef,
   useEffect,
   useRef,
+  useImperativeHandle,
+  forwardRef,
+
+  // types
   type ChangeEvent,
   type SetStateAction,
   type Dispatch,
@@ -15,16 +17,19 @@ import {
 import { useForm } from "react-hook-form";
 
 // components
-import FormInput from "./Input/FormInput";
-import ErrorDiv from "./Input/ErrorDiv";
+import FormInput from "../../../components/appForm/Input/FormInput";
+import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
 
 // utiles
 import { nanoid } from "@reduxjs/toolkit";
-import convertFilesToBase64 from "../../utiles/functions/files/convertFilesToBase64";
-import makeEmptyFile from "../../utiles/functions/files/makeEmptyFile";
+import convertFilesToBase64 from "../../../utiles/functions/files/convertFilesToBase64";
+import makeEmptyFile from "../../../utiles/functions/files/makeEmptyFile";
 
 // types
-import { ProductFormValues } from "../../pages/products/ProductFormPage";
+import type { ProductFormValues } from "./ProductFormPage";
+
+// framer motion
+import { motion } from "framer-motion";
 
 type HookFormMethodsType = ReturnType<typeof useForm<ProductFormValues>>;
 
@@ -63,7 +68,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
 
     const imgRef2 = useRef<HTMLInputElement | null>(null);
     const { ref: imgRef, ...regist } = register("imgs", {
-      required: "product must has at least one image",
+      required: "product must have at least one image",
       onChange: async (e: ChangeEvent<HTMLInputElement>) => {
         const imgs = e.currentTarget.files;
         if (imgs?.length) addImgs(imgs);
@@ -85,7 +90,13 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
     }, [imgsList]);
 
     return (
-      <div
+      <motion.div
+        layout
+        transition={{
+          type: "tween",
+          duration: 0.15,
+          ease: "easeInOut",
+        }}
         className="product-imgs-area"
         onDragLeave={(e) => {
           e.preventDefault();
@@ -161,7 +172,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
         </div>
 
         <ErrorDiv msg={imgErr} />
-      </div>
+      </motion.div>
     );
   }
 );

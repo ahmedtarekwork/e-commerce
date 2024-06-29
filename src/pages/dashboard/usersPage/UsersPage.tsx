@@ -1,8 +1,9 @@
 // react
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // redux
 import useDispatch from "../../../hooks/redux/useDispatch";
+// redux actions
 import { setAllUsers } from "../../../store/fetures/userSlice";
 
 // react-query
@@ -14,12 +15,13 @@ import Heading from "../../../components/Heading";
 import SplashScreen from "../../../components/spinners/SplashScreen";
 import DisplayError from "../../../components/layout/DisplayError";
 // modal
-import AppModal, {
-  AppModalRefType,
-} from "../../../components/modals/appModal/AppModal";
 import AppModalCell from "../../../components/modals/appModal/AppModalCell";
 import GridList from "../../../components/gridList/GridList";
 import OrderCard from "../../../components/orders/OrderCard";
+
+import AppModal, {
+  type AppModalRefType,
+} from "../../../components/modals/appModal/AppModal";
 import TopMessage, {
   type TopMessageRefType,
 } from "../../../components/TopMessage";
@@ -30,6 +32,9 @@ import axios from "../../../utiles/axios";
 // types
 import type { OrderType, UserType } from "../../../utiles/types";
 import type { AxiosResponse } from "axios";
+
+// layouts
+import AnimatedLayout from "../../../layouts/AnimatedLayout";
 
 const cells = ["username", "email", "address", "isAdmin", "orders", "delete"];
 const errMsg = "something went wrong while getting users list";
@@ -59,17 +64,20 @@ const getAllUsers = async (): Promise<
 const UsersPage = () => {
   const dispatch = useDispatch();
 
+  // refs
   const modalRef = useRef<AppModalRefType>(null);
   const msgRef = useRef<TopMessageRefType>(null);
+
+  // states
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedUsername, setSelectedUsername] = useState("");
 
+  // react query
   const {
     data: usersList,
     isError: usersListErr,
     error: usersListErrData,
     isPending: usersListLoading,
-    isFetching,
   } = useQuery({
     queryKey: ["getAllUsers"],
     queryFn: getAllUsers,
@@ -88,17 +96,8 @@ const UsersPage = () => {
   if (!usersList) return <h1>{errMsg}</h1>;
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>Users List</Heading>
-
-      {isFetching && !usersListLoading && (
-        <p
-          style={{ "--clr": "var(--main)" } as CSSProperties}
-          className="spinner-pseudo-after"
-        >
-          updating Users...
-        </p>
-      )}
 
       <GridList isChanging={false} initType="row" cells={cells}>
         {usersList.map((user) => {
@@ -132,7 +131,7 @@ const UsersPage = () => {
       </AppModal>
 
       <TopMessage ref={msgRef} />
-    </>
+    </AnimatedLayout>
   );
 };
 

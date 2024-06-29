@@ -3,10 +3,7 @@
 }
 
 .product-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: space-between;
+  @include flex(space-between, null, 10px, column);
   border-radius: var(--radius);
   padding: 10px;
   transition: 0.3s;
@@ -22,6 +19,7 @@
         border: 1px solid transparent;
         border-radius: var(--radius);
         transition: 0.2s;
+        max-width: 100%;
       }
     }
 
@@ -45,17 +43,12 @@
     right: -8px;
     background: var(--dark-trans);
     padding: 7px;
-    @include cardBorder(var(--radius), 2px);
     z-index: 10;
-
     width: 40px;
     height: 40px;
     display: grid;
     place-content: center;
-
-    .empty-spinner {
-      margin: 0 !important;
-    }
+    @include cardBorder(var(--radius), 2px);
 
     svg {
       font-size: 20px;
@@ -63,13 +56,16 @@
     }
   }
 
-  .product-card-title {
+  .product-card-title,
+  .product-data-big-holder .prop-cell-value:not(:has(.list-wrapper)) {
     overflow: hidden;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     display: -webkit-box;
+    word-break: break-all;
   }
 
+  // product cart btns
   .product-card-more-info {
     margin-inline: auto;
   }
@@ -78,8 +74,11 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    overflow: hidden;
 
     > * {
+      @include flex(center, center, 7px);
+      flex-wrap: wrap;
       min-width: max-content;
       flex: 1;
       text-align: center;
@@ -127,6 +126,14 @@
         var(--list-item-cell-width) * calc(var(--cells-length) - 1) - var(--gap)
       );
 
+    .swiper-pagination {
+      display: none;
+    }
+    .swiper {
+      pointer-events: none;
+      user-select: none;
+    }
+
     .product-data-big-holder {
       display: flex;
       gap: 5px;
@@ -145,6 +152,17 @@
         width: 100%;
         margin: 0;
       }
+    }
+  }
+
+  @media (min-width: 631px) and (max-width: 991px) {
+    .product-card-btns-holder {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      min-width: max-content;
+    }
+    .product-card-more-info {
+      font-size: 13px;
     }
   }
 

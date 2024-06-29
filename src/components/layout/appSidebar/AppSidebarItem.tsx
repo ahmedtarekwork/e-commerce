@@ -7,15 +7,37 @@ import { BsFillCaretRightFill } from "react-icons/bs";
 // types
 import { type IconType } from "react-icons";
 
+import { type AnimationControls, motion } from "framer-motion";
+
 export type SidebarItemProps = {
   content: string;
   Icon: IconType;
   path: string;
+  index: number;
+  controller: AnimationControls;
 };
 
-const SidebarItem = ({ content, path, Icon }: SidebarItemProps) => {
+const AppSidebarItem = ({
+  content,
+  path,
+  Icon,
+  index,
+  controller,
+}: SidebarItemProps) => {
   return (
-    <li>
+    <motion.li
+      initial={{
+        x: "-100%",
+      }}
+      exit={{
+        x: "-100%",
+      }}
+      animate={controller}
+      transition={{
+        type: "tween",
+        delay: 0.05 * index,
+      }}
+    >
       <NavLink
         to={path}
         className="close-side"
@@ -29,8 +51,8 @@ const SidebarItem = ({ content, path, Icon }: SidebarItemProps) => {
           {content}
         </p>
       </NavLink>
-    </li>
+    </motion.li>
   );
 };
 
-export default SidebarItem;
+export default AppSidebarItem;

@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 // components
 import Spinner from "./Spinner";
+// layouts
+import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 type Props = {
   children?: ReactNode;
@@ -11,16 +13,15 @@ type Props = {
 
 const SplashScreen = ({ children, notMain }: Props) => {
   return (
-    <div className={`splash-screen${notMain ? " not-main" : ""}`}>
+    <AnimatedLayout className={`splash-screen${notMain ? " not-main" : ""}`}>
       <Spinner
-        settings={{ clr: "var(--main)" }}
         style={{
-          margin: 0,
+          marginInline: "auto",
         }}
       >
         {children || "Loading..."}
       </Spinner>
-    </div>
+    </AnimatedLayout>
   );
 };
 

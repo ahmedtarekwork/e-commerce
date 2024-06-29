@@ -2,9 +2,10 @@
   margin-inline: auto;
   @include flex(null, center);
   border-radius: var(--radius);
-  overflow: auto;
   width: fit-content;
   max-width: 100%;
+  overflow: hidden;
+  overflow-x: auto;
 
   > * + * {
     border-left: var(--brdr);

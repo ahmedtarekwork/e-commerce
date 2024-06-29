@@ -8,6 +8,7 @@ type InitStateType = {
   cartMsg: string;
   allUsers: UserType[];
   cartLoading: boolean;
+  wishlistLoading: boolean;
 };
 
 const initialState: InitStateType = {
@@ -16,6 +17,7 @@ const initialState: InitStateType = {
   cartMsg: "",
   allUsers: [],
   cartLoading: false,
+  wishlistLoading: false,
 };
 
 const userSlice = createSlice({
@@ -25,9 +27,6 @@ const userSlice = createSlice({
     // current user
     setUser: (state, { payload }: PayloadAction<UserType>) => {
       state.user = payload;
-    },
-    resetUserWishlist: (state) => {
-      if (state.user?.wishlist) state.user.wishlist = [];
     },
     removeUser: (state) => {
       state.user = null;
@@ -46,7 +45,18 @@ const userSlice = createSlice({
       state.allUsers = [];
     },
 
-    // cart
+    // current user wishlist
+    resetUserWishlist: (state) => {
+      if (state.user?.wishlist) state.user.wishlist = [];
+    },
+    setUserWishlist: (state, { payload }: PayloadAction<string[]>) => {
+      if (state.user?.wishlist) state.user.wishlist = payload;
+    },
+    toggleWishlistLoading: (state, { payload }: PayloadAction<boolean>) => {
+      state.wishlistLoading = payload;
+    },
+
+    // current user cart
     setCart: (state, { payload }: PayloadAction<CartType>) => {
       state.userCart = payload;
       state.cartMsg = "";
@@ -64,14 +74,21 @@ const userSlice = createSlice({
 });
 
 export const {
+  // current user
   setUser,
   removeUser,
-  resetUserWishlist,
   logoutUser,
 
+  // current user wishlist
+  resetUserWishlist,
+  setUserWishlist,
+  toggleWishlistLoading,
+
+  // all users
   setAllUsers,
   resetAllUsers,
 
+  // current user cart
   setCart,
   resteCart,
   setCartLoading,

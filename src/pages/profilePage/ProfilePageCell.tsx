@@ -10,6 +10,7 @@ import { setUser } from "../../store/fetures/userSlice";
 import { useMutation } from "@tanstack/react-query";
 
 // component
+import BtnWithSpinner from "../../components/animatedBtns/BtnWithSpinner";
 import FormInput from "../../components/appForm/Input/FormInput";
 import TopMessage, {
   type TopMessageRefType,
@@ -36,7 +37,6 @@ const updateUserMutationFn = async (userId: string, userData: UserType) => {
 };
 
 const ProfilePageCell = ({ propName, content, user }: Props) => {
-  const saveBtnRef = useRef<HTMLButtonElement>(null);
   const msgRef = useRef<TopMessageRefType>(null);
 
   const dispatch = useDispatch();
@@ -81,15 +81,11 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
     }
   }, [updatedUserData, updateUserErr, updateUserErrData, dispatch, propName]);
 
-  useEffect(() => {
-    saveBtnRef.current?.classList.toggle("active", isLoading);
-  }, [isLoading]);
-
   return (
     <>
       <div className="profile-page-cell">
         <div className="profile-page-cell-content-holder">
-          <strong className="cell-prop-name">{propName}:</strong>
+          <strong className="prop-cell-name">{propName}:</strong>
           <div className="profile-cell-content">
             {editMode ? (
               <FormInput
@@ -98,14 +94,14 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
                 value={inputValue}
               />
             ) : (
-              `${propName === "email" ? "@" : ""}${content}`
+              `${propName === "username" ? "#" : ""}${content}`
             )}
           </div>
         </div>
 
         <div className="profile-cell-btns-holder">
           <button
-            title="edit specific profile property btn"
+            title={`edit your ${propName}`}
             className={`${editMode ? "red-" : ""}btn`}
             disabled={isLoading}
             onClick={() => {
@@ -117,12 +113,10 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
           </button>
 
           {editMode && (
-            <button
-              title="save profile property new changes btn"
-              ref={saveBtnRef}
-              className={`${
-                isLoading ? "center fade scale spinner-pseudo-after " : ""
-              }btn`}
+            <BtnWithSpinner
+              title="save changes"
+              toggleSpinner={isLoading}
+              className="btn save-profile-cell-btn"
               disabled={
                 !inputValue.length || inputValue === content || isLoading
               }
@@ -134,7 +128,7 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
               }
             >
               save changes
-            </button>
+            </BtnWithSpinner>
           )}
         </div>
       </div>

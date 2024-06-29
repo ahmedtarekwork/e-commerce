@@ -1,4 +1,8 @@
+// react
 import { type ReactNode } from "react";
+
+// components
+import PropCell from "../PropCell";
 
 type Props = {
   cells: (keyof Props["itemData"] | string)[];
@@ -10,10 +14,11 @@ const GridListItem = ({ cells, itemData }: Props) => {
     <li>
       {cells.map((cell) => {
         return (
-          <p key={cell.toString()} className="grid-list-item-content">
-            <strong className="cell-prop-name">{cell.toString()}: </strong>
-            <span>{cell in itemData ? itemData[cell] : "--"}</span>
-          </p>
+          <PropCell
+            key={cell.toString()}
+            name={cell.toString()}
+            val={cell in itemData ? itemData[cell] : "--"}
+          />
         );
       })}
     </li>

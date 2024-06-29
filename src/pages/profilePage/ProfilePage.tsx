@@ -16,19 +16,20 @@ import { logoutUser } from "../../store/fetures/userSlice";
 // components
 import ProfilePageCell from "./ProfilePageCell";
 import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
-import CartArea from "../../components/CartArea";
+import CartArea from "../../components/cartArea/CartArea";
 import Heading from "../../components/Heading";
 import SplashScreen from "../../components/spinners/SplashScreen";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../components/TopMessage";
 import TabsList from "../../components/TabsList";
 import WishlistArea from "../../components/WishlistArea";
 import PropCell from "../../components/PropCell";
 import DangerZone from "../../components/dangerZone/DangerZone";
+import TopMessage, {
+  type TopMessageRefType,
+} from "../../components/TopMessage";
 
 // icons
 import { FaDonate } from "react-icons/fa";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
 
 // hooks
 import useDeleteUserBtn from "../../hooks/ReactQuery/useDeleteUserBtn";
@@ -39,6 +40,9 @@ import handleError from "../../utiles/functions/handleError";
 
 // types
 import type { UserType } from "../../utiles/types";
+
+// layouts
+import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 // fetchers
 const getUserQueryFn = async ({
@@ -79,7 +83,7 @@ const ProfilePage = () => {
   const [user, setUser] = useState<UserType | null>(
     isCurrentUserProfile ? appUser : singleUser
   );
-  const withId = isCurrentUserProfile ? {} : { userId: user?._id };
+  const withId = isCurrentUserProfile ? {} : { userId: id };
 
   // delete user account hook
   const { deleteBtn, deleteErr, deleteErrData, deleteSuccess, reset } =
@@ -88,11 +92,16 @@ const ProfilePage = () => {
   // useEffects
   // if no user => send request to get user
   useEffect(() => {
-    if (!isCurrentUserProfile && id === user?._id) {
-      navigate("/profile", { relative: "path" });
+    if (!isCurrentUserProfile) {
+      if (id === appUser?._id) {
+        navigate("/profile", { relative: "path" });
+      } else {
+        if (!user) getUser();
+      }
     }
-    if (!user) getUser();
-  }, [isCurrentUserProfile, user, navigate, getUser, id]);
+
+    if (isCurrentUserProfile && !user) getUser();
+  }, [isCurrentUserProfile, appUser, user, navigate, getUser, id]);
 
   useEffect(() => {
     if (resUser) setUser(resUser);
@@ -130,10 +139,11 @@ const ProfilePage = () => {
       itemId: _id,
       username,
       children: "delete your account",
+      style: { marginInline: "auto" },
     });
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>
         {isCurrentUserProfile ? "Your Profile" : "Profile Page"}
       </Heading>
@@ -169,7 +179,10 @@ const ProfilePage = () => {
                 relative="path"
               >
                 {user.donationPlan ? (
-                  "change plan"
+                  <>
+                    <FaMoneyBillTransfer />
+                    change plan
+                  </>
                 ) : (
                   <>
                     <FaDonate />
@@ -184,7 +197,7 @@ const ProfilePage = () => {
 
       <hr style={{ marginBlock: 15 }} />
 
-      {!isCurrentUserProfile ? (
+      {!isCurrentUserProfile && (
         <>
           <TabsList
             lists={[
@@ -205,7 +218,7 @@ const ProfilePage = () => {
                 tabName: "User wishlist",
                 tabContent: (
                   <WishlistArea
-                    wishlist={user.wishlist}
+                    userId={user._id}
                     isCurrentUserProfile={isCurrentUserProfile}
                   />
                 ),
@@ -215,7 +228,7 @@ const ProfilePage = () => {
 
           <hr style={{ marginBlock: 15 }} />
         </>
-      ) : null}
+      )}
 
       <DangerZone
         content="delete your account, you can't restore your account after delete it."
@@ -227,7 +240,7 @@ const ProfilePage = () => {
       />
 
       <TopMessage ref={msgRef} />
-    </>
+    </AnimatedLayout>
   );
 };
 

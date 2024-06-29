@@ -1,5 +1,4 @@
 // components
-import Spinner from "../spinners/Spinner";
 import OrderCard from "./OrderCard";
 import OrderCellWithChangeStatus from "./OrderCellWithChangeStatus";
 import DisplayError from "../layout/DisplayError";
@@ -10,6 +9,10 @@ import type { OrderType } from "../../utiles/types";
 
 // SVGs
 import EmptyOrdersListSvg from "../../../imgs/no-orders.svg";
+
+// layouts
+import AnimatedLayout from "../../layouts/AnimatedLayout";
+import Spinner from "../spinners/Spinner";
 
 type Props = {
   loading: boolean;
@@ -30,20 +33,20 @@ const OrdersArea = ({
 }: Props) => {
   if (loading)
     return (
-      <Spinner
-        fullWidth={true}
-        settings={{
-          clr: "var(--main)",
+      <AnimatedLayout
+        style={{
+          justifyContent: "center",
         }}
       >
-        <strong
+        <Spinner
           style={{
-            color: "var(--main)",
+            marginInline: "auto",
+            marginBlock: 60,
           }}
         >
           Loading Orders...
-        </strong>
-      </Spinner>
+        </Spinner>
+      </AnimatedLayout>
     );
 
   if (isError) {
@@ -67,17 +70,19 @@ const OrdersArea = ({
     );
 
   return (
-    <ul className="orders-list">
-      {orders.map((order) => (
-        <li key={order._id} className="orders-page-order-cell">
-          {withEditStatus ? (
-            <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
-          ) : (
-            <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
-          )}
-        </li>
-      ))}
-    </ul>
+    <AnimatedLayout>
+      <ul className="orders-list">
+        {orders.map((order) => (
+          <li key={order._id} className="orders-page-order-cell">
+            {withEditStatus ? (
+              <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
+            ) : (
+              <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
+            )}
+          </li>
+        ))}
+      </ul>
+    </AnimatedLayout>
   );
 };
 export default OrdersArea;

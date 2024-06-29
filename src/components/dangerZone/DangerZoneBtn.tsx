@@ -3,25 +3,24 @@ import { useRef, useState } from "react";
 
 // components
 import TopMessage, { type TopMessageRefType } from "../TopMessage";
-import AreYouSureModal from "../modals/AreYouSureModal";
+import AreYouSureModal, { type SureModalRef } from "../modals/AreYouSureModal";
 
 // types
 import { type InlineDeleteBtnType } from "./DangerZone";
-import { type AppModalRefType } from "../modals/appModal/AppModal";
 
 const DangerZoneBtn = ({
   content,
   modalMsg,
   onAcceptFn,
 }: InlineDeleteBtnType) => {
-  const sureModalRef = useRef<AppModalRefType>(null);
+  const sureModalRef = useRef<SureModalRef>(null);
   const msgRef = useRef<TopMessageRefType>(null);
   const [toggleClosingFunctions, setToggleClosingFunctions] = useState(true);
 
   return (
     <>
       <button
-        title="danger zone red btn"
+        title="danger zone red"
         onClick={() => sureModalRef.current?.toggleModal(true)}
         className="red-btn danger-zone-btn"
       >
@@ -35,18 +34,11 @@ const DangerZoneBtn = ({
           const acceptBtn = e.currentTarget;
 
           if (acceptBtn) {
-            acceptBtn?.classList.add(
-              "center",
-              "scale",
-              "spinner-pseudo-after",
-              "fade"
-            );
+            sureModalRef.current?.setShowYesSpinner(true);
 
             acceptBtn.parentElement?.parentElement?.parentElement
               ?.querySelectorAll("button")
               .forEach((btn) => (btn.disabled = true));
-
-            setTimeout(() => acceptBtn?.classList.add("active"));
           }
           setToggleClosingFunctions(false);
           onAcceptFn(e);

@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // component
 import ProductCard from "../../../../../../components/productCard/ProductCard";
-import Spinner from "../../../../../../components/spinners/Spinner";
+import EmptySpinner from "../../../../../../components/spinners/EmptySpinner";
 
 // utils
 import axios from "axios";
@@ -78,79 +78,86 @@ const HomePageProductsSlider = ({ filters }: Props) => {
   if (!bestSell && category) textSideContent = category;
   if (bestSell && category) textSideContent = category + "Best Sales";
 
-  if (isLoading) {
-    return (
-      <div className="home-page-products-slider">
-        <Spinner
-          content="Loading Products..."
-          settings={{ clr: "var(--main)" }}
-          style={{
-            fontWeight: "bold",
-            color: "var(--main)",
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
-    data && (
-      <div className="home-page-products-slider">
-        <p className="home-page-products-slider-text-side">{textSideContent}</p>
-
-        <Swiper
-          slidesPerView={2.5}
-          spaceBetween={10}
-          className="products-list-with-border"
-          navigation={true}
-          modules={[Navigation, FreeMode]}
-          grabCursor={true}
-          freeMode={true}
-          breakpoints={{
-            1199: {
-              slidesPerView: 4.5,
-            },
-            991: {
-              slidesPerView: 3.5,
-            },
-            601: {
-              slidesPerView: 2.1,
-            },
-            450: {
-              slidesPerView: 1.5,
-            },
-            1: {
-              slidesPerView: 1,
-            },
+    <div className="home-page-products-slider">
+      {isLoading && (
+        <strong
+          className="home-page-products-slider-loading"
+          style={{
+            color: "var(--dark)",
           }}
         >
-          {data.map((product) => (
-            <SwiperSlide key={nanoid()}>
-              <ProductCard
-                product={{ ...product, imgs: [product.imgs[0]] }}
-                className="card-mode"
-                TagName="div"
-                imgWidth="100px"
-                withAddToCart
-                withQty={false}
-              />
-            </SwiperSlide>
-          ))}
+          Loading {textSideContent} Products...
+          <EmptySpinner
+            settings={{
+              diminsions: "28px",
+              "brdr-width": "3px",
+            }}
+          />
+        </strong>
+      )}
 
-          {!bestSell && category && (
-            <SwiperSlide className="home-page-products-slider-explore-more-card">
-              <Link
-                title="go to products page with specific category btn"
-                to={`/products?category=${category}`}
-                relative="path"
-              >
-                <span className="plus-icon">+</span> More
-              </Link>
-            </SwiperSlide>
-          )}
-        </Swiper>
-      </div>
-    )
+      {data && !isLoading && (
+        <>
+          <p className="home-page-products-slider-text-side">
+            {textSideContent}
+          </p>
+
+          <Swiper
+            slidesPerView={2.5}
+            spaceBetween={10}
+            className="products-list-with-border"
+            navigation={true}
+            modules={[Navigation, FreeMode]}
+            grabCursor={true}
+            freeMode={true}
+            breakpoints={{
+              1199: {
+                slidesPerView: 4.5,
+              },
+              991: {
+                slidesPerView: 3.5,
+              },
+              601: {
+                slidesPerView: 2.1,
+              },
+              450: {
+                slidesPerView: 1.5,
+              },
+              1: {
+                slidesPerView: 1,
+              },
+            }}
+          >
+            {data.map((product) => (
+              <SwiperSlide key={nanoid()}>
+                <ProductCard
+                  product={{ ...product, imgs: [product.imgs[0]] }}
+                  className="card-mode"
+                  TagName="div"
+                  imgWidth="130px"
+                  withQty={false}
+                  withAddToWishList
+                  withAddToCart
+                />
+              </SwiperSlide>
+            ))}
+
+            {!bestSell && category && (
+              <SwiperSlide className="home-page-products-slider-explore-more-card">
+                <Link
+                  title="go to products page with specific category btn"
+                  to={`/products?category=${category}`}
+                  relative="path"
+                >
+                  <span className="plus-icon">+</span> More
+                </Link>
+              </SwiperSlide>
+            )}
+          </Swiper>
+        </>
+      )}
+    </div>
   );
 };
 export default HomePageProductsSlider;

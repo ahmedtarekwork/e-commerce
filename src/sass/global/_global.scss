@@ -95,16 +95,6 @@ main.app-holder {
   }
 }
 
-main.grid-page {
-  display: grid;
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
-  }
-}
-
 // inputs && select-list-summary
 $elements: ("input", "textarea", ".select-list-summary");
 $selectors: (

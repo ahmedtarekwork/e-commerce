@@ -1,4 +1,15 @@
-import { ComponentProps, Fragment, ReactNode, useEffect, useRef } from "react";
+import {
+  Fragment,
+  forwardRef,
+  useEffect,
+  useRef,
+
+  // types
+  type RefObject,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
+import { motion } from "framer-motion";
 
 type Content =
   | {
@@ -22,68 +33,96 @@ type Settings =
 
 type Props = Content & {
   settings?: Settings;
-  effect?: "fade" | "scale" | "fade scale";
   mainSpinner?: boolean;
   fullWidth?: boolean;
+  holderAttributes?: ComponentProps<"div">;
+} & ComponentProps<"div">;
+
+const circleSpinVariantes = {
+  animate: {
+    rotate: 360,
+
+    transition: {
+      duration: 1.6,
+      ease: "easeInOut",
+      repeat: Infinity,
+      type: "spring",
+      stiffness: 40,
+    },
+  },
 };
 
-const Spinner = (props: Props & ComponentProps<"div">) => {
-  const {
-    settings,
-    effect,
-    mainSpinner,
-    content,
-    children,
-    fullWidth,
-    ...attr
-  } = props;
+const Spinner = forwardRef<HTMLDivElement, Props>((props, ref) => {
+  const { settings, content, children, fullWidth, holderAttributes, ...attr } =
+    props;
 
-  const spinnerEl = useRef<HTMLDivElement>(null);
+  const emergencyRef = useRef<HTMLDivElement>(null);
+  const spinnerEl = ref || emergencyRef;
 
   useEffect(() => {
-    const spinner = spinnerEl.current;
+    const spinner = (spinnerEl as RefObject<HTMLDivElement>).current;
 
     if (spinner) {
       // gap between content and cirlcle stroke
       const gap = 30;
+      spinner.style.padding = `${gap}px`;
 
       if (settings && Object.keys(settings).length) {
-        spinner.style.cssText +=
-          `padding: ${gap}px; margin-block: 20px;` +
-          Object.entries(settings)
-            .map(
-              ([prop, val]) =>
-                `--${prop}: ${val}${prop === "brdr-width" ? "px" : ""}`
-            )
-            .join("; ");
-
-        setTimeout(() => spinner.classList.add("active"));
+        spinner.style.cssText += Object.entries(settings)
+          .map(([prop, val]) => `--${prop}: ${val}`)
+          .join("; ");
       }
 
       return () => {
         spinner.parentElement?.style.removeProperty("position");
       };
     }
-  }, [settings]);
+  }, [settings, spinnerEl]);
 
-  const Test = fullWidth ? "div" : Fragment;
+  const Holder = fullWidth ? "div" : Fragment;
 
-  const holderAttr: ComponentProps<"div"> = fullWidth
-    ? { className: "spinner-full-width-holder" }
+  const finalHolderAttr: ComponentProps<"div"> = fullWidth
+    ? {
+        ...holderAttributes,
+        className: `spinner-full-width-holder${
+          holderAttributes?.className ? ` ${holderAttributes.className}` : ""
+        }`,
+      }
     : {};
 
   return (
-    <Test {...holderAttr}>
+    <Holder {...finalHolderAttr}>
       <div
         {...attr}
         ref={spinnerEl}
-        className={`spinner-el ${mainSpinner ? "main-spinner" : ""} ${
-          effect || ""
+        className={`spinner-holder${
+          attr.className ? ` ${attr.className}` : ""
         }`}
       >
+        <motion.span
+          className="spinner"
+          variants={circleSpinVariantes}
+          animate="animate"
+        />
+        <motion.span
+          className="spinner-transparent-circle"
+          initial={{
+            scale: 0,
+          }}
+          animate={{
+            scale: 1,
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: 1.6,
+            ease: "easeInOut",
+            repeatType: "loop",
+            repeat: Infinity,
+          }}
+        />
         {<p>{children || content}</p>}
       </div>
-    </Test>
+    </Holder>
   );
-};
+});
 export default Spinner;

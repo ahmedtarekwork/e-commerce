@@ -7,6 +7,7 @@ Disallow: /dashboard
 Disallow: /dashboard/orders
 Disallow: /dashboard/products
 Disallow: /dashboard/users
+Disallow: /dashboard/homePageSettings
 
 Allow: /
 

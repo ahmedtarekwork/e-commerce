@@ -1,17 +1,19 @@
 // react
-import { type CSSProperties, useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 
 // react-router-dom
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // redux
 import useDispatch from "../hooks/redux/useDispatch";
+// redux actions
 import { setUser } from "../store/fetures/userSlice";
 
 // components
 import FormInput from "../components/appForm/Input/FormInput";
 import FormList from "../components/appForm/FormList";
 import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
+import BtnWithSpinner from "../components/animatedBtns/BtnWithSpinner";
 
 // react-hook-form
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -25,7 +27,10 @@ import cookie from "js-cookie";
 import handleError from "../utiles/functions/handleError";
 
 // types
-import { UserType } from "../utiles/types";
+import type { UserType } from "../utiles/types";
+
+// layouts
+import AnimatedLayout from "../layouts/AnimatedLayout";
 
 type FormValues = Omit<UserType, "_id"> & { password: string };
 
@@ -52,7 +57,6 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
   const navigate = useNavigate();
 
   // refs
-  const submitBtnRef = useRef<HTMLButtonElement>(null);
   const msgRef = useRef<TopMessageRefType>(null);
   const renders = useRef(0);
 
@@ -129,13 +133,6 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
     }
   }, [pathname]);
 
-  // show spinner in submit btn while sending request to the server
-  useEffect(() => {
-    const btn = submitBtnRef.current;
-
-    if (btn) btn.classList.toggle("active", loginLoading || registerLoading);
-  }, [loginLoading, registerLoading]);
-
   // login user
   useEffect(() => {
     if (loginStatus !== "idle") {
@@ -183,10 +180,10 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
         }, 1500);
       }
     }
-  }, [registerErr, registerData, registerErrData, registerStatus, navigate]);
+  }, [registerErr, registerData, registerErrData, registerStatus]);
 
   return (
-    <>
+    <AnimatedLayout>
       <form
         onSubmit={handleSubmit(onSubmit)}
         id="auth-form"
@@ -256,44 +253,36 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
           </>
         )}
 
-        <button
-          title="login or signup btn"
-          ref={submitBtnRef}
-          className={`btn ${
-            loginLoading || registerLoading
-              ? "center fade scale spinner-pseudo-after"
-              : ""
-          }`}
+        <BtnWithSpinner
+          toggleSpinner={loginLoading || registerLoading}
+          title="submit"
+          className="btn"
           type="submit"
           disabled={
             !isDirty || loginLoading || registerLoading || disableSubmit
           }
-          style={{ "--diminsions": "15px" } as CSSProperties}
         >
           {disableSubmit ? "redirecting..." : type}
-        </button>
+        </BtnWithSpinner>
       </form>
 
       <p className="auth-msg">
-        {type === "login" ? (
-          <>
-            you don't have an account?{" "}
-            <Link title="go to signup page btn" to="/signup">
-              signup
-            </Link>
-          </>
-        ) : (
-          <>
-            you have an account already?{" "}
-            <Link title="go to login page btn" to="/login">
-              login
-            </Link>
-          </>
-        )}
+        {type === "login"
+          ? "you don't have an account?"
+          : "you have an account already?"}
+
+        <Link
+          title={`go to ${type === "login" ? "signup" : "login"} page`}
+          to={`/${type === "login" ? "signup" : "login"}`}
+          relative="path"
+          className="link"
+        >
+          {type === "login" ? "signup" : "login"}
+        </Link>
       </p>
 
       <TopMessage ref={msgRef} />
-    </>
+    </AnimatedLayout>
   );
 };
 

@@ -1,8 +1,8 @@
 // react
-import { useEffect } from "react";
+import { type RefObject, useEffect } from "react";
 
 // react query
-import { type UseMutateFunction, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 // components
 import EmptySpinner from "../spinners/EmptySpinner";
@@ -11,23 +11,25 @@ import SelectList, {
   type selectListOptionType,
 } from "../selectList/SelectList";
 
+// hooks
+import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
+
 // utils
 import axios from "../../utiles/axios";
 
 // types
 import type { OrderProductType, ProductType } from "../../utiles/types";
+import type { TopMessageRefType } from "../TopMessage";
+
+// framer motion
+import { motion, AnimatePresence } from "framer-motion";
+// variants
+import { scaleUpDownVariant } from "../../utiles/variants";
 
 type Props = {
   propName: string;
   product: ProductType | OrderProductType;
-  cartLoading: boolean;
-
-  addToCart: UseMutateFunction<
-    unknown,
-    Error,
-    { productId: string; count: number },
-    unknown
-  >;
+  msgRef: RefObject<TopMessageRefType>;
 };
 
 const getProductQtyQueryFn = async ({
@@ -39,13 +41,10 @@ const getProductQtyQueryFn = async ({
   return (await axios("products/" + prdId)).data.quantity;
 };
 
-const ProductCardQtyList = ({
-  propName,
-  product,
-  cartLoading,
-  addToCart,
-}: Props) => {
+const ProductCardQtyList = ({ propName, product, msgRef }: Props) => {
   const { _id } = product;
+
+  const { mutate: addToCart, isPending: cartLoading } = useAddToCart(msgRef);
 
   const {
     refetch: getProductQty,
@@ -60,10 +59,7 @@ const ProductCardQtyList = ({
 
   useEffect(() => {
     getProductQty();
-  }, [getProductQty]);
-
-  if (productQtyLoading)
-    return <EmptySpinner key={propName} settings={{ diminsions: "10px" }} />;
+  }, []);
 
   if (productQtyErr)
     return (
@@ -82,33 +78,63 @@ const ProductCardQtyList = ({
   })) as unknown as selectListOptionType<`${number}`>[];
 
   return (
-    <PropCell
-      key={propName}
-      name={propName}
-      val={
-        <SelectList
-          disabled={{
-            value: cartLoading,
-            text: "loading...",
+    <AnimatePresence mode="popLayout">
+      {productQtyLoading && (
+        <motion.div
+          key="one"
+          variants={scaleUpDownVariant}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          style={{
+            display: "grid",
+            placeContent: "center",
           }}
-          outOfFlow={{
-            value: true,
-            fullWidth: true,
-          }}
-          optClickFunc={(e) => {
-            const value = e.currentTarget.dataset.opt;
+        >
+          <EmptySpinner
+            key={propName}
+            settings={{ diminsions: "40px", "brdr-width": "3px" }}
+          />
+        </motion.div>
+      )}
 
-            if (value)
-              addToCart({
-                productId: _id,
-                count: +value - +(product as OrderProductType).count,
-              });
-          }}
-          // id={_id}
-          listOptsArr={list}
-        />
-      }
-    />
+      {!productQtyLoading && (
+        <motion.div
+          key="two"
+          variants={scaleUpDownVariant}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+        >
+          <PropCell
+            key={propName}
+            name={propName}
+            val={
+              <SelectList
+                disabled={{
+                  value: cartLoading,
+                  text: "loading...",
+                }}
+                outOfFlow={{
+                  value: true,
+                  fullWidth: true,
+                }}
+                optClickFunc={(e) => {
+                  const value = e.currentTarget.dataset.opt;
+
+                  if (value)
+                    addToCart({
+                      productId: _id,
+                      count: +value - +(product as OrderProductType).count,
+                    });
+                }}
+                listOptsArr={list}
+              />
+            }
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 export default ProductCardQtyList;

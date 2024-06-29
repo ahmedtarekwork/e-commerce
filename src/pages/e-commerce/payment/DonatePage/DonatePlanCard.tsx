@@ -1,6 +1,7 @@
 // react
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
+// react router dom
 import { useNavigate } from "react-router-dom";
 
 // components
@@ -13,12 +14,16 @@ import useGetPaymentSessionURL from "../../../../hooks/ReactQuery/useGetPaymentS
 
 // icons
 import { FaCrown } from "react-icons/fa6";
+import { BiTransferAlt } from "react-icons/bi";
+import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
 
 // utils
 import handleError from "../../../../utiles/functions/handleError";
 
 // types
 import type { UserType } from "../../../../utiles/types";
+import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
+import BtnWithSpinner from "../../../../components/animatedBtns/BtnWithSpinner";
 
 export type DonatePlanCardComponentProps = {
   name: Exclude<UserType["donationPlan"], undefined>;
@@ -34,17 +39,6 @@ const DonatePlanCard = ({
   user,
 }: DonatePlanCardComponentProps) => {
   const navigation = useNavigate();
-  const description = `This is the ${name} plan, it's ${price} only, harry up before price gets change.`;
-
-  const isCurrentPlan = user?.donationPlan
-    ?.toLocaleLowerCase()
-    .startsWith(name);
-
-  let subscripeBtnContent = "Subscripe Now";
-  if (user?.donationPlan)
-    subscripeBtnContent = isCurrentPlan
-      ? "Subscriped"
-      : "Subscripe to this plan insted";
 
   // refs
   const msgRef = useRef<TopMessageRefType>(null);
@@ -52,6 +46,31 @@ const DonatePlanCard = ({
   // hooks
   const { handlePayment, isPending, data, error } =
     useGetPaymentSessionURL(msgRef);
+
+  const description = `This is the ${name} plan, it's ${price} only, harry up before price gets change.`;
+
+  const isCurrentPlan = user?.donationPlan
+    ?.toLocaleLowerCase()
+    .startsWith(name);
+
+  let subscripeBtnContent: ReactNode = "Subscribe Now";
+  if (user?.donationPlan) {
+    subscripeBtnContent = isCurrentPlan ? (
+      <>
+        <IoCheckmarkDoneCircleSharp />
+        Subscribed
+      </>
+    ) : (
+      <>
+        <IconAndSpinnerSwitcher
+          spinnerDiminsions="20px"
+          toggleIcon={isPending}
+          icon={<BiTransferAlt />}
+        />
+        Switch to this plan
+      </>
+    );
+  }
 
   // useEffects
   useEffect(() => {
@@ -63,6 +82,8 @@ const DonatePlanCard = ({
 
     if (data) window.location.href = data.url;
   }, [data, error]);
+
+  const TagName = user?.donationPlan ? "button" : BtnWithSpinner;
 
   return (
     <>
@@ -81,7 +102,8 @@ const DonatePlanCard = ({
         </p>
         <p className="donate-plan-card-description">{description}</p>
 
-        <button
+        <TagName
+          toggleSpinner={!user?.donationPlan && isPending}
           title="subscripe to this donate plan"
           disabled={isCurrentPlan || isPending}
           onClick={() => {
@@ -102,12 +124,10 @@ const DonatePlanCard = ({
               });
             } else navigation("/login", { relative: "path" });
           }}
-          className={`donate-plan-card-btn btn${
-            isPending ? " center spinner-pseudo-after fade scale active" : ""
-          }`}
+          className="donate-plan-card-btn btn"
         >
           {subscripeBtnContent}
-        </button>
+        </TagName>
       </li>
 
       <TopMessage ref={msgRef} />

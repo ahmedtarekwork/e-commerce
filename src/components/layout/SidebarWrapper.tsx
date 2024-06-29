@@ -37,7 +37,7 @@ const SidebarWrapper = forwardRef<SidebarWraperComponentRefType, Props>(
 
     useImperativeHandle(
       ref,
-      () => ({ setToggleSidebar, sidebar: sidebarRef.current }),
+      () => ({ setToggleSidebar, sidebar: sidebarRef?.current }),
       []
     );
 
@@ -46,15 +46,15 @@ const SidebarWrapper = forwardRef<SidebarWraperComponentRefType, Props>(
       const clickFunc = (e: any) => {
         // don't close sidebar if the clicked element is inside the sidebar
         const insideCloseList = insideClose
-          ? sidebarRef.current?.querySelectorAll("*") || []
+          ? sidebarRef?.current?.querySelectorAll("*") || []
           : [];
 
         const insideNotCloseList = !insideClose
-          ? sidebarRef.current?.querySelectorAll("*") || []
+          ? sidebarRef?.current?.querySelectorAll("*") || []
           : [];
 
         if (
-          [sidebarRef.current, ...insideNotCloseList].some((el) =>
+          [sidebarRef?.current, ...insideNotCloseList].some((el) =>
             el?.isEqualNode(e.target)
           )
         )
@@ -85,34 +85,35 @@ const SidebarWrapper = forwardRef<SidebarWraperComponentRefType, Props>(
         window.removeEventListener("click", clickFunc);
         window.removeEventListener("keydown", keyDownFunc);
       };
-    }, [toggleSidebar, closeList?.list, closeList?.reversedList]); // don't change dependencies array
+    }, [toggleSidebar, closeList?.list, closeList?.reversedList, insideClose]); // don't change dependencies array
 
     useEffect(() => {
       // tracking header diminsions => so when width or height changes then we will fire the callback func inside tracker
       const header = document.querySelector(".app-header") as HTMLElement;
-      const sidebar = sidebarRef.current;
+      const sidebar = sidebarRef?.current;
 
       if (header && sidebar) {
         const headerDim = new ResizeObserver(() => {
           sidebar.style.cssText = `
-        height: calc(100% - ${header.offsetHeight}px);
-        top: ${header.offsetHeight}px
-        `;
+            height: calc(100% - ${header.offsetHeight}px);
+            top: ${header.offsetHeight}px
+          `;
         });
         headerDim.observe(header);
 
         return () => headerDim.unobserve(header);
       }
-    }, []);
+    }, [toggleSidebar]);
 
     return (
       <>
         <aside
           ref={sidebarRef}
-          {...attr}
-          className={`sidebar-wrapper${
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          {...(attr as any)}
+          className={`sidebar-wrapper${toggleSidebar ? " active" : ""}${
             attr.className ? ` ${attr.className}` : ""
-          }${toggleSidebar ? " active" : ""}`}
+          }`}
         >
           {children}
         </aside>

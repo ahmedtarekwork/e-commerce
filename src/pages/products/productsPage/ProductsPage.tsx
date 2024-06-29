@@ -49,6 +49,12 @@ import makeNewProductSvg from "../../../../imgs/make.svg";
 import NoSearchResault from "../../../../imgs/no-search-resault.svg";
 import NoFiltersResault from "../../../../imgs/no_Filters.svg";
 
+// framer motion
+import { AnimatePresence } from "framer-motion";
+
+// layouts
+import AnimatedLayout from "../../../layouts/AnimatedLayout";
+
 export type FiltersListType = {
   categories?: string[] | undefined;
   brands?: string[] | undefined;
@@ -262,7 +268,7 @@ const ProductsPage = () => {
   };
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>Products List</Heading>
 
       {isDashboard && user?.isAdmin && (
@@ -284,73 +290,65 @@ const ProductsPage = () => {
 
       <ProductsPageSearch onChangeFn={onSearchValueChangeFn} />
 
-      {fetchStatus !== "idle" && loading ? (
-        <div className="products-page-spinner">
-          <Spinner
-            fullWidth={true}
-            settings={{ clr: "var(--main)" }}
-            style={{
-              color: "var(--main)",
-              height: "100%",
-              margin: 0,
-            }}
-          >
-            <strong> Loading Products...</strong>
-          </Spinner>
-        </div>
-      ) : (
-        <>
-          {noFiltersResault && (
-            <EmptyPage
-              centerPage={false}
-              content="No products with your Filters"
-              svg={NoFiltersResault}
-              withBtn={{
-                type: "custom",
-                btn: (
-                  <button
-                    className="btn no-filters-resault-sidebar-toggler"
-                    onClick={() =>
-                      filtersListRef.current?.sidebarRef.current?.setToggleSidebar(
-                        true
-                      )
-                    }
-                  >
-                    <TbFilterStar />
-                    Edit Your Filters
-                  </button>
-                ),
-              }}
-            />
-          )}
+      <AnimatePresence mode="wait">
+        {fetchStatus !== "idle" && loading ? (
+          <AnimatedLayout className="products-page-spinner" key={"one"}>
+            <Spinner fullWidth={true}>Loading Products...</Spinner>
+          </AnimatedLayout>
+        ) : (
+          <AnimatedLayout>
+            {noFiltersResault && (
+              <EmptyPage
+                centerPage={false}
+                content="No products with your Filters"
+                svg={NoFiltersResault}
+                withBtn={{
+                  type: "custom",
+                  btn: (
+                    <button
+                      className="btn no-filters-resault-sidebar-toggler"
+                      onClick={() =>
+                        filtersListRef.current?.sidebarRef.current?.setToggleSidebar(
+                          true
+                        )
+                      }
+                    >
+                      <TbFilterStar />
+                      Edit Your Filters
+                    </button>
+                  ),
+                }}
+              />
+            )}
 
-          {noSearchResault && (
-            <EmptyPage
-              centerPage={false}
-              content="No products with your search"
-              svg={NoSearchResault}
-            />
-          )}
+            {noSearchResault && (
+              <EmptyPage
+                centerPage={false}
+                content="No products with your search"
+                svg={NoSearchResault}
+              />
+            )}
 
-          {!noFiltersResault && !noSearchResault && (
-            <GridList
-              isChanging={false}
-              cells={listCell}
-              initType="column"
-              className="product-page-products-list"
-            >
-              {paginatedProducts[page]?.map((product) => (
-                <ProductCard
-                  withAddToWishList
-                  key={product._id}
-                  product={product}
-                  withAddToCart={!isDashboard}
-                />
-              ))}
-            </GridList>
-          )}
-        </>
-      )}
+            {!noFiltersResault && !noSearchResault && (
+              <GridList
+                isChanging={false}
+                cells={listCell}
+                initType="column"
+                className="product-page-products-list"
+              >
+                {paginatedProducts[page]?.map((product) => (
+                  <ProductCard
+                    withAddToWishList
+                    key={product._id}
+                    product={product}
+                    withAddToCart={!isDashboard}
+                  />
+                ))}
+              </GridList>
+            )}
+          </AnimatedLayout>
+        )}
+      </AnimatePresence>
 
       {!!apiProducts?.products.length && !loading && (
         <Pagination
@@ -372,7 +370,7 @@ const ProductsPage = () => {
         initCategories={initCategories}
         initBrands={initBrands}
       />
-    </>
+    </AnimatedLayout>
   );
 };
 

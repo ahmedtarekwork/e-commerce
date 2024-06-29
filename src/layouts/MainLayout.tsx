@@ -1,13 +1,27 @@
 // react
-import { useEffect, useRef } from "react";
+import { cloneElement, useEffect, useRef } from "react";
 
 // router
-import { Outlet, useLocation } from "react-router-dom";
+import { useLocation, useOutlet } from "react-router-dom";
 
 // components
 import Header from "../components/layout/appHeader/Header";
 import Footer from "../components/layout/Footer";
 import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
+
+// framer motion
+import { AnimatePresence } from "framer-motion";
+
+const AnimatedOutlet = () => {
+  const outlet = useOutlet();
+  const { pathname } = useLocation();
+
+  return (
+    <AnimatePresence mode="popLayout">
+      {outlet && cloneElement(outlet, { key: pathname })}
+    </AnimatePresence>
+  );
+};
 
 const MainLayout = () => {
   const { pathname } = useLocation();
@@ -52,9 +66,7 @@ const MainLayout = () => {
       if (mainEl && footer)
         mainEl.style.cssText = `--remove-size: ${footer.offsetHeight}px`;
 
-      document
-        .querySelector<HTMLElement>(".app-holder")!
-        .style.removeProperty("margin-top");
+      mainEl?.style.removeProperty("margin-top");
     }
   }, [showHeader]);
 
@@ -89,18 +101,39 @@ const MainLayout = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (makePageFullHeight) {
+      const mainEl = mainElRef.current;
+      const header = headerRef.current;
+      const footer = footerRef.current;
+
+      if (mainEl && header && footer) {
+        mainElRef.current.style.minHeight = `calc(100vh - ${
+          header.offsetHeight + footer.offsetHeight
+        })`;
+      }
+    }
+  }, [makePageFullHeight]);
+
   return (
     <>
       {showHeader && <Header ref={headerRef} />}
-
       <main
         ref={mainElRef}
-        className={`app-holder${!showHeader ? " login-page" : ""}${
-          makePageFullHeight ? " grid-page" : ""
-        }`}
+        className={`app-holder${!showHeader ? " login-page" : ""}`}
       >
-        <div className="container">
-          <Outlet />
+        <div
+          className="container"
+          style={{
+            ...(makePageFullHeight
+              ? {
+                  display: "flex",
+                  flexDirection: "column",
+                }
+              : {}),
+          }}
+        >
+          <AnimatedOutlet key={pathname} />
         </div>
       </main>
       <TopMessage ref={msgRef} />

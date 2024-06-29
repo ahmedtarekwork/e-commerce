@@ -5,7 +5,7 @@
   max-width: 100%;
   background: #fff;
   box-shadow: bx_shad(0, 10px);
-  z-index: 1000;
+  z-index: calc(var(--header-index));
   transition: 0.3s;
   translate: -100%;
 

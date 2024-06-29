@@ -6,12 +6,16 @@ import { useQuery } from "@tanstack/react-query";
 
 // components
 import OrdersArea from "../../components/orders/OrdersArea";
+import UserAreaLoading from "../../components/UserAreaLoading";
 
 // utils
 import axios from "../../utiles/axios";
 
 // types
 import type { OrderType, UserType } from "../../utiles/types";
+
+// icons
+import { TbMailboxOff } from "react-icons/tb";
 
 type Props = {
   user: UserType;
@@ -45,20 +49,41 @@ const ProfilePageOrdersArea = ({ user, isCurrentUserProfile }: Props) => {
     if (user) getUserOrders();
   }, [user, getUserOrders]);
 
+  if (!isCurrentUserProfile) {
+    if (userOrdersLoading) {
+      return (
+        <UserAreaLoading isCurrentUserProfile={false}>
+          Loading Orders...
+        </UserAreaLoading>
+      );
+    }
+
+    if (!userOrders?.orders?.length) {
+      return (
+        <div className="no-specific-user-orders-holder">
+          <TbMailboxOff />
+          <strong>this user hasn't any orders yet</strong>
+        </div>
+      );
+    }
+
+    if (userOrdersErr) {
+      return (
+        <div className="no-specific-user-orders-holder">
+          <TbMailboxOff />
+          <strong>can't get this user orders at the moment</strong>
+        </div>
+      );
+    }
+  }
+
   return (
-    <>
-      <h3>orders</h3>
-      <OrdersArea
-        isError={userOrdersErr}
-        loading={userOrdersLoading}
-        orders={userOrders?.orders || []}
-        noOrdersMsg={
-          isCurrentUserProfile
-            ? "you don't have any orders yet"
-            : "this user hasn't any orders yet"
-        }
-      />
-    </>
+    <OrdersArea
+      isError={userOrdersErr}
+      loading={userOrdersLoading}
+      orders={userOrders?.orders || []}
+      noOrdersMsg="you don't have any orders yet"
+    />
   );
 };
 export default ProfilePageOrdersArea;

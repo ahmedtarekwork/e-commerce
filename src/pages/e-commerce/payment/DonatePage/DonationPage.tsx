@@ -28,6 +28,9 @@ import handleError from "../../../../utiles/functions/handleError";
 
 // types
 import { type AppModalRefType } from "../../../../components/modals/appModal/AppModal";
+// layouts
+
+import AnimatedLayout from "../../../../layouts/AnimatedLayout";
 
 // fetchers
 const DeleteDonationMutationFn = async () => {
@@ -39,7 +42,6 @@ const donatePlanArr: Omit<DonatePlanCardComponentProps, "user">[] = [
     name: "standard",
     price: 10,
   },
-
   {
     name: "pro",
     price: 25,
@@ -78,7 +80,7 @@ const DonationPage = () => {
       dispatch(setUser(data));
       msgRef.current?.setMessageData({
         clr: "green",
-        content: "Subscription has been canceled",
+        content: "Subscribtion has been canceled",
         show: true,
         time: 5000,
       });
@@ -92,7 +94,7 @@ const DonationPage = () => {
   }, [error, data, dispatch]);
 
   return (
-    <>
+    <AnimatedLayout>
       <Heading>Donate Us</Heading>
 
       <Warning>
@@ -108,15 +110,15 @@ const DonationPage = () => {
 
       {user?.donationPlan && (
         <DangerZone
-          content="you can unsubscripe from your Current plan by clicking on the
-            unsubscripe button."
-          title="Unsubscripe"
+          content="you can unsubscribe from your Current plan by clicking on the
+            unsubscribe button."
+          title="Unsubscribe"
           deleteBtn={{
             type: "inline",
-            content: "Unsubscripe",
+            content: "Unsubscribe",
             modalMsg: (
               <>
-                Are you sure you want to unsubscripe from{" "}
+                Are you sure you want to unsubscribe from{" "}
                 <strong style={{ color: "var(--danger)" }}>
                   {user?.donationPlan}
                 </strong>{" "}
@@ -128,7 +130,7 @@ const DonationPage = () => {
         />
       )}
       <TopMessage ref={msgRef} />
-    </>
+    </AnimatedLayout>
   );
 };
 export default DonationPage;

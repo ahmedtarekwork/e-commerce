@@ -5,11 +5,14 @@ import { HiEye, HiEyeOff } from "react-icons/hi";
 
 // components
 import InputComponent from "./InputComponent";
-import ErrorDiv from "./ErrorDiv";
 import IconsSwitcher from "../../IconsSwitcher";
+import ErrorDiv from "./ErrorDiv";
 
 // types
 import type { InputPropsType } from "./InputComponent";
+
+// framer motion
+import { motion } from "framer-motion";
 
 const FormInput = forwardRef<
   HTMLInputElement,
@@ -21,12 +24,17 @@ const FormInput = forwardRef<
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div
-      className={`input-holder`}
-      {...(type === "password" ? { "data-type": "button" } : {})}
+    <motion.div
+      layout="size"
+      transition={{
+        type: "tween",
+        duration: 0.15,
+        ease: "easeInOut",
+      }}
+      className="input-holder"
     >
       {type === "password" && (
-        <>
+        <div className="password-input-holder">
           <InputComponent
             {...attr}
             error={!!errorMsg}
@@ -52,7 +60,7 @@ const FormInput = forwardRef<
               isActive={showPassword}
             />
           </button>
-        </>
+        </div>
       )}
 
       {type === "color" && (
@@ -66,8 +74,8 @@ const FormInput = forwardRef<
         <InputComponent ref={ref} {...attr} type={type} error={!!errorMsg} />
       ) : null}
 
-      {"errorMsg" in attr && <ErrorDiv msg={errorMsg} />}
-    </div>
+      <ErrorDiv msg={errorMsg} />
+    </motion.div>
   );
 });
 
