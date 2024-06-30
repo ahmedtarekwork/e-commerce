@@ -17,6 +17,11 @@ import useGetHomePageSliderImgs from "../../../../hooks/ReactQuery/useGetHomePag
 // SVGs
 import welcomePlaceholder from "../../../../../imgs/welcomePlaceholder.svg";
 
+// framer motion
+import { AnimatePresence } from "framer-motion";
+// layouts
+import AnimatedLayout from "../../../../layouts/AnimatedLayout";
+
 const HomePageImgsSlider = () => {
   const dispatch = useDispatch();
   const { imgs } = useSelector((state) => state.homePageSliderImgs);
@@ -39,48 +44,48 @@ const HomePageImgsSlider = () => {
     }
   }, [homePageSliderImgs, dispatch]);
 
-  if (homePageSliderImgsErr || !imgs.length) {
-    return (
-      <div className="no-home-slider-imgs home-slider">
-        <img
-          width="100%"
-          height="100%"
-          src={welcomePlaceholder}
-          alt="welcome placeholder"
-        />
-        <div className="align-content">
-          <p>Welcome to E-commerce Store</p>
-          {homePageSliderImgsLoading && fetchStatus !== "idle" && (
-            <EmptySpinner
-              holderAttr={{
-                style: {
-                  display: "block",
-                  marginInline: "auto",
-                },
-              }}
-              settings={{
-                diminsions: "55px",
-                "brdr-width": "3.5px",
-              }}
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
+  return (
+    <AnimatePresence mode="wait">
+      {(homePageSliderImgsErr || !imgs.length) && (
+        <AnimatedLayout
+          key="one"
+          className="no-home-slider-imgs home-slider"
+          withFlex={false}
+        >
+          <img
+            width="100%"
+            height="100%"
+            src={welcomePlaceholder}
+            alt="welcome placeholder"
+          />
+          <div className="no-home-slider-imgs-contnet-holder">
+            <p>Welcome to E-commerce Store</p>
+            {homePageSliderImgsLoading && fetchStatus !== "idle" && (
+              <EmptySpinner
+                settings={{
+                  diminsions: "50px",
+                  "brdr-width": "3.5px",
+                }}
+              />
+            )}
+          </div>
+        </AnimatedLayout>
+      )}
 
-  if (!homePageSliderImgsErr && imgs.length) {
-    return (
-      <ImgsSlider
-        isHomeSlider
-        imgWidth="100%"
-        imgs={imgs.map((img) => img.image)}
-        withTimer={{
-          value: true,
-          time: 5000,
-        }}
-      />
-    );
-  }
+      {!homePageSliderImgsErr && imgs.length && (
+        <AnimatedLayout key="two">
+          <ImgsSlider
+            isHomeSlider
+            imgWidth="100%"
+            imgs={imgs.map((img) => img.image)}
+            withTimer={{
+              value: true,
+              time: 5000,
+            }}
+          />
+        </AnimatedLayout>
+      )}
+    </AnimatePresence>
+  );
 };
 export default HomePageImgsSlider;

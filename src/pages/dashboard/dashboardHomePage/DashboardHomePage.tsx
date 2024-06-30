@@ -346,7 +346,7 @@ const DashboardHomePage = () => {
 
       <AnimatePresence>
         {isPending ? (
-          <AnimatedLayout>
+          <AnimatedLayout key="one">
             <Spinner
               holderAttributes={{
                 style: {
@@ -360,7 +360,7 @@ const DashboardHomePage = () => {
             />
           </AnimatedLayout>
         ) : (
-          <AnimatedLayout>
+          <AnimatedLayout key="two">
             <div className="dashboard-squares-main-holder">
               <ul className="dashboard-squares-list">
                 {squares.map((square) => (

@@ -6,9 +6,17 @@ import { motion } from "framer-motion";
 
 type Props = {
   children: ReactNode;
+  withFlex?: boolean;
 } & ComponentProps<"div">;
 
-const AnimatedLayout = ({ children, ...attr }: Props) => {
+const AnimatedLayout = ({ children, withFlex = true, ...attr }: Props) => {
+  const style = !withFlex
+    ? {}
+    : {
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      };
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -21,9 +29,7 @@ const AnimatedLayout = ({ children, ...attr }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {...(attr as any)}
       style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
+        ...style,
         ...attr.style,
       }}
     >

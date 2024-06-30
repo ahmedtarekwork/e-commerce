@@ -292,11 +292,11 @@ const ProductsPage = () => {
 
       <AnimatePresence mode="wait">
         {fetchStatus !== "idle" && loading ? (
-          <AnimatedLayout className="products-page-spinner" key={"one"}>
+          <AnimatedLayout className="products-page-spinner" key="one">
             <Spinner fullWidth={true}>Loading Products...</Spinner>
           </AnimatedLayout>
         ) : (
-          <AnimatedLayout>
+          <AnimatedLayout key="two">
             {noFiltersResault && (
               <EmptyPage
                 centerPage={false}
