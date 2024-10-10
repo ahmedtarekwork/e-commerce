@@ -20,7 +20,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../../hooks/redux/useDispatch";
-import useSelector from "../../../hooks/redux/useSelector";
 // redux acions
 import { editProduct } from "../../../store/fetures/productsSlice";
 
@@ -37,6 +36,7 @@ import type { ImageType, ProductType } from "../../../utils/types";
 
 // hooks
 import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../hooks/useShowMsg";
 
 // framer motion
 import { motion } from "framer-motion";
@@ -77,7 +77,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
 
     // redux
     const dispatch = useDispatch();
-    const showMsg = useSelector((state) => state.topMessage.showMsg);
+    const showMsg = useShowMsg();
 
     // states
     const [imgsList, setImgsList] = useState<{ img: File; _id: string }[]>([]);

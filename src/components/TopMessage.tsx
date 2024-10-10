@@ -1,9 +1,6 @@
 import {
-  useState,
   useEffect,
   useRef,
-  useImperativeHandle,
-  forwardRef,
 
   // types
   type Dispatch,
@@ -14,14 +11,10 @@ import { createPortal } from "react-dom";
 // redux
 import useDispatch from "../hooks/redux/useDispatch";
 import useSelector from "../hooks/redux/useSelector";
-// redux actions
-import { setTopMessageShowFn } from "../store/fetures/topMessageSlice";
-
-// types
-import type { ShowMsgFnType } from "../utils/types";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
+import { showMsg } from "../store/fetures/topMessageSlice";
 
 export type MessageDataType = {
   time: number;
@@ -35,42 +28,23 @@ export type TopMessageRefType = {
   setMessageData: Dispatch<SetStateAction<MessageDataType>>;
 };
 
-const TopMessage = forwardRef<TopMessageRefType>((_, ref) => {
+const TopMessage = () => {
   const dispatch = useDispatch();
-  const appShowMsg = useSelector((state) => state.topMessage.showMsg);
+  const messageData = useSelector((state) => state.topMessage.msgData);
 
   const messageRef = useRef<HTMLDivElement>(null);
-  const [messageData, setMessageData] = useState<MessageDataType>({
-    show: false,
-    clr: "green",
-    content: "",
-    time: 3500,
-  });
 
   const closeMsg = (msgEl: HTMLDivElement) => {
     if (msgEl === messageRef.current)
-      setMessageData({ show: false, clr: "green", content: "", time: 3500 });
+      dispatch(showMsg({ show: false, clr: "green", content: "", time: 3500 }));
     else msgEl.remove();
   };
-
-  const showMsg: ShowMsgFnType = ({ time = 3500, clr, content }) => {
-    setMessageData({
-      show: true,
-      clr,
-      content,
-      time,
-    });
-  };
-
-  useEffect(() => {
-    if (!appShowMsg) dispatch(setTopMessageShowFn(showMsg));
-  }, []);
 
   useEffect(() => {
     const msgEl = messageRef.current;
 
     if (msgEl)
-      if (messageData.show) {
+      if (messageData?.show) {
         const appHeaderEl = document.querySelector(
           ".app-header"
         ) as HTMLElement;
@@ -88,18 +62,9 @@ const TopMessage = forwardRef<TopMessageRefType>((_, ref) => {
       }
   }, [messageData]);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      message: messageRef.current,
-      setMessageData,
-    }),
-    []
-  );
-
   return createPortal(
     <AnimatePresence>
-      {messageData.show && (
+      {messageData?.show && (
         <motion.div
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -113,5 +78,5 @@ const TopMessage = forwardRef<TopMessageRefType>((_, ref) => {
     </AnimatePresence>,
     document.body
   );
-});
+};
 export default TopMessage;

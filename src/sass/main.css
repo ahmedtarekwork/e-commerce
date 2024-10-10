@@ -919,10 +919,10 @@ form#auth-form {
 .order-card:hover {
   background: var(--dark-trans);
 }
-.order-card:hover .cell-prop-name {
+.order-card:hover .prop-cell-name {
   color: #003375;
 }
-.order-card:hover .cell-prop-name + span {
+.order-card:hover .prop-cell-value {
   color: #003375;
 }
 .order-card span {
@@ -1816,13 +1816,13 @@ form#auth-form {
 .main-btns-list li button svg {
   font-size: 20px;
 }
-.main-btns-list li a svg.logOut-icon,
-.main-btns-list li button svg.logOut-icon {
-  font-size: 23px;
-}
 .main-btns-list li a:hover,
 .main-btns-list li button:hover {
   color: var(--dark);
+}
+.main-btns-list .logout-icon-holder {
+  display: grid;
+  place-content: center;
 }
 .main-btns-list #header-cart-icon {
   position: relative;

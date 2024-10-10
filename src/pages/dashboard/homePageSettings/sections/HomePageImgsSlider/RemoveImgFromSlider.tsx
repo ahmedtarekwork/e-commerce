@@ -20,10 +20,10 @@ import axios from "../../../../../utils/axios";
 
 // hooks
 import useHandleErrorMsg from "../../../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../../../hooks/useShowMsg";
 
 // icons
 import { IoMdCloseCircle } from "react-icons/io";
-import useSelector from "../../../../../hooks/redux/useSelector";
 
 type Props = {
   imgId: string;
@@ -36,7 +36,7 @@ const removeImgFromHomeSliderMutationFn = async (imgId: string) => {
 
 const RemoveImgFromSlider = ({ imgId }: Props) => {
   const dispatch = useDispatch();
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   const sureModelRef = useRef<SureModalRef>(null);
 

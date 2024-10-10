@@ -84,11 +84,11 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   );
   const [payMethod, setPayMethod] = useState<OrderType["method"]>("Card");
 
-  const isCartItems = !!userCart?.products.length;
+  const isCartItems = !!userCart?.products?.length;
   const isWishlistItems = !!user?.wishlist?.length && !wishlistLoading;
   const isShow = isCartPage ? isCartItems : isWishlistItems;
 
-  const showCartComponents = isCartPage && userCart?.products.length;
+  const showCartComponents = isCartPage && userCart?.products?.length;
 
   // refs
   const makeOrderBtnRef = useRef<HTMLButtonElement>(null);

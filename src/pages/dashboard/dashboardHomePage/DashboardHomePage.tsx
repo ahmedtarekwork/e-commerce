@@ -52,6 +52,8 @@ import type {
 
 // layouts
 import AnimatedLayout from "../../../layouts/AnimatedLayout";
+
+// framer motion
 import { AnimatePresence } from "framer-motion";
 
 ChartJS.register(
@@ -309,10 +311,10 @@ const DashboardHomePage = () => {
 
   const showAllInsight = () => {
     return (
-      isShowInsight(bestSellChartsData()) &&
-      isShowInsight(productsAvilability()) &&
-      isShowInsight(brandsData()) &&
-      isShowInsight(categoriesData()) &&
+      isShowInsight(bestSellChartsData()) ||
+      isShowInsight(productsAvilability()) ||
+      isShowInsight(brandsData()) ||
+      isShowInsight(categoriesData()) ||
       isShowInsight(adminsData())
     );
   };

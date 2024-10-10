@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import useSelector from "../../../hooks/redux/useSelector";
 
 // components
-import MainBtnsList from "../appHeader/MainBtnsList";
+import MainBtnsList from "../appHeader/mainBtnsList/MainBtnsList";
 import AppSidebarItem from "./AppSidebarItem";
 import SidebarWrapper, {
   type SidebarWraperComponentRefType,

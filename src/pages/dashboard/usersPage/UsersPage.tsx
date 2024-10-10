@@ -39,7 +39,7 @@ const errMsg = "something went wrong while getting users list";
 const getAllUsers = async (): Promise<
   (UserType & { orders: OrderType[] })[]
 > => {
-  return (await axios("users")).data;
+  return (await axios("users?withOrders=true")).data;
 };
 
 const UsersPage = () => {

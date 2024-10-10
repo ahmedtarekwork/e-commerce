@@ -91,7 +91,7 @@ const WishlistArea = ({
   useEffect(() => {
     if (wishlistProducts) {
       if (isCurrentUserProfile) {
-        dispatch(setUserWishlist(wishlistProducts.map(({ _id }) => _id)));
+        dispatch(setUserWishlist(wishlistProducts?.map(({ _id }) => _id)));
       }
       setCurrentWishlist(wishlistProducts);
     }

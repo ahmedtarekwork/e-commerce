@@ -10,6 +10,9 @@ import axios from "../../utils/axios";
 // types
 import type { LineItemType } from "../../utils/types";
 
+// hooks
+import useShowMsg from "../useShowMsg";
+
 type GetCheckoutSessionUrlFnType = (params: {
   customer_email: string;
   line_items: LineItemType[];
@@ -47,7 +50,7 @@ const useGetPaymentSessionURL = (
   });
 
   const { user, userCart } = useSelector((state) => state.user);
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   type HandlePaymentParams =
     | {

@@ -40,6 +40,7 @@ import axios from "../../../utils/axios";
 // hooks
 import useGetBrandsOrCategories from "../../../hooks/ReactQuery/useGetBrandsOrCategories";
 import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../hooks/useShowMsg";
 
 // framer motion
 import { motion } from "framer-motion";
@@ -122,7 +123,7 @@ const NewProductPage = () => {
 
   // redux
   const dispatch = useDispatch();
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
   const appProduct = useSelector((state) =>
     state.products.products.find((prd) => prd._id === (id || ""))
   );

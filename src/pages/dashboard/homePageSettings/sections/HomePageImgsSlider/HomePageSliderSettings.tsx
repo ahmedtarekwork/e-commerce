@@ -23,6 +23,7 @@ import {
 // hooks
 import useGetHomePageSliderImgs from "../../../../../hooks/ReactQuery/useGetHomePageSliderImgs";
 import useHandleErrorMsg from "../../../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../../../hooks/useShowMsg";
 
 // utils
 import axios from "../../../../../utils/axios";
@@ -47,7 +48,7 @@ const addImageToHomeSliderMutationFn = async (imgs: File[]) => {
 const HomePageSliderSettings = () => {
   const dispatch = useDispatch();
   const { imgs } = useSelector((state) => state.homePageSliderImgs);
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   const [imgsToUpload, setImgsToUpload] = useState<File[]>([]);
 

@@ -3,7 +3,6 @@ import { useState } from "react";
 
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
-import useSelector from "../../hooks/redux/useSelector";
 // redux actions
 import { setUser } from "../../store/fetures/userSlice";
 
@@ -22,6 +21,7 @@ import type { UserType } from "../../utils/types";
 
 // hooks
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../hooks/useShowMsg";
 
 type Props = {
   propName: keyof UserType;
@@ -59,7 +59,7 @@ const ProfilePageCell = ({
   const handleError = useHandleErrorMsg();
 
   const dispatch = useDispatch();
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   // states
   const [inputValue, setInputValue] = useState(content);

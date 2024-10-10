@@ -37,6 +37,7 @@ import type { CategoryAndBrandType } from "../../utils/types";
 
 // hooks
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../hooks/useShowMsg";
 
 type Props = {
   type: "categories" | "brands";
@@ -111,7 +112,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
 
   // redux
   const dispatch = useDispatch();
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
   const initialEditableModel = useSelector(
     (state) => state.categoriesAndBrands[type]
   ).find((model) => model._id === id);

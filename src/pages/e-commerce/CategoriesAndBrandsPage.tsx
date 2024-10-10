@@ -36,6 +36,7 @@ import { motion } from "framer-motion";
 
 // hooks
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../hooks/useShowMsg";
 
 type Props = {
   type: "categories" | "brands";
@@ -65,7 +66,7 @@ const CategoriesAndBrandsPage = ({ type }: Props) => {
   // redux
   const dispatch = useDispatch();
   const modelArr = useSelector((state) => state.categoriesAndBrands)[type];
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   // hooks
   const handleError = useHandleErrorMsg();

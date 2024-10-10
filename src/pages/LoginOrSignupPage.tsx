@@ -6,7 +6,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // redux
 import useDispatch from "../hooks/redux/useDispatch";
-import useSelector from "../hooks/redux/useSelector";
 // redux actions
 import { setUser } from "../store/fetures/userSlice";
 
@@ -23,6 +22,7 @@ import { useMutation } from "@tanstack/react-query";
 
 // hooks
 import useHandleErrorMsg from "../hooks/useHandleErrorMsg";
+import useShowMsg from "../hooks/useShowMsg";
 
 // utils
 import axios from "../utils/axios";
@@ -55,7 +55,7 @@ const registerMutationFn = async (
 // component \\
 const LoginPage = ({ type }: { type: "login" | "signup" }) => {
   const dispatch = useDispatch();
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   // hooks
   const handleError = useHandleErrorMsg();

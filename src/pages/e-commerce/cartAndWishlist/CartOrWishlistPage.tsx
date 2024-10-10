@@ -20,7 +20,7 @@ const CartOrWishlistPage = () => {
   const { pathname } = useLocation();
   const isCartPage = pathname.includes("cart");
 
-  let title = isCartPage && userCart?.products.length ? "Your Cart" : "";
+  let title = isCartPage && userCart?.products?.length ? "Your Cart" : "";
   if (!isCartPage && user?.wishlist.length) title = "Your Wishlist";
 
   if (!user) {

@@ -30,6 +30,7 @@ import AnimatedLayout from "../../../../layouts/AnimatedLayout";
 
 // hooks
 import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../../hooks/useShowMsg";
 
 // fetchers
 const DeleteDonationMutationFn = async () => {
@@ -58,7 +59,7 @@ const DonationPage = () => {
 
   // states
   const { user } = useSelector((state) => state.user);
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   // hooks
   const handleError = useHandleErrorMsg();

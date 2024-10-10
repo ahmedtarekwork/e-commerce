@@ -13,11 +13,9 @@ export type ChartDataType<T extends "bar" | "pie" | "doughnut"> = ChartData<
 // redux
 export type RootStateType = ReturnType<typeof store.getState>;
 
-export type ShowMsgFnType = (
-  params: Pick<MessageDataType, "clr" | "content"> & {
-    time?: MessageDataType["time"];
-  }
-) => void;
+export type showMsgFnParamsType = Pick<MessageDataType, "clr" | "content"> & {
+  time?: MessageDataType["time"];
+};
 
 export type ImageType = Record<"public_id" | "secure_url" | "_id", string>;
 

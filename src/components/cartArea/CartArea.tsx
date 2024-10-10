@@ -92,8 +92,8 @@ const CartArea = ({
 
         if (!sameLength) return false;
 
-        return userCart?.products.every((prd) => {
-          return cart.products?.some((p) => p._id === prd._id);
+        return userCart?.products?.every((prd) => {
+          return cart?.products?.some((p) => p._id === prd._id);
         });
       };
 
@@ -102,7 +102,7 @@ const CartArea = ({
   }, [cart, dispatch]);
 
   useEffect(() => {
-    if (isCurrentUserCart && userCart?.products.length) {
+    if (isCurrentUserCart && userCart?.products?.length) {
       if (cartErr || !cart || (isCurrentUserCart && !userCart)) {
         dispatch(resetCart());
       }
@@ -145,7 +145,7 @@ const CartArea = ({
   }
 
   const withBtn = (
-    !userCart?.products.length
+    !userCart?.products?.length
       ? {
           type: "custom",
           btn: (
@@ -165,7 +165,7 @@ const CartArea = ({
       : undefined
   ) as WithBtnType;
 
-  if (!cart.products.length) {
+  if (!cart.products?.length) {
     if (isCurrentUserCart) {
       return (
         <EmptyPage

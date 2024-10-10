@@ -15,15 +15,17 @@
 
       svg {
         font-size: 20px;
-        &.logOut-icon {
-          font-size: 23px;
-        }
       }
 
       &:hover {
         color: var(--dark);
       }
     }
+  }
+
+  .logout-icon-holder {
+    display: grid;
+    place-content: center;
   }
 
   #header-cart-icon {

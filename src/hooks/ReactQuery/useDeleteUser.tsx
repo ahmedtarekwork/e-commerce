@@ -7,6 +7,7 @@ import useSelector from "../redux/useSelector";
 // hooks
 import useLogoutUser from "../useLogoutUser";
 import useHandleErrorMsg from "../useHandleErrorMsg";
+import useShowMsg from "../useShowMsg";
 
 // utils
 import axios from "../../utils/axios";
@@ -21,12 +22,12 @@ const useDeleteUser = (
   onError?: (error: unknown) => void
 ) => {
   // hooks
-  const logoutUser = useLogoutUser();
+  const { logoutUser } = useLogoutUser();
   const handleError = useHandleErrorMsg();
 
   // redux
   const { user } = useSelector((state) => state.user);
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   const currentUser = (userId: string) => userId === user?._id;
 

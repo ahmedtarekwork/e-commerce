@@ -9,7 +9,7 @@ import { FaBars } from "react-icons/fa";
 import logo from "../../../../assets/favicon.svg";
 
 // components
-import MainBtnsList from "./MainBtnsList";
+import MainBtnsList from "./mainBtnsList/MainBtnsList";
 import AppSidebar from "../appSidebar/AppSidebar";
 import AppHeaderLogoText from "./AppHeaderLogoText";
 

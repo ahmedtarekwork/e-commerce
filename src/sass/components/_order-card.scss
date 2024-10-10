@@ -42,12 +42,11 @@
   &:hover {
     background: var(--dark-trans);
 
-    .cell-prop-name {
+    .prop-cell-name {
       color: #003375;
-
-      + span {
-        color: #003375;
-      }
+    }
+    .prop-cell-value {
+      color: #003375;
     }
   }
 

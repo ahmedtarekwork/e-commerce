@@ -1,6 +1,8 @@
-import useSelector from "./redux/useSelector";
-
+// utils
 import axios from "axios";
+// hooks
+
+import useShowMsg from "./useShowMsg";
 
 type EmergencyMsgType =
   | {
@@ -13,7 +15,7 @@ type EmergencyMsgType =
     };
 
 const useHandleErrorMsg = () => {
-  const showMsg = useSelector((state) => state.topMessage.showMsg);
+  const showMsg = useShowMsg();
 
   return (err: unknown, emergencyMsg?: EmergencyMsgType, time?: number) => {
     let msg: string = axios.isAxiosError(err)
