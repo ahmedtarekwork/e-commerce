@@ -93,7 +93,7 @@ const CartArea = ({
         if (!sameLength) return false;
 
         return userCart?.products.every((prd) => {
-          return cart.products.some((p) => p._id === prd._id);
+          return cart.products?.some((p) => p._id === prd._id);
         });
       };
 

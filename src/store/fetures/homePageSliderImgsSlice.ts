@@ -33,7 +33,7 @@ const homePageSliderImgsSlice = createSlice({
       { payload }: PayloadAction<string[]>
     ) => {
       state.imgs = state.imgs.filter(
-        ({ public_id }) => !payload.some((removeId) => removeId === public_id)
+        ({ public_id }) => !payload?.some((removeId) => removeId === public_id)
       );
     },
   },
