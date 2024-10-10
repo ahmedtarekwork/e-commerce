@@ -20,10 +20,11 @@ export type SidebarWraperComponentRefType = {
 type Props = {
   children: ReactNode;
 
-  /* "closeList property"
+  /* "closeList property": {
       list[] property => if the element inside it has been clicked it will close the sidebar
       reversedList[] => if the element inside it has been clicked it willn't close the sidebar, but if any other element has been clicked it will close the sidebar
-   */
+    }
+  */
 
   closeList?: Partial<Record<"list" | "reversedList", (HTMLElement | null)[]>>;
   insideClose: boolean;
@@ -42,6 +43,12 @@ const SidebarWrapper = forwardRef<SidebarWraperComponentRefType, Props>(
     );
 
     useEffect(() => {
+      if (toggleSidebar) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.removeProperty("overflow");
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const clickFunc = (e: any) => {
         // don't close sidebar if the clicked element is inside the sidebar
@@ -109,8 +116,7 @@ const SidebarWrapper = forwardRef<SidebarWraperComponentRefType, Props>(
       <>
         <aside
           ref={sidebarRef}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          {...(attr as any)}
+          {...attr}
           className={`sidebar-wrapper${toggleSidebar ? " active" : ""}${
             attr.className ? ` ${attr.className}` : ""
           }`}

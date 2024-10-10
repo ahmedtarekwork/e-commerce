@@ -34,7 +34,10 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
 
     // refs
     const acceptBtn = useRef<HTMLButtonElement>(null);
-    const modalRef = useRef<AppModalRefType>({ toggleModal: () => {} });
+    const modalRef = useRef<AppModalRefType>({
+      toggleModal: () => {},
+      appModalEl: null,
+    });
 
     useImperativeHandle(
       ref,

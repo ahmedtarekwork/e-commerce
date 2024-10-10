@@ -1,4 +1,16 @@
 #app-side-bar {
+  translate: -100%;
+  transition: 0.3s;
+
+  &.active {
+    translate: 0;
+
+    ul.app-side-bar-list li {
+      translate: 0;
+      transition-delay: var(--delay);
+    }
+  }
+
   .main-btns-list {
     display: none;
 
@@ -29,8 +41,10 @@
   ul.app-side-bar-list {
     // sidebar item
     li {
-      a,
-      button {
+      translate: -100%;
+      transition: 0.5s;
+
+      a {
         text-transform: capitalize;
         width: 100%;
         padding: 12px 9px;

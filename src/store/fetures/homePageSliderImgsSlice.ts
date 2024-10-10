@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { HomePageSliderImgType } from "../../utiles/types";
+import type { ImageType } from "../../utils/types";
 
 type InitStateType = {
-  imgs: HomePageSliderImgType[];
+  imgs: ImageType[];
 };
 
 const initialState: InitStateType = {
@@ -16,14 +16,14 @@ const homePageSliderImgsSlice = createSlice({
   reducers: {
     setHomeSliderImgsAction: (
       state,
-      { payload }: PayloadAction<HomePageSliderImgType[]>
+      { payload }: PayloadAction<ImageType[]>
     ) => {
       state.imgs = payload;
     },
 
     addImgsToHomeSliderAction: (
       state,
-      { payload }: PayloadAction<HomePageSliderImgType[]>
+      { payload }: PayloadAction<ImageType[]>
     ) => {
       state.imgs = [...state.imgs, ...payload];
     },
@@ -33,7 +33,7 @@ const homePageSliderImgsSlice = createSlice({
       { payload }: PayloadAction<string[]>
     ) => {
       state.imgs = state.imgs.filter(
-        ({ _id }) => !payload.some((removeId) => removeId === _id)
+        ({ public_id }) => !payload.some((removeId) => removeId === public_id)
       );
     },
   },

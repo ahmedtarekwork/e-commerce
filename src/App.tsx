@@ -17,21 +17,17 @@ import { useQuery } from "@tanstack/react-query";
 import SplashScreen from "./components/spinners/SplashScreen";
 
 // utils
-import cookies from "js-cookie";
-import axios from "./utiles/axios";
+import axios from "./utils/axios";
 
 // types
-import type { UserType } from "./utiles/types";
+import type { UserType } from "./utils/types";
 
 // hooks
 import useAppRouter from "./hooks/useAppRouter";
 
 // fetchers
 const checkUserQueryFn = async (): Promise<UserType> => {
-  const token = cookies.get("dashboard-jwt-token");
-
-  if (token) return (await axios.get("auth/checkUser")).data;
-  throw new Error("no token");
+  return (await axios.get("auth/checkUser")).data;
 };
 
 const App = () => {
@@ -63,7 +59,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (checkUserData) dispatch(setUser(checkUserData));
+    if (checkUserData && !("message" in checkUserData))
+      dispatch(setUser(checkUserData));
   }, [checkUserData, dispatch]);
 
   if (checkUserLoading) return <SplashScreen>Loading...</SplashScreen>;

@@ -6,13 +6,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // redux
 import useDispatch from "../hooks/redux/useDispatch";
+import useSelector from "../hooks/redux/useSelector";
 // redux actions
 import { setUser } from "../store/fetures/userSlice";
 
 // components
 import FormInput from "../components/appForm/Input/FormInput";
 import FormList from "../components/appForm/FormList";
-import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
 import BtnWithSpinner from "../components/animatedBtns/BtnWithSpinner";
 
 // react-hook-form
@@ -21,13 +21,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 // react query
 import { useMutation } from "@tanstack/react-query";
 
-// utiles
-import axios from "../utiles/axios";
-import cookie from "js-cookie";
-import handleError from "../utiles/functions/handleError";
+// hooks
+import useHandleErrorMsg from "../hooks/useHandleErrorMsg";
+
+// utils
+import axios from "../utils/axios";
 
 // types
-import type { UserType } from "../utiles/types";
+import type { UserType } from "../utils/types";
 
 // layouts
 import AnimatedLayout from "../layouts/AnimatedLayout";
@@ -39,8 +40,11 @@ const loginMutationFn = async (userData: {
   username: string;
   password: string;
 }): Promise<UserType & { accessToken?: string }> => {
-  return (await axios.post("auth/login", userData, { timeout: 30 * 1000 }))
-    .data;
+  return (
+    await axios.post("auth/login/credentials", userData, {
+      timeout: 30 * 1000,
+    })
+  ).data;
 };
 const registerMutationFn = async (
   userData: Omit<UserType, "_id"> & { password: string }
@@ -51,13 +55,16 @@ const registerMutationFn = async (
 // component \\
 const LoginPage = ({ type }: { type: "login" | "signup" }) => {
   const dispatch = useDispatch();
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
+
+  // hooks
+  const handleError = useHandleErrorMsg();
 
   // react-router-dom
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   // refs
-  const msgRef = useRef<TopMessageRefType>(null);
   const renders = useRef(0);
 
   // states
@@ -81,29 +88,44 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
 
   // react query
   // login
-  const {
-    data: loginData,
-    error: loginErrData,
-    isError: loginErr,
-    isPending: loginLoading,
-    status: loginStatus,
-    mutate: loginMutate,
-  } = useMutation({
+  const { isPending: loginLoading, mutate: loginMutate } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginMutationFn,
+    onSuccess(data) {
+      dispatch(setUser({ ...data }));
+    },
+    onError(error) {
+      handleError(error, {
+        forAllStates: "something went wrong while login",
+      });
+    },
   });
   // register
   const {
-    data: registerData,
     isPending: registerLoading,
-    error: registerErrData,
-    isError: registerErr,
-    status: registerStatus,
     mutate: registerMutate,
     reset: resetRegister,
   } = useMutation({
     mutationKey: ["register"],
     mutationFn: registerMutationFn,
+    onSuccess() {
+      setDisableSubmit(true);
+      showMsg?.({
+        clr: "green",
+        content: "user registerd successfully",
+        time: 1500,
+      });
+      setTimeout(() => {
+        navigate("/login", { relative: "path" });
+        resetRegister();
+        setDisableSubmit(false);
+      }, 1500);
+    },
+    onError(error) {
+      handleError(error, {
+        forAllStates: "something went wrong while register a new user",
+      });
+    },
   });
 
   // handlers
@@ -132,55 +154,6 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
       reset();
     }
   }, [pathname]);
-
-  // login user
-  useEffect(() => {
-    if (loginStatus !== "idle") {
-      if (loginData) {
-        if (loginData.accessToken) {
-          cookie.set("dashboard-jwt-token", loginData.accessToken, {
-            expires: 7,
-          });
-        }
-
-        const user = { ...loginData };
-        delete user.accessToken;
-
-        dispatch(setUser(user));
-      }
-
-      if (loginErr)
-        handleError(loginErrData, msgRef, {
-          forAllStates: "something went wrong while register a new user",
-        });
-    }
-  }, [loginData, loginErr, loginErrData, loginStatus, dispatch]);
-
-  // register new user
-  useEffect(() => {
-    if (registerStatus !== "idle") {
-      if (registerErr) {
-        handleError(registerErrData, msgRef, {
-          forAllStates: "something went wrong while register a new user",
-        });
-      }
-
-      if (registerData) {
-        setDisableSubmit(true);
-        msgRef.current?.setMessageData?.({
-          clr: "green",
-          content: "user registerd successfully",
-          time: 1500,
-          show: true,
-        });
-        setTimeout(() => {
-          navigate("/login", { relative: "path" });
-          resetRegister();
-          setDisableSubmit(false);
-        }, 1500);
-      }
-    }
-  }, [registerErr, registerData, registerErrData, registerStatus]);
 
   return (
     <AnimatedLayout>
@@ -280,8 +253,6 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
           {type === "login" ? "signup" : "login"}
         </Link>
       </p>
-
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

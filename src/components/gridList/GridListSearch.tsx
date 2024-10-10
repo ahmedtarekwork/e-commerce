@@ -1,17 +1,11 @@
 // react
-import {
-  type ChangeEvent,
-  // , useRef
-} from "react";
+import type { ChangeEvent } from "react";
 
 // components
 import FormInput from "../appForm/Input/FormInput";
 import SelectList, {
   type SelectListComponentProps,
 } from "../selectList/SelectList";
-
-// utils
-// import { nanoid } from "@reduxjs/toolkit";
 
 export type GridListSearchProps = {
   initValue?: string;
@@ -29,8 +23,6 @@ const GridListSearch = ({
   placeholder,
   onInputChangeFn,
 }: GridListSearchProps) => {
-  // const listId = useRef(nanoid());
-
   return (
     <div
       className={`grid-list-search-holder${
@@ -50,7 +42,6 @@ const GridListSearch = ({
             value: true,
             fullWidth: false,
           }}
-          // id={`grid-list-search-list-${listId.current}`}
           optClickFunc={categories.optionOnClickFn}
           listOptsArr={categories.list.map((c, i) => ({
             selected: i === 0,

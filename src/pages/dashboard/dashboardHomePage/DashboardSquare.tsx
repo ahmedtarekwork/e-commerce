@@ -5,24 +5,24 @@ import { Link } from "react-router-dom";
 import type { IconType } from "react-icons";
 
 // icons
-import { BsBoxArrowInUpRight, BsFillXSquareFill } from "react-icons/bs";
+import { BsBoxArrowInUpRight } from "react-icons/bs";
 
 export type DashboardSqaureProps = {
-  path?: string;
+  path: string;
   title: string;
   Icon: IconType;
   number: number;
   noNum: boolean;
 };
 
-const DashboardSquare = ({
-  path,
-  title,
-  number,
+const SquareData = ({
   Icon,
   noNum,
+  number,
+  title,
+  path,
 }: DashboardSqaureProps) => {
-  const Children = () => (
+  return (
     <>
       <div className="square-top">
         <Icon size={28} />
@@ -31,26 +31,25 @@ const DashboardSquare = ({
 
       <strong>{number}</strong>
 
-      {number && !noNum && path && <BsBoxArrowInUpRight />}
-      {number && !noNum && !path && <BsFillXSquareFill />}
+      {path && <BsBoxArrowInUpRight />}
 
       {noNum && !number && <strong>unknown</strong>}
     </>
   );
+};
+
+const DashboardSquare = (props: DashboardSqaureProps) => {
+  const { path, title } = props;
 
   return (
     <li className="dashboard-square">
       {path ? (
-        <Link
-          to={path || ""}
-          relative="path"
-          title={`go to ${title} square btn`}
-        >
-          <Children />
+        <Link to={path} relative="path" title={`go to ${title}`}>
+          <SquareData {...props} />
         </Link>
       ) : (
-        <div className="non-anchor-dashbaord-square">
-          <Children />
+        <div className="dashbaord-square">
+          <SquareData {...props} />
         </div>
       )}
     </li>

@@ -1,5 +1,5 @@
 // react
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 // react router dom
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,10 @@ import { useNavigate } from "react-router-dom";
 import useSelector from "../../../../hooks/redux/useSelector";
 import useDispatch from "../../../../hooks/redux/useDispatch";
 // redux actions
-import { resteCart, setUser } from "../../../../store/fetures/userSlice";
+import {
+  resetUserWishlist,
+  setCart,
+} from "../../../../store/fetures/userSlice";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,19 +20,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CartCheckoutMethod from "./CartCheckoutMethod";
 import CartAreaDownInfo from "../../../../components/cartArea/CartAreaDownInfo";
 import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../../components/TopMessage";
 
 // hooks
 import useGetPaymentSessionURL from "../../../../hooks/ReactQuery/useGetPaymentSessionURL";
+import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
 
 // types
-import type { UserType } from "../../../../utiles/types";
+import type { OrderType } from "../../../../utils/types";
 
 // utils
-import axios from "../../../../utiles/axios";
-import handleError from "../../../../utiles/functions/handleError";
+import axios from "../../../../utils/axios";
 
 // icons
 import { IoBagCheckOutline } from "react-icons/io5";
@@ -40,37 +40,49 @@ import { FaCreditCard } from "react-icons/fa";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
-import { slideOutVariant } from "../../../../utiles/variants";
+import { slideOutVariant } from "../../../../utils/variants";
 
 type Props = {
   isCartPage: boolean;
 };
 
 // fetchers
-const clearCartMutationFn = async () => {
-  return await axios.delete("carts/empty-user-cart");
+const clearCartMutationFn = async (userId: string) => {
+  if (!userId)
+    throw new axios.AxiosError(
+      "you need to login before modify your cart",
+      "403"
+    );
+
+  return await axios.delete(`carts/${userId}/resetCart`);
 };
 
-const deleteWishlistMutationFn = async (user: UserType) => {
-  return (await axios.put("users/" + user._id, user)).data;
+const deleteWishlistMutationFn = async (userId: string) => {
+  if (!userId)
+    throw new axios.AxiosError(
+      "you need to login before modify your wishlist",
+      "403"
+    );
+
+  return (await axios.delete(`users/wishlist/${userId}`)).data;
 };
 
 const makeOrderMutationFn = async () => {
-  return (await axios.post("/orders")).data;
+  return (await axios.post("orders", {})).data;
 };
-
-export type PayMethods = "Cash on Delivery" | "Card";
 
 const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const handleError = useHandleErrorMsg();
 
   // states
+  const showMsg = useHandleErrorMsg();
   const { user, userCart, wishlistLoading } = useSelector(
     (state) => state.user
   );
-  const [payMethod, setPayMethod] = useState<PayMethods>("Card");
+  const [payMethod, setPayMethod] = useState<OrderType["method"]>("Card");
 
   const isCartItems = !!userCart?.products.length;
   const isWishlistItems = !!user?.wishlist?.length && !wishlistLoading;
@@ -79,61 +91,76 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   const showCartComponents = isCartPage && userCart?.products.length;
 
   // refs
-  const msgRef = useRef<TopMessageRefType>(null);
   const makeOrderBtnRef = useRef<HTMLButtonElement>(null);
 
   // react query
-  const {
-    mutate: clearCart,
-    error: clearCartErrData,
-    isPending: clearCartLoading,
-    isSuccess: clearCartSuccess,
-  } = useMutation({
+  const { mutate: clearCart, isPending: clearCartLoading } = useMutation({
     mutationKey: ["clearCart"],
-    mutationFn: clearCartMutationFn,
+    mutationFn: () => clearCartMutationFn(user?._id || ""),
+
+    onSuccess: () => {
+      showMsg?.({
+        content: "your cart reseted successfully",
+        show: true,
+        time: 3500,
+        clr: "green",
+      });
+
+      if (user) dispatch(setCart({ orderdby: user?._id, products: [] }));
+    },
+
+    onError(error) {
+      handleError(error, {
+        forAllStates: "something went wrong while clearing your cart",
+      });
+    },
   });
-  const {
-    mutate: deleteWishlist,
-    isPending: deleteWishlistLoading,
-    data: deleteWishlistData,
-    isError: deleteWishlistErr,
-    error: deleteWishlistErrData,
-  } = useMutation({
-    mutationFn: deleteWishlistMutationFn,
-    mutationKey: ["deleteWishlist"],
-  });
+
+  const { mutate: deleteWishlist, isPending: deleteWishlistLoading } =
+    useMutation({
+      mutationFn: () => deleteWishlistMutationFn(user?._id || ""),
+      mutationKey: ["deleteWishlist"],
+      onSuccess(data) {
+        showMsg?.({
+          content:
+            "message" in data
+              ? data.message
+              : "your wishlist deleted successfully",
+          show: true,
+          time: 3500,
+          clr: "green",
+        });
+
+        dispatch(resetUserWishlist());
+      },
+      onError(error) {
+        handleError(error, {
+          forAllStates:
+            "something went wrong while trying to delete your wishlist",
+        });
+      },
+    });
 
   // get stripe checkout session url
-  const {
-    data: sessionUrl,
-    isPending: sessionUrlLoading,
-    isError: sessionUrlErr,
-    error: sessionUrlErrData,
-    handlePayment,
-  } = useGetPaymentSessionURL(msgRef);
+  const { isPending: sessionUrlLoading, handlePayment } =
+    useGetPaymentSessionURL(
+      (data) => (window.location.href = data.url),
+      (error) => {
+        handleError(error, {
+          forAllStates: "something went wrong while trying to handle payment",
+        });
+      }
+    );
 
   // make order
-  const {
-    mutate: makeOrder,
-    error: orderErrData,
-    isPending: orderLoading,
-    isSuccess: orderSuccess,
-  } = useMutation({
+  const { mutate: makeOrder, isPending: orderLoading } = useMutation({
     mutationKey: ["makeOrder"],
     mutationFn: makeOrderMutationFn,
-    onSuccess: () => queryClient.prefetchQuery({ queryKey: ["getProducts"] }),
-  });
+    onSuccess: () => {
+      queryClient.prefetchQuery({ queryKey: ["getProducts"] });
+      if (user) dispatch(setCart({ orderdby: user?._id, products: [] }));
 
-  // useEffects
-
-  // clear cart when create order success or when clear cart success
-  useEffect(() => {
-    if (orderSuccess || clearCartSuccess) {
-      dispatch(resteCart());
-    }
-
-    if (orderSuccess) {
-      msgRef.current?.setMessageData({
+      showMsg?.({
         clr: "green",
         content: "order created successfully",
         show: true,
@@ -144,59 +171,24 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
         navigate("/", {
           relative: "path",
         });
-      }, 3750);
-    }
-  }, [clearCartSuccess, orderSuccess, dispatch, navigate]);
-
-  // if there is an error while makign order
-  useEffect(() => {
-    if (orderErrData)
+      }, 3600);
+    },
+    onError(error) {
       handleError(
-        orderErrData,
-        msgRef,
+        error,
         {
           forAllStates: "something went wrong while making the order for you",
         },
         4000
       );
-  }, [orderErrData]);
-
-  // if there is an error while clearing the cart
-  useEffect(() => {
-    if (clearCartErrData)
-      handleError(clearCartErrData, msgRef, {
-        forAllStates: "something went wrong while clearing your cart",
-      });
-  }, [clearCartErrData]);
-
-  // delete wishlist
-  useEffect(() => {
-    if (deleteWishlistData) dispatch(setUser(deleteWishlistData));
-
-    if (deleteWishlistErr)
-      handleError(deleteWishlistErrData, msgRef, {
-        forAllStates:
-          "something went wrong while trying to delete your wishlist",
-      });
-  }, [deleteWishlistData, deleteWishlistErr, deleteWishlistErrData, dispatch]);
-
-  // stripe checkout session url
-  useEffect(() => {
-    if (sessionUrl) window.location.href = sessionUrl.url;
-
-    if (sessionUrlErr) {
-      handleError(sessionUrlErrData, msgRef, {
-        forAllStates: "something went wrong while trying to handle payment",
-      });
-    }
-  }, [sessionUrlErr, sessionUrlErrData, sessionUrl]);
+    },
+  });
 
   return (
     <AnimatePresence initial={false}>
       {isShow && (
         <>
           <motion.div
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             variants={slideOutVariant}
             initial="initial"
             animate="animate"
@@ -228,7 +220,8 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
                   onClick={() => {
                     if (payMethod === "Card")
                       return handlePayment({ sessionType: "payment" });
-                    else if (payMethod === "Cash on Delivery") makeOrder();
+
+                    makeOrder();
                   }}
                   disabled={
                     sessionUrlLoading || clearCartLoading || orderLoading
@@ -256,7 +249,7 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
                 className="red-btn"
                 onClick={() => {
                   if (isCartPage) return clearCart();
-                  if (user) deleteWishlist({ ...user, wishlist: [] });
+                  if (user) deleteWishlist();
                 }}
                 disabled={clearCartLoading || deleteWishlistLoading}
               >
@@ -274,8 +267,6 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
               </button>
             </div>
           </motion.div>
-
-          <TopMessage ref={msgRef} />
         </>
       )}
     </AnimatePresence>

@@ -10,7 +10,6 @@ import EmptySpinner from "../../../../../../components/spinners/EmptySpinner";
 
 // utils
 import axios from "axios";
-import { nanoid } from "@reduxjs/toolkit";
 
 // swiper.js
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -20,10 +19,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 // types
-import type { ProductType } from "../../../../../../utiles/types";
+import type { ProductType } from "../../../../../../utils/types";
 
 // types
-type CategoryAndBestSell =
+export type CategoryAndBestSell =
   | {
       bestSell: true;
       category: string;
@@ -67,7 +66,11 @@ const getLimitedProductsFromSpecificCategory: GetLimitedProductsFnType =
 const HomePageProductsSlider = ({ filters }: Props) => {
   const { bestSell, category } = filters;
 
-  const { data, isPending: isLoading } = useQuery({
+  const {
+    data,
+    isPending: isLoading,
+    fetchStatus,
+  } = useQuery({
     queryKey: ["getLimitedProductsFromSpecificCategory", filters],
     queryFn: getLimitedProductsFromSpecificCategory,
   });
@@ -77,6 +80,8 @@ const HomePageProductsSlider = ({ filters }: Props) => {
   if (bestSell && !category) textSideContent = "Best Sell";
   if (!bestSell && category) textSideContent = category;
   if (bestSell && category) textSideContent = category + "Best Sales";
+
+  if (!data?.length && !isLoading && fetchStatus !== "fetching") return null;
 
   return (
     <div className="home-page-products-slider">
@@ -130,7 +135,7 @@ const HomePageProductsSlider = ({ filters }: Props) => {
             }}
           >
             {data.map((product) => (
-              <SwiperSlide key={nanoid()}>
+              <SwiperSlide key={product._id}>
                 <ProductCard
                   product={{ ...product, imgs: [product.imgs[0]] }}
                   className="card-mode"

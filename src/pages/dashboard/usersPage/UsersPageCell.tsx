@@ -1,39 +1,22 @@
 // react
-import {
-  type Dispatch,
-  type RefObject,
-  type SetStateAction,
-  useEffect,
-} from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
 // react-router-dom
 import { Link } from "react-router-dom";
 
-// redux
-import useDispatch from "../../../hooks/redux/useDispatch";
-import useSelector from "../../../hooks/redux/useSelector";
-// redux actions
-import { logoutUser } from "../../../store/fetures/userSlice";
-
 // components
 import GridListItem from "../../../components/gridList/GridListItem";
-import useDeleteUserBtn from "../../../hooks/ReactQuery/useDeleteUserBtn";
-
-// utiles
-import handleError from "../../../utiles/functions/handleError";
+import DeleteUserBtn from "../../../components/DeleteUserBtn";
 
 // types
 import type { AppModalRefType } from "../../../components/modals/appModal/AppModal";
-import type { TopMessageRefType } from "../../../components/TopMessage";
-import type { OrderType, UserType } from "../../../utiles/types";
+import type { OrderType, UserType } from "../../../utils/types";
 
 type Props = {
   user: UserType & { orders: OrderType[] };
   setSelectedUsername: Dispatch<SetStateAction<string>>;
   setSelectedUserId: Dispatch<SetStateAction<string>>;
-  selectedUserId: string;
   modalRef: RefObject<AppModalRefType>;
-  msgRef: RefObject<TopMessageRefType>;
   cells: string[];
 };
 
@@ -80,61 +63,9 @@ const UsersPageCell = ({
   user: { _id, isAdmin, email, address, username, orders },
   setSelectedUsername,
   setSelectedUserId,
-  selectedUserId,
   modalRef,
-  msgRef,
   cells,
 }: Props) => {
-  const { user } = useSelector((state) => state.user);
-
-  const dispatch = useDispatch();
-
-  const {
-    deleteBtn,
-    deleteErr,
-    deleteErrData,
-    deleteSuccess,
-    reset,
-    deletedUserData,
-  } = useDeleteUserBtn(selectedUserId);
-
-  useEffect(() => {
-    if (deleteErr) {
-      handleError(
-        deleteErrData,
-        msgRef,
-        {
-          forAllStates: "something went wrong while deleting the user",
-        },
-        5000
-      );
-    }
-  }, [deleteErr, deleteErrData, msgRef]);
-
-  useEffect(() => {
-    if (deleteSuccess) {
-      if (deletedUserData._id === user?._id) {
-        dispatch(logoutUser());
-        reset();
-      } else {
-        msgRef.current?.setMessageData?.({
-          clr: "green",
-          content: "user deleted successfully",
-          show: true,
-          time: 3500,
-        });
-        setTimeout(() => reset(), 3500);
-      }
-    }
-  }, [deleteSuccess, reset, dispatch, deletedUserData, user?._id, msgRef]);
-
-  const DeleteBtn = () =>
-    deleteBtn({
-      itemId: _id,
-      username,
-      children: "delete",
-    });
-
   return (
     <GridListItem
       cells={cells}
@@ -164,7 +95,15 @@ const UsersPageCell = ({
         ) : (
           "no orders!"
         ),
-        delete: <DeleteBtn />,
+        delete: (
+          <DeleteUserBtn
+            style={{ width: "100%" }}
+            userId={_id}
+            username={username}
+          >
+            delete
+          </DeleteUserBtn>
+        ),
       }}
     />
   );

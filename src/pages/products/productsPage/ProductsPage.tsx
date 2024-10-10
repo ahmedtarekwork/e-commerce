@@ -11,7 +11,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useSelector from "../../../hooks/redux/useSelector";
 import useDispatch from "../../../hooks/redux/useDispatch";
 // redux actions
-import { addProducts } from "../../../store/fetures/productsSlice";
+import {
+  addProducts,
+  resetProducts,
+} from "../../../store/fetures/productsSlice";
 
 // components
 import Heading from "../../../components/Heading";
@@ -35,10 +38,10 @@ import ProductsPageFiltersList, {
 import useInitProductsCells from "../../../hooks/useInitProductsCells";
 
 // utils
-import axios from "../../../utiles/axios";
+import axios from "../../../utils/axios";
 
 // types
-import type { ProductType } from "../../../utiles/types";
+import type { ProductType } from "../../../utils/types";
 
 // icons
 import { RiFilterLine, RiFilterFill } from "react-icons/ri";
@@ -189,7 +192,12 @@ const ProductsPage = () => {
   }, [queryClient, filtersList, page, limit, searchMode]); // don't change dependencies array
 
   useEffect(() => {
-    if (apiProducts) {
+    if (!apiProducts?.products.length && apiProducts?.pagesCount === 0) {
+      setPaginatedProducts([]);
+      dispatch(resetProducts());
+    }
+
+    if (apiProducts?.products.length) {
       if (initRender.current) initRender.current = false;
       pagesCount.current = apiProducts.pagesCount || 1;
 
@@ -200,15 +208,18 @@ const ProductsPage = () => {
         }
 
         const oldProducts = prev[page] || [];
-        const newProducts = oldProducts.length
-          ? apiProducts.products.filter(({ _id }) =>
-              oldProducts.every(({ _id: same }) => same !== _id)
-            )
-          : apiProducts.products;
+        const newProducts = apiProducts.products;
+
+        const finalProducts = [
+          ...oldProducts.filter(({ _id }) =>
+            apiProducts.products.every(({ _id: same }) => same !== _id)
+          ),
+          ...newProducts,
+        ];
 
         return {
           ...prev,
-          [page]: [...oldProducts, ...newProducts],
+          [page]: finalProducts,
         };
       });
 

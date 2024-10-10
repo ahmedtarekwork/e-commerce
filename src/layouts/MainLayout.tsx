@@ -7,7 +7,6 @@ import { useLocation, useOutlet } from "react-router-dom";
 // components
 import Header from "../components/layout/appHeader/Header";
 import Footer from "../components/layout/Footer";
-import TopMessage, { type TopMessageRefType } from "../components/TopMessage";
 
 // framer motion
 import { AnimatePresence } from "framer-motion";
@@ -42,7 +41,6 @@ const MainLayout = () => {
   const headerRef = useRef<HTMLElement>(null);
   const mainElRef = useRef<HTMLElement>(null);
   const footerRef = useRef<HTMLElement>(null);
-  const msgRef = useRef<TopMessageRefType>(null);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -69,37 +67,6 @@ const MainLayout = () => {
       mainEl?.style.removeProperty("margin-top");
     }
   }, [showHeader]);
-
-  useEffect(() => {
-    const msgData = msgRef.current;
-
-    if (msgData) {
-      const offlineFn = () => {
-        msgData.setMessageData?.({
-          show: true,
-          clr: "red",
-          content: "you are offline, check your internet connection",
-          remove: false,
-        });
-      };
-      const onlineFn = () => {
-        msgData.setMessageData?.({
-          show: true,
-          clr: "green",
-          content: "you back online again",
-          time: 2500,
-        });
-      };
-
-      window.addEventListener("offline", offlineFn);
-      window.addEventListener("online", onlineFn);
-
-      return () => {
-        window.removeEventListener("offline", offlineFn);
-        window.removeEventListener("online", onlineFn);
-      };
-    }
-  }, []);
 
   useEffect(() => {
     if (makePageFullHeight) {
@@ -136,7 +103,6 @@ const MainLayout = () => {
           <AnimatedOutlet key={pathname} />
         </div>
       </main>
-      <TopMessage ref={msgRef} />
       <Footer ref={footerRef} />
     </>
   );

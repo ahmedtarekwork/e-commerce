@@ -1,5 +1,5 @@
 // react
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 // components
 import AddImgsToHomeSlidedrBtn from "./AddImgsToHomeSliderBtn";
@@ -7,9 +7,6 @@ import RemoveImgFromSlider from "./RemoveImgFromSlider";
 import BtnWithSpinner from "../../../../../components/animatedBtns/BtnWithSpinner";
 import Spinner from "../../../../../components/spinners/Spinner";
 import GridList from "../../../../../components/gridList/GridList";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../../../components/TopMessage";
 
 // react query
 import { useMutation } from "@tanstack/react-query";
@@ -25,32 +22,37 @@ import {
 
 // hooks
 import useGetHomePageSliderImgs from "../../../../../hooks/ReactQuery/useGetHomePageSliderImgs";
+import useHandleErrorMsg from "../../../../../hooks/useHandleErrorMsg";
 
 // utils
-import axios from "../../../../../utiles/axios";
+import axios from "../../../../../utils/axios";
 import { nanoid } from "@reduxjs/toolkit";
-import handleError from "../../../../../utiles/functions/handleError";
-import convertFilesToBase64 from "../../../../../utiles/functions/files/convertFilesToBase64";
 
 // framer motion
 import { motion } from "framer-motion";
 
 // fetchers
-const addImageToHomeSliderMutationFn = async (imgs: { image: string }[]) => {
+const addImageToHomeSliderMutationFn = async (imgs: File[]) => {
+  const formData = new FormData();
+
+  imgs.forEach((img) => formData.append("images[]", img));
+
   return (
-    await axios.post("dashboard/homepageSliderImgs", {
-      images: imgs,
+    await axios.post("dashboard/homepageSliderImgs", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     })
-  ).data.imgs;
+  ).data;
 };
 
 const HomePageSliderSettings = () => {
   const dispatch = useDispatch();
   const { imgs } = useSelector((state) => state.homePageSliderImgs);
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
+
   const [imgsToUpload, setImgsToUpload] = useState<File[]>([]);
 
-  // refs
-  const msgRef = useRef<TopMessageRefType>(null);
+  // hooks
+  const handleError = useHandleErrorMsg();
 
   const {
     data: homePageSliderImgs,
@@ -58,17 +60,33 @@ const HomePageSliderSettings = () => {
     isPending: homePageSliderImgsLoading,
     fetchStatus,
     refetch: getHomePageSliderImgs,
+    error: homePageSliderImgsErrData,
   } = useGetHomePageSliderImgs();
 
   const {
-    data: newHomePageSliderImgs,
-    error: newHomePageSliderImgsErrData,
     isPending: newHomePageSliderImgsLoading,
     mutate: addImgsToHomeSlider,
     isSuccess: isImgsRemoved,
   } = useMutation({
     mutationKey: ["addImageToHomeSlider"],
     mutationFn: addImageToHomeSliderMutationFn,
+    onError(error) {
+      handleError(error, {
+        forAllStates:
+          "sorry, can't put images in the home page slider at the moment",
+      });
+    },
+    onSuccess(data) {
+      showMsg?.({
+        clr: "green",
+        content: "message" in data ? data.message : "images successfully added",
+      });
+
+      setTimeout(() => {
+        dispatch(addImgsToHomeSliderAction(data.images));
+        setImgsToUpload([]);
+      }, 1200);
+    },
   });
 
   useEffect(() => {
@@ -81,39 +99,44 @@ const HomePageSliderSettings = () => {
     }
   }, [homePageSliderImgs, dispatch]);
 
-  useEffect(() => {
-    if (newHomePageSliderImgs) {
-      msgRef.current?.setMessageData({
-        clr: "green",
-        content: "images successfully added",
-        show: true,
-        time: 1200,
-      });
-
-      setTimeout(() => {
-        dispatch(addImgsToHomeSliderAction(newHomePageSliderImgs));
-        setImgsToUpload([]);
-      }, 1200);
-    }
-
-    if (newHomePageSliderImgsErrData) {
-      handleError(newHomePageSliderImgsErrData, msgRef, {
-        forAllStates:
-          "sorry, can't put images in the home page slider at the moment",
-      });
-    }
-  }, [newHomePageSliderImgsErrData, newHomePageSliderImgs, dispatch]);
-
   // loading
   if (homePageSliderImgsLoading && fetchStatus !== "idle") {
     return <Spinner fullWidth={true}>Loading Images...</Spinner>;
   }
 
-  // no images in home page slider and no image has been selected to upload
-  if (homePageSliderImgsErr && !imgs?.length && !imgsToUpload.length) {
+  // there is an error
+  if (
+    !homePageSliderImgsLoading &&
+    fetchStatus !== "fetching" &&
+    homePageSliderImgsErr
+  ) {
+    const errorMessage =
+      "message" in homePageSliderImgsErrData
+        ? homePageSliderImgsErrData.message
+        : "something went wrogn while fetching images!";
+
+    return (
+      <p
+        style={{
+          color: "var(--danger)",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        {errorMessage}
+      </p>
+    );
+  }
+
+  if (!homePageSliderImgsErr && !imgs?.length && !imgsToUpload.length) {
+    // no images in home page slider and no image has been selected to upload
     return (
       <p style={{ color: "var(--danger)" }}>
-        <strong>There aren't any home page slider images.</strong>{" "}
+        <strong
+          style={{ marginBottom: 10, display: "block", textAlign: "center" }}
+        >
+          There aren't any home page slider images.
+        </strong>{" "}
         <AddImgsToHomeSlidedrBtn setImgsToUpload={setImgsToUpload}>
           Add some images
         </AddImgsToHomeSlidedrBtn>
@@ -130,16 +153,16 @@ const HomePageSliderSettings = () => {
         cells={[]}
         className="home-page-slider-settings-imgs-list-preview"
       >
-        {imgs.map(({ image, _id }) => (
-          <motion.li layout key={_id}>
+        {imgs.map(({ secure_url, public_id }) => (
+          <motion.li layout key={public_id}>
             <img
               width="100%"
               height="100%"
-              src={image}
+              src={secure_url}
               alt="home page slider image"
             />
 
-            <RemoveImgFromSlider imgId={_id} msgRef={msgRef} />
+            <RemoveImgFromSlider imgId={public_id} />
           </motion.li>
         ))}
       </GridList>
@@ -197,15 +220,7 @@ const HomePageSliderSettings = () => {
             <BtnWithSpinner
               toggleSpinner={newHomePageSliderImgsLoading}
               title="upload selected images to home page iamges slider"
-              onClick={async () => {
-                const finalImgs: { image: string }[] = [];
-
-                for (let i = 0; i < imgsToUpload.length; i++) {
-                  const base64Img = await convertFilesToBase64(imgsToUpload[i]);
-                  finalImgs.push({ image: base64Img });
-                }
-                addImgsToHomeSlider(finalImgs);
-              }}
+              onClick={async () => addImgsToHomeSlider(imgsToUpload)}
               className="btn"
               disabled={newHomePageSliderImgsLoading || isImgsRemoved}
             >
@@ -233,8 +248,6 @@ const HomePageSliderSettings = () => {
           </AddImgsToHomeSlidedrBtn>
         </>
       )}
-
-      <TopMessage ref={msgRef} />
     </>
   );
 };

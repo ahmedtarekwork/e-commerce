@@ -1,5 +1,5 @@
 // react
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 // react query
 import { useMutation } from "@tanstack/react-query";
@@ -18,19 +18,18 @@ import DangerZone from "../../../../components/dangerZone/DangerZone";
 import DonatePlanCard, {
   type DonatePlanCardComponentProps,
 } from "./DonatePlanCard";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../../components/TopMessage";
 
 // utils
-import axios from "../../../../utiles/axios";
-import handleError from "../../../../utiles/functions/handleError";
+import axios from "../../../../utils/axios";
 
 // types
 import { type AppModalRefType } from "../../../../components/modals/appModal/AppModal";
-// layouts
 
+// layouts
 import AnimatedLayout from "../../../../layouts/AnimatedLayout";
+
+// hooks
+import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
 
 // fetchers
 const DeleteDonationMutationFn = async () => {
@@ -59,39 +58,37 @@ const DonationPage = () => {
 
   // states
   const { user } = useSelector((state) => state.user);
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
+
+  // hooks
+  const handleError = useHandleErrorMsg();
 
   // refs
   const sureModalRef = useRef<AppModalRefType>(null);
-  const msgRef = useRef<TopMessageRefType>(null);
 
-  const {
-    data,
-    error,
-    mutate: deleteDonation,
-  } = useMutation({
+  const { mutate: deleteDonation } = useMutation({
     mutationKey: ["donationUnsubscripe"],
     mutationFn: DeleteDonationMutationFn,
-  });
 
-  useEffect(() => {
-    if (data || error) sureModalRef.current?.toggleModal(false);
-
-    if (data) {
+    onSuccess(data) {
       dispatch(setUser(data));
-      msgRef.current?.setMessageData({
+      showMsg?.({
         clr: "green",
         content: "Subscribtion has been canceled",
-        show: true,
         time: 5000,
       });
-    }
+    },
 
-    if (error) {
-      handleError(error, msgRef, {
+    onError(error) {
+      handleError(error, {
         forAllStates: "something went wrong while remove your subscription",
       });
-    }
-  }, [error, data, dispatch]);
+    },
+
+    onSettled() {
+      sureModalRef.current?.toggleModal(false);
+    },
+  });
 
   return (
     <AnimatedLayout>
@@ -129,7 +126,6 @@ const DonationPage = () => {
           }}
         />
       )}
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

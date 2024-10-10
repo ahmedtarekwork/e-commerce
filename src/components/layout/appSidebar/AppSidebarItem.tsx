@@ -5,38 +5,24 @@ import { NavLink } from "react-router-dom";
 import { BsFillCaretRightFill } from "react-icons/bs";
 
 // types
-import { type IconType } from "react-icons";
-
-import { type AnimationControls, motion } from "framer-motion";
+import type { IconType } from "react-icons";
+import type { CSSProperties } from "react";
 
 export type SidebarItemProps = {
   content: string;
   Icon: IconType;
   path: string;
   index: number;
-  controller: AnimationControls;
 };
 
-const AppSidebarItem = ({
-  content,
-  path,
-  Icon,
-  index,
-  controller,
-}: SidebarItemProps) => {
+const AppSidebarItem = ({ content, path, Icon, index }: SidebarItemProps) => {
   return (
-    <motion.li
-      initial={{
-        x: "-100%",
-      }}
-      exit={{
-        x: "-100%",
-      }}
-      animate={controller}
-      transition={{
-        type: "tween",
-        delay: 0.05 * index,
-      }}
+    <li
+      style={
+        {
+          "--delay": `${index * 0.05}s`,
+        } as CSSProperties
+      }
     >
       <NavLink
         to={path}
@@ -51,7 +37,7 @@ const AppSidebarItem = ({
           {content}
         </p>
       </NavLink>
-    </motion.li>
+    </li>
   );
 };
 

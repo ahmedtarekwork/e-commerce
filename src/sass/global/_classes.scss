@@ -119,6 +119,11 @@ $status: (
   }
 }
 
+.rows-list .prop-cell-value-as-btn {
+  flex: 1;
+  color: #052d60 !important;
+}
+
 .prop-cell-holder {
   @include flex(flex-start, center, 10px);
   flex-wrap: wrap;

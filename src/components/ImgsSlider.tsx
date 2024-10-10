@@ -1,6 +1,3 @@
-// utils
-import { nanoid } from "@reduxjs/toolkit";
-
 // swiper.js
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
@@ -11,7 +8,7 @@ import "swiper/css/pagination";
 import type { SwiperOptions } from "swiper/types";
 
 type Props = {
-  imgs: string[];
+  imgs: Record<"public_id" | "secure_url", string>[];
   imgWidth: string;
   withTimer?: {
     value: boolean;
@@ -47,7 +44,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
     >
       {imgs.map((img) => (
         <SwiperSlide
-          key={nanoid()}
+          key={img.public_id}
           style={{
             display: "grid",
             placeContent: "center",
@@ -60,7 +57,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
             }}
             width={imgWidth}
             height={imgWidth}
-            src={img}
+            src={img.secure_url}
             alt="prodcut image"
           />
         </SwiperSlide>

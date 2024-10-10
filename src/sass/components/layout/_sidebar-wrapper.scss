@@ -8,6 +8,8 @@
   z-index: calc(var(--header-index));
   transition: 0.3s;
   translate: -100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   &.active {
     translate: 0;

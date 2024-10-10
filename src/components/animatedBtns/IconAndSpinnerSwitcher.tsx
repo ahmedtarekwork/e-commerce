@@ -9,7 +9,7 @@ import EmptySpinner, {
 // framer motion
 import { motion, AnimatePresence } from "framer-motion";
 // variants
-import { scaleUpDownVariant } from "../../utiles/variants";
+import { scaleUpDownVariant } from "../../utils/variants";
 
 type Props = {
   toggleIcon: boolean;

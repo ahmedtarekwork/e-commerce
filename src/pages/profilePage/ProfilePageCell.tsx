@@ -1,8 +1,9 @@
 // react
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
 // redux actions
 import { setUser } from "../../store/fetures/userSlice";
 
@@ -12,65 +13,77 @@ import { useMutation } from "@tanstack/react-query";
 // component
 import BtnWithSpinner from "../../components/animatedBtns/BtnWithSpinner";
 import FormInput from "../../components/appForm/Input/FormInput";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../components/TopMessage";
 
-// utiles
-import axios from "../../utiles/axios";
-import handleError from "../../utiles/functions/handleError";
+// utils
+import axios from "../../utils/axios";
 
 // types
-import type { UserType } from "../../utiles/types";
+import type { UserType } from "../../utils/types";
+
+// hooks
+import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 
 type Props = {
   propName: keyof UserType;
   content: string;
   user: UserType;
+  isCurrentUserProfile: boolean;
 };
 
-type reqParamType = { userId: string; userData: UserType };
+type reqParamType = {
+  userId: string;
+  userData: Partial<Pick<UserType, "address" | "email" | "username">>;
+};
 
 // fetchers
-const updateUserMutationFn = async (userId: string, userData: UserType) => {
-  return (await axios.put("/users/" + userId, userData)).data;
+const updateUserMutationFn = async (
+  userId: reqParamType["userId"],
+  userData: reqParamType["userData"]
+) => {
+  if (!Object.keys(userData).length) {
+    throw new axios.AxiosError(
+      "you need to send some data to update it",
+      "400"
+    );
+  }
+
+  return (await axios.patch(`/users/${userId}`, userData)).data;
 };
 
-const ProfilePageCell = ({ propName, content, user }: Props) => {
-  const msgRef = useRef<TopMessageRefType>(null);
+const ProfilePageCell = ({
+  propName,
+  content,
+  user,
+  isCurrentUserProfile,
+}: Props) => {
+  const handleError = useHandleErrorMsg();
 
   const dispatch = useDispatch();
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
+
+  // states
   const [inputValue, setInputValue] = useState(content);
   const [editMode, setEditMode] = useState(false);
 
-  const {
-    mutate: updateUser,
-    isPending: isLoading,
-    data: updatedUserData,
-    error: updateUserErrData,
-    isError: updateUserErr,
-  } = useMutation({
-    mutationKey: ["updateUser", user?._id],
+  const { mutate: updateUser, isPending: isLoading } = useMutation({
+    mutationKey: ["updateUser", user._id],
     mutationFn: ({ userId, userData }: reqParamType) =>
       updateUserMutationFn(userId, userData),
-  });
 
-  useEffect(() => {
-    if (updatedUserData) {
-      dispatch(setUser(updatedUserData));
+    onSuccess(data) {
+      dispatch(setUser(data));
+
       setEditMode(false);
-      msgRef.current?.setMessageData?.({
+
+      showMsg?.({
         clr: "green",
         content: `${propName} updated successfully`,
-        show: true,
-        time: 3500,
       });
-    }
+    },
 
-    if (updateUserErr) {
+    onError(error) {
       handleError(
-        updateUserErrData,
-        msgRef,
+        error,
         {
           forAllStates: "somethign went wrong while updating user Data",
           duplicatedMsg: propName + " is already taken",
@@ -78,27 +91,27 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
 
         5000
       );
-    }
-  }, [updatedUserData, updateUserErr, updateUserErrData, dispatch, propName]);
+    },
+  });
 
   return (
-    <>
-      <div className="profile-page-cell">
-        <div className="profile-page-cell-content-holder">
-          <strong className="prop-cell-name">{propName}:</strong>
-          <div className="profile-cell-content">
-            {editMode ? (
-              <FormInput
-                className="profile-cell-input"
-                onChange={(e) => setInputValue(e.target.value)}
-                value={inputValue}
-              />
-            ) : (
-              `${propName === "username" ? "#" : ""}${content}`
-            )}
-          </div>
+    <div className="profile-page-cell">
+      <div className="profile-page-cell-content-holder">
+        <strong className="prop-cell-name">{propName}:</strong>
+        <div className="profile-cell-content">
+          {editMode ? (
+            <FormInput
+              className="profile-cell-input"
+              onChange={(e) => setInputValue(e.target.value)}
+              value={inputValue}
+            />
+          ) : (
+            `${propName === "username" ? "#" : ""}${content}`
+          )}
         </div>
+      </div>
 
+      {isCurrentUserProfile && (
         <div className="profile-cell-btns-holder">
           <button
             title={`edit your ${propName}`}
@@ -123,7 +136,7 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
               onClick={() =>
                 updateUser({
                   userId: user._id,
-                  userData: { ...user, [propName]: inputValue },
+                  userData: { [propName]: inputValue },
                 })
               }
             >
@@ -131,9 +144,8 @@ const ProfilePageCell = ({ propName, content, user }: Props) => {
             </BtnWithSpinner>
           )}
         </div>
-      </div>
-      <TopMessage ref={msgRef} />
-    </>
+      )}
+    </div>
   );
 };
 export default ProfilePageCell;

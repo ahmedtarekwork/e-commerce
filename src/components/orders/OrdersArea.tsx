@@ -3,16 +3,16 @@ import OrderCard from "./OrderCard";
 import OrderCellWithChangeStatus from "./OrderCellWithChangeStatus";
 import DisplayError from "../layout/DisplayError";
 import EmptyPage from "../layout/EmptyPage";
+import Spinner from "../spinners/Spinner";
 
 // types
-import type { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utils/types";
 
 // SVGs
 import EmptyOrdersListSvg from "../../../imgs/no-orders.svg";
 
 // layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
-import Spinner from "../spinners/Spinner";
 
 type Props = {
   loading: boolean;
@@ -31,7 +31,7 @@ const OrdersArea = ({
   withId = false,
   withEditStatus = false,
 }: Props) => {
-  if (loading)
+  if (loading) {
     return (
       <AnimatedLayout
         style={{
@@ -48,6 +48,7 @@ const OrdersArea = ({
         </Spinner>
       </AnimatedLayout>
     );
+  }
 
   if (isError) {
     return (
@@ -58,7 +59,7 @@ const OrdersArea = ({
     );
   }
 
-  if (orders.length === 0)
+  if (orders.length === 0) {
     return (
       <EmptyPage
         content={noOrdersMsg}
@@ -68,6 +69,7 @@ const OrdersArea = ({
         }}
       />
     );
+  }
 
   return (
     <AnimatedLayout>

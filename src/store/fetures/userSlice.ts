@@ -1,11 +1,11 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { CartType, UserType } from "../../utiles/types";
-import Cookies from "js-cookie";
+
+// types
+import type { CartType, UserType } from "../../utils/types";
 
 type InitStateType = {
   user: null | UserType;
   userCart: CartType | null;
-  cartMsg: string;
   allUsers: UserType[];
   cartLoading: boolean;
   wishlistLoading: boolean;
@@ -14,7 +14,6 @@ type InitStateType = {
 const initialState: InitStateType = {
   user: null,
   userCart: null,
-  cartMsg: "",
   allUsers: [],
   cartLoading: false,
   wishlistLoading: false,
@@ -33,8 +32,6 @@ const userSlice = createSlice({
     },
     logoutUser: (state) => {
       state.user = null;
-      Cookies.remove("dashboard-jwt-token");
-      window.location.href = "/login";
     },
 
     // all users
@@ -59,12 +56,10 @@ const userSlice = createSlice({
     // current user cart
     setCart: (state, { payload }: PayloadAction<CartType>) => {
       state.userCart = payload;
-      state.cartMsg = "";
       state.cartLoading = false;
     },
-    resteCart: (state, { payload }: PayloadAction<string | undefined>) => {
+    resetCart: (state) => {
       state.userCart = null;
-      state.cartMsg = payload || "you don't have items in your cart";
       state.cartLoading = false;
     },
     setCartLoading: (state, { payload }: PayloadAction<boolean>) => {
@@ -90,7 +85,7 @@ export const {
 
   // current user cart
   setCart,
-  resteCart,
+  resetCart,
   setCartLoading,
 } = userSlice.actions;
 

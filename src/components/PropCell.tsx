@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import { Fragment, type ComponentProps, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
@@ -20,14 +20,36 @@ const PropCell = ({
 }: Props) => {
   const navigate = useNavigate();
 
+  const ValueHolderTagName = valueAsLink
+    ? {
+        tagName: "button",
+        props: {
+          title: "property cell btn",
+          className: "hov link prop-cell-value-as-btn",
+          onClick: () => {
+            navigate(valueAsLink.path, {
+              relative: "path",
+            });
+          },
+        } as ComponentProps<"button">,
+      }
+    : { tagName: Fragment, props: {} };
+
   return (
     <div
       {...attr}
       className={"prop-cell-holder" + (className ? ` ${className}` : "")}
     >
       <strong className="prop-cell-name">{name}: </strong>
-      {valueAsLink ? (
+      <ValueHolderTagName.tagName {...ValueHolderTagName.props}>
+        <div className="prop-cell-value" {...propNameProps}>
+          {val}
+        </div>
+      </ValueHolderTagName.tagName>
+
+      {/* {valueAsLink ? (
         <button
+          style={{ flex: 1, color: "#052d60" }}
           title="property cell btn"
           className="hov link"
           onClick={() =>
@@ -44,7 +66,7 @@ const PropCell = ({
         <div className="prop-cell-value" {...propNameProps}>
           {val}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

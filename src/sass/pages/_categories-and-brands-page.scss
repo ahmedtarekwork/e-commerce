@@ -1,0 +1,19 @@
+.categories-or-brands-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.category-or-brand-no-data-holder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+
+  strong {
+    font-size: 30px;
+    text-transform: capitalize;
+    color: var(--main);
+  }
+}

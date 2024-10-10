@@ -1,5 +1,5 @@
 // react
-import type { RefObject, ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 // react router dom
 import { Link, useNavigate } from "react-router-dom";
@@ -20,13 +20,9 @@ import { MdBlockFlipped } from "react-icons/md";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 
-// types
-import type { TopMessageRefType } from "./TopMessage";
-
 type Props = {
   productId: string;
   productQty: number;
-  msgRef: RefObject<TopMessageRefType>;
 } & ComponentProps<"button">;
 
 // variants
@@ -51,12 +47,7 @@ const addToCartBtnContentVariant = {
   },
 };
 
-const AddProductToCartBtn = ({
-  msgRef,
-  productQty,
-  productId,
-  ...attr
-}: Props) => {
+const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
   // react router dom
   const navigate = useNavigate();
 
@@ -69,9 +60,9 @@ const AddProductToCartBtn = ({
   const isInStock = +(productQty || 0) > 0;
 
   // react query
-  const { mutate: addToCart, isPending } = useAddToCart(msgRef);
+  const { mutate: addToCart, isPending } = useAddToCart();
 
-  if (!user)
+  if (!user) {
     return (
       <Link
         title="go to login before add to cart btn"
@@ -84,6 +75,7 @@ const AddProductToCartBtn = ({
         {isInStock ? "add to cart" : "sold out"}
       </Link>
     );
+  }
 
   return (
     <button
@@ -95,9 +87,10 @@ const AddProductToCartBtn = ({
         if (isProductInCart) return navigate("/cart", { relative: "path" });
         else {
           if (!isInStock) return;
+
           addToCart({
-            productId: productId,
-            count: 1,
+            productId,
+            wantedQty: 1,
           });
         }
 

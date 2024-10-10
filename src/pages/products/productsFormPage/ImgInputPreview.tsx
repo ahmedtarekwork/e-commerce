@@ -7,87 +7,165 @@ import {
   forwardRef,
 
   // types
-  type ChangeEvent,
   type SetStateAction,
   type Dispatch,
   type MouseEvent,
 } from "react";
 
-// react-hook-form
-import { useForm } from "react-hook-form";
+// react router dom
+import { useParams } from "react-router-dom";
+
+// react query
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+// redux
+import useDispatch from "../../../hooks/redux/useDispatch";
+import useSelector from "../../../hooks/redux/useSelector";
+// redux acions
+import { editProduct } from "../../../store/fetures/productsSlice";
 
 // components
 import FormInput from "../../../components/appForm/Input/FormInput";
 import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
 
-// utiles
+// utils
+import axios from "axios";
 import { nanoid } from "@reduxjs/toolkit";
-import convertFilesToBase64 from "../../../utiles/functions/files/convertFilesToBase64";
-import makeEmptyFile from "../../../utiles/functions/files/makeEmptyFile";
 
 // types
-import type { ProductFormValues } from "./ProductFormPage";
+import type { ImageType, ProductType } from "../../../utils/types";
+
+// hooks
+import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
 
 // framer motion
 import { motion } from "framer-motion";
 
-type HookFormMethodsType = ReturnType<typeof useForm<ProductFormValues>>;
-
 type Props = {
-  register: HookFormMethodsType["register"];
-  imgErr: string | undefined;
+  imgErr: string;
+  product: ProductType | undefined;
+  setProduct: Dispatch<SetStateAction<ProductType | undefined>>;
 };
 
 export type ImgInputPreviewRefType = {
-  imgsList: string[];
-  setImgsList: Dispatch<SetStateAction<string[]>>;
+  imgsList: { img: File; _id: string }[];
+  setImgsList: Dispatch<SetStateAction<{ img: File; _id: string }[]>>;
+
+  initImgs: ImageType[];
+  setInitImgs: Dispatch<SetStateAction<ImageType[]>>;
 };
 
 const imgsMaxLegnth = 7;
 
+const removeSingleProductImageMutationFn = async ({
+  imgPublicId,
+  productId,
+}: Record<"imgPublicId" | "productId", string>) => {
+  return await axios.delete(`/products/deleteImgs/${productId}`, {
+    data: { imgs: [imgPublicId] },
+  });
+};
+
 const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
-  ({ imgErr, register }, ref) => {
-    const addImgs = async (imgs: FileList) => {
-      const finalImgs: string[] = [];
+  ({ imgErr, product, setProduct }, ref) => {
+    const handleError = useHandleErrorMsg();
 
-      for (let i = 0; i < imgs.length; i++) {
-        if (!imgs?.length) break;
-        const img = imgs[i as keyof typeof imgs] as File;
+    const queryClient = useQueryClient();
 
-        const final = await convertFilesToBase64(img);
-        finalImgs.push(final);
-      }
+    // react router
+    const { id } = useParams();
 
-      if (imgsList.length !== 7) {
-        setImgsList((prev) => [
-          ...prev,
-          ...finalImgs.slice(0, imgsMaxLegnth - imgsList.length),
-        ]);
-      }
-    };
+    // redux
+    const dispatch = useDispatch();
+    const showMsg = useSelector((state) => state.topMessage.showMsg);
 
-    const imgRef2 = useRef<HTMLInputElement | null>(null);
-    const { ref: imgRef, ...regist } = register("imgs", {
-      required: "product must have at least one image",
-      onChange: async (e: ChangeEvent<HTMLInputElement>) => {
-        const imgs = e.currentTarget.files;
-        if (imgs?.length) addImgs(imgs);
+    // states
+    const [imgsList, setImgsList] = useState<{ img: File; _id: string }[]>([]);
+    const [initImgs, setInitImgs] = useState<ImageType[]>([]);
+
+    // react query
+    const {
+      mutate: removeSingleImg,
+      isPending: removeImgLoading,
+      status,
+    } = useMutation({
+      mutationKey: ["delete product image", id],
+      mutationFn: removeSingleProductImageMutationFn,
+      onError(error) {
+        handleError(error, {
+          forAllStates: "something went wrong while deleteing the image",
+        });
+
+        (
+          [
+            ...listRef.current!.querySelectorAll(
+              "button.delete-product-img-btn"
+            ),
+          ] as HTMLButtonElement[]
+        ).forEach((btn) => {
+          btn.disabled = false;
+          btn.textContent = "remove";
+        });
+      },
+      onSuccess(data, { imgPublicId }) {
+        showMsg?.({
+          clr: "green",
+          content:
+            "message" in data
+              ? (data.message as string)
+              : "image deleted successfully",
+        });
+
+        queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
+
+        setInitImgs((prev) =>
+          prev.filter(({ public_id }) => public_id !== imgPublicId)
+        );
+
+        if (product) {
+          setProduct({
+            ...product,
+            imgs: product.imgs.filter(
+              ({ public_id }) => public_id !== imgPublicId
+            ),
+          });
+
+          dispatch(
+            editProduct({
+              ...product,
+              imgs: product.imgs.filter(
+                ({ public_id }) => public_id !== imgPublicId
+              ),
+            })
+          );
+        }
       },
     });
 
-    const [imgsList, setImgsList] = useState<string[]>([]);
+    // refs
+    const imgInputRef = useRef<HTMLInputElement | null>(null);
+    const listRef = useRef<HTMLUListElement>(null);
 
-    useImperativeHandle(ref, () => ({ imgsList, setImgsList }), [imgsList]);
+    useImperativeHandle(
+      ref,
+      () => ({ imgsList, setImgsList, setInitImgs, initImgs }),
+      [imgsList, initImgs]
+    );
 
-    // fix bug with file input
     useEffect(() => {
-      const input = imgRef2.current;
-      const fileList = makeEmptyFile();
-
-      if (input)
-        input.files =
-          imgsList.length === 0 ? new DataTransfer().files : fileList;
-    }, [imgsList]);
+      if (!removeImgLoading && status === "idle") {
+        (
+          [
+            ...listRef.current!.querySelectorAll(
+              "button.delete-product-img-btn"
+            ),
+          ] as HTMLButtonElement[]
+        ).forEach((btn) => {
+          btn.disabled = false;
+          btn.textContent = "remove";
+        });
+      }
+    }, [removeImgLoading]);
 
     return (
       <motion.div
@@ -120,54 +198,98 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
           );
 
           if (files.length) {
-            const fileList = new DataTransfer();
-            files.forEach((file) => fileList.items.add(file));
+            // const fileList = new DataTransfer();
+            // files.forEach((file) => fileList.items.add(file));
 
-            addImgs(fileList.files);
+            // setImgsList((prev) => [...prev, ...fileList.files]);
+
+            setImgsList((prev) => [
+              ...prev,
+              ...files.map((file) => ({ img: file, _id: nanoid() })),
+            ]);
           }
         }}
       >
         <strong className="product-imgs-area-title">
-          product images: {imgsList.length} / {imgsMaxLegnth}
+          product images: {imgsList.length + initImgs.length} / {imgsMaxLegnth}
         </strong>
 
         <div className="product-imgs-real-area">
-          <ul className="preview-product-imgs-list">
+          <ul className="preview-product-imgs-list" ref={listRef}>
             <li className="add-input-holder">
               <FormInput
-                onClick={(e: MouseEvent<HTMLInputElement>) => {
-                  e.currentTarget.value = null as unknown as string;
+                onChange={(e) => {
+                  const files = e.currentTarget.files;
+
+                  if (files) {
+                    const finalImgs: typeof imgsList = [];
+
+                    for (let i = 0; i < files?.length; i++) {
+                      finalImgs.push({
+                        img: files.item(i) as File,
+                        _id: nanoid(),
+                      });
+                    }
+
+                    setImgsList((prev) => [...prev, ...finalImgs]);
+                  }
                 }}
-                ref={(e) => {
-                  imgRef(e);
-                  imgRef2.current = e;
-                }}
-                {...regist}
+                ref={imgInputRef}
                 disabled={imgsList.length === imgsMaxLegnth}
                 id="imgs"
                 type="file"
-                multiple={true}
+                multiple
                 accept="image/*"
                 label="+"
               />
             </li>
 
-            {imgsList.map((img, i) => (
-              <li key={nanoid()} className="img-preview-cell">
-                <img src={img} alt="product image" width="100%" height="100%" />
-                <button
-                  title="remove image from list btn"
-                  className="red-btn"
-                  onClick={() =>
-                    setImgsList((prev) =>
-                      prev.filter((_, index) => i !== index)
-                    )
-                  }
-                >
-                  remove
-                </button>
-              </li>
-            ))}
+            {[...initImgs, ...imgsList].map((img, i) => {
+              const serverImg = "secure_url" in img;
+
+              return (
+                <li key={img._id} className="img-preview-cell">
+                  <img
+                    src={
+                      serverImg ? img.secure_url : URL.createObjectURL(img.img)
+                    }
+                    alt="product image"
+                    width="100%"
+                    height="100%"
+                  />
+
+                  <button
+                    title="remove image from list btn"
+                    className="red-btn delete-product-img-btn"
+                    onClick={async (e: MouseEvent<HTMLButtonElement>) => {
+                      if (!serverImg) {
+                        return setImgsList((prev) =>
+                          prev.filter((_, index) => i !== index)
+                        );
+                      }
+
+                      if (id) {
+                        e.currentTarget.disabled = true;
+                        e.currentTarget.textContent = "removing...";
+
+                        return removeSingleImg({
+                          imgPublicId: img.public_id,
+                          productId: id,
+                        });
+                      }
+
+                      showMsg?.({
+                        clr: "red",
+                        content:
+                          "something went wrong while deleteing the image",
+                      });
+                    }}
+                  >
+                    remove
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
 

@@ -81,11 +81,9 @@ const ListWrapper = forwardRef<ListWrapperRefType, ListWrapperComponentsProps>(
     useEffect(() => {
       const wrapper = wrapperRef.current;
       const firstHolder = firstHolderRef.current;
+      const lastHolder = lastHolderRef.current;
 
-      if (firstHolder && wrapper) {
-        const timeout =
-          parseFloat(getComputedStyle(firstHolder).transitionDuration) * 1000;
-
+      if (firstHolder && wrapper && lastHolder) {
         if (toggleList) {
           const btnsList = [
             ...document.querySelectorAll(".list-wrapper > button"),
@@ -100,18 +98,19 @@ const ListWrapper = forwardRef<ListWrapperRefType, ListWrapperComponentsProps>(
           btnsList.forEach((btn) =>
             btn?.addEventListener("click", () => closeAllFN(btn))
           );
-          wrapper.style.overflow = "visible";
+
+          firstHolder.style.height = `${lastHolder.offsetHeight}px`;
 
           return () => {
             btnsList.forEach((btn) =>
               btn?.removeEventListener("click", () => closeAllFN(btn))
             );
           };
-        } else
-          setTimeout(() => wrapper.style.removeProperty("overflow"), timeout);
+        } else firstHolder.style.removeProperty("height");
       }
     }, [toggleList]);
 
+    // close list when click outside it or when press "esc" on keyboard
     useEffect(() => {
       const btn = btnRef.current;
 
@@ -176,6 +175,7 @@ const ListWrapper = forwardRef<ListWrapperRefType, ListWrapperComponentsProps>(
     return (
       <div {...attr} className={listClassName} ref={wrapperRef}>
         <button
+          type="button"
           ref={btnRef}
           title="toggle list btn"
           {...btnAttr}

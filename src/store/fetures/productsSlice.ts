@@ -1,5 +1,5 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { ProductType } from "../../utiles/types";
+import type { ProductType } from "../../utils/types";
 
 type InitStateType = {
   products: ProductType[];
@@ -22,12 +22,10 @@ const productsSlice = createSlice({
       state.products = [];
     },
     addProducts: (state, { payload }: PayloadAction<ProductType[]>) => {
-      const oldProducts = state.products;
-      const newProducts = oldProducts.length
-        ? payload.filter(({ _id }) =>
-            oldProducts.every(({ _id: same }) => same !== _id)
-          )
-        : payload;
+      const oldProducts = state.products.filter(({ _id }) =>
+        payload.every(({ _id: same }) => same !== _id)
+      );
+      const newProducts = payload;
 
       state.products = [...oldProducts, ...newProducts];
     },

@@ -33,7 +33,12 @@ const CartOrWishlistPage = () => {
       <Heading>{title}</Heading>
 
       {isCartPage ? (
-        <CartArea withAddMore withDeleteBtn="cart" showTotal={false} />
+        <CartArea
+          withAddMore
+          withDeleteBtn="cart"
+          showTotal={false}
+          userId={user._id}
+        />
       ) : (
         <WishlistArea
           userId={user._id}

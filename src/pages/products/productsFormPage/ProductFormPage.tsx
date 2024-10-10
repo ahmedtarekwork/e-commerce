@@ -11,10 +11,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import useSelector from "../../../hooks/redux/useSelector";
 import useDispatch from "../../../hooks/redux/useDispatch";
 // actions
-import { addProducts } from "../../../store/fetures/productsSlice";
+import { addProducts, editProduct } from "../../../store/fetures/productsSlice";
+import { setCategoriesOrBrand } from "../../../store/fetures/categoriesAndBrandsSlice";
 
 // react query
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // components
 import FormInput from "../../../components/appForm/Input/FormInput";
@@ -24,23 +25,27 @@ import EmptyPage from "../../../components/layout/EmptyPage";
 import DisplayError from "../../../components/layout/DisplayError";
 import Heading from "../../../components/Heading";
 import IconAndSpinnerSwitcher from "../../../components/animatedBtns/IconAndSpinnerSwitcher";
+import Spinner from "../../../components/spinners/Spinner";
+import SelectList, {
+  type SelectListComponentRefType,
+} from "../../../components/selectList/SelectList";
 
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../components/TopMessage";
 import ImgInputPreview, {
   type ImgInputPreviewRefType,
 } from "./ImgInputPreview";
 
 // utils
-import handleError from "../../../utiles/functions/handleError";
-import axios from "../../../utiles/axios";
+import axios from "../../../utils/axios";
+
+// hooks
+import useGetBrandsOrCategories from "../../../hooks/ReactQuery/useGetBrandsOrCategories";
+import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
 
 // framer motion
 import { motion } from "framer-motion";
 
 // types
-import type { ProductType } from "../../../utiles/types";
+import type { ProductType } from "../../../utils/types";
 
 // icons
 import { IoIosAddCircle } from "react-icons/io";
@@ -54,14 +59,21 @@ import AnimatedLayout from "../../../layouts/AnimatedLayout";
 export type ProductFormValues = Omit<
   ProductType,
   "_id" | "ratings" | "totalRating"
-> & {
-  imgs: FileList;
-};
+>;
 
 export type requestProductType = Omit<
   ProductType,
-  "_id" | "ratings" | "totalRating"
->;
+  "_id" | "ratings" | "totalRating" | "imgs"
+> & {
+  imgs: File[];
+};
+
+type MutateFnArgumentsType<T> = {
+  productData: Omit<requestProductType, "category" | "brand"> & {
+    category: string;
+    brand: string;
+  };
+} & (T extends "patch" ? { productId: string } : { productId?: never });
 
 // fetchers
 const getSingleProductQueryFn = async ({
@@ -73,21 +85,34 @@ const getSingleProductQueryFn = async ({
   return (await axios.get(`products/${productId}`)).data;
 };
 
-const addProductMutationFn = async (productData: requestProductType) => {
-  return (await axios.post("/products", productData)).data;
-};
+const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
+  return async ({ productData, productId }: MutateFnArgumentsType<T>) => {
+    const formData = new FormData();
 
-const editProductMutationFn = async ({
-  productData,
-  prdId,
-}: {
-  productData: requestProductType;
-  prdId: string;
-}) => {
-  return (await axios.put("products/" + prdId, productData)).data;
+    Object.entries(productData).forEach(([key, value]) => {
+      if (key === "imgs") {
+        return (value as File[]).forEach((img) =>
+          formData.append("imgs[]", img)
+        );
+      }
+
+      formData.append(key, value.toString());
+    });
+
+    return (
+      await axios[type](
+        `/products${type === "patch" ? `/${productId}` : ""}`,
+        productData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+    ).data;
+  };
 };
 
 const NewProductPage = () => {
+  const handleError = useHandleErrorMsg();
+  const queryClient = useQueryClient();
+
   // react-router-dom
   const { pathname } = useLocation();
   const { id } = useParams();
@@ -96,19 +121,54 @@ const NewProductPage = () => {
   const isEditMode = pathname.includes("/edit-product");
 
   // redux
-  const disaptch = useDispatch();
+  const dispatch = useDispatch();
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
   const appProduct = useSelector((state) =>
     state.products.products.find((prd) => prd._id === (id || ""))
   );
+  const appCategories = useSelector(
+    (state) => state.categoriesAndBrands.categories
+  );
+  const appBrands = useSelector((state) => state.categoriesAndBrands.brands);
 
+  // states
   const [product, setProduct] = useState<ProductType | undefined>(appProduct);
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    product?.category._id || ""
+  );
+  const [selectedBrand, setSelectedBrand] = useState<string>(
+    product?.brand._id || ""
+  );
+  const [imgErr, setImgErr] = useState("");
 
   // refs
-  const submitBtnRef = useRef<HTMLButtonElement>(null);
   const imgsList = useRef<ImgInputPreviewRefType>(null);
-  const msgRef = useRef<TopMessageRefType>(null);
+  const categoriesListRef = useRef<SelectListComponentRefType>(null);
+  const brandsListRef = useRef<SelectListComponentRefType>(null);
+
+  const isFirestRender = useRef(true);
 
   // react query
+
+  // get brands
+  const {
+    data: resBrands,
+    isError: resBrandsErr,
+    error: resBrandsErrData,
+    refetch: getBrands,
+    isPending: resBrandsLoading,
+  } = useGetBrandsOrCategories("brands", undefined, false);
+
+  // get categories
+  const {
+    data: resCategories,
+    isError: resCategoriesErr,
+    error: resCategoriesErrData,
+    refetch: getCategories,
+    isPending: resCategoriesLoading,
+  } = useGetBrandsOrCategories("categories", undefined, false);
+
+  // get single product "if edit mode"
   const {
     refetch: getResProduct,
     data: resProduct,
@@ -123,39 +183,63 @@ const NewProductPage = () => {
   });
 
   // make a new product
-  const {
-    data: productData,
-    isPending: productLoading,
-    mutate: addProductMutate,
-    status: productStatus,
-    isError: productErr,
-    error: productErrData,
-  } = useMutation({
+  const { isPending: productLoading, mutate: addProductMutate } = useMutation({
     mutationKey: ["addProduct"],
-    mutationFn: addProductMutationFn,
+    mutationFn: addOrUpdateProductMutationFn("post"),
+    onSuccess(data) {
+      if (data) {
+        showMsg?.({
+          clr: "green",
+          content: "product created successfully",
+        });
+
+        dispatch(addProducts([data as ProductType]));
+        queryClient.invalidateQueries({ queryKey: ["getProducts"] });
+
+        reset();
+
+        setSelectedBrand("");
+        setSelectedCategory("");
+
+        imgsList.current?.setImgsList([]);
+        imgsList.current?.setInitImgs([]);
+      }
+    },
+    onError(error) {
+      handleError(
+        error,
+        { forAllStates: "something went wrong while makeing a new product" },
+        5000
+      );
+    },
   });
+
   // edit existing product
-  const {
-    mutate: editProductMutate,
-    isSuccess: editSuccess,
-    isPending: editLoading,
-    isError: editErr,
-    error: editErrData,
-    status: editStatus,
-  } = useMutation({
+  const { mutate: editProductMutate, isPending: editLoading } = useMutation({
     mutationKey: ["edit-product", id],
-    mutationFn: editProductMutationFn,
+    mutationFn: addOrUpdateProductMutationFn("patch"),
+    onSuccess(data) {
+      dispatch(editProduct(data as ProductType));
+      queryClient.prefetchQuery({ queryKey: ["getProducts"] });
+      queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
+
+      navigate("/dashboard/products", { relative: "path" });
+    },
+    onError(error) {
+      handleError(
+        error,
+        { forAllStates: "something went wrong while updating product info" },
+        5000
+      );
+    },
   });
 
   // react-hook-form
   const form = useForm<ProductFormValues>();
-  const { handleSubmit, register, formState, reset, setValue, setError } = form;
+  const { handleSubmit, register, formState, reset, setValue } = form;
   const { errors } = formState;
   const {
-    brand: brandErr,
-    category: catErr,
     color: clrErr,
-    imgs: imgErr,
     price: priceErr,
     quantity: qtyErr,
     title: titleErr,
@@ -165,37 +249,98 @@ const NewProductPage = () => {
   const onSubmit: SubmitHandler<ProductFormValues> = (data, e) => {
     e?.preventDefault();
 
-    if (!imgsList.current?.imgsList.length) {
-      return setError("imgs", {
-        type: "required",
-        message: "product must has at least one image",
+    if (
+      !imgsList.current?.imgsList.length &&
+      !imgsList.current?.initImgs.length
+    ) {
+      return setImgErr("product must have at least one image");
+    }
+
+    if (!selectedBrand || !selectedCategory) {
+      return showMsg?.({
+        clr: "red",
+        content: `please select a ${
+          !selectedBrand ? "brand" : "category"
+        } for this product`,
       });
     }
 
-    const productData: requestProductType = {
+    const productData = {
       ...data,
-      imgs: imgsList.current?.imgsList,
+      category: selectedCategory,
+      brand: selectedBrand,
+      imgs: imgsList.current?.imgsList.map((img) => img.img),
     };
 
     if (isEditMode) {
-      if (!id) return console.error("the product id not found!");
-      editProductMutate({ productData, prdId: id });
+      if (!id) {
+        return showMsg?.({
+          clr: "red",
+          content: "product id not found",
+        });
+      }
+
+      if (product) {
+        Object.entries(product).forEach(([oldKey, oldValue]) => {
+          if (oldKey === "ratings") {
+            delete productData[oldKey as keyof typeof productData];
+
+            return;
+          }
+
+          if (oldKey === "imgs") {
+            if (!productData.imgs.length) {
+              delete productData[oldKey as keyof typeof productData];
+            }
+
+            return;
+          }
+
+          const newValue = productData[oldKey as keyof typeof productData];
+
+          const finalOldValue = ["category", "brand"].includes(oldKey)
+            ? (oldValue as ProductType["brand" | "category"])._id
+            : oldValue;
+
+          if (newValue === finalOldValue) {
+            delete productData[oldKey as keyof typeof productData];
+          }
+        });
+
+        editProductMutate({ productData, productId: id });
+      } else
+        showMsg?.({
+          clr: "red",
+          content: "something went wrong while updating product info",
+        });
     } else {
-      addProductMutate(productData);
+      addProductMutate({
+        productData,
+      });
     }
   };
 
   useEffect(() => {
     if (!product && id) getResProduct();
-  }, [id, product]);
 
-  useEffect(() => {
-    if (resProduct) setProduct(resProduct);
-  }, [resProduct]);
+    if (appProduct && id) {
+      Object.entries(appProduct!).forEach(([key, val]) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setValue(key as keyof requestProductType, val as any)
+      );
 
-  // if the page is edit product => fill in form inputs with product data
-  useEffect(() => {
+      if (appProduct?.brand._id) setSelectedBrand(appProduct?.brand._id);
+      if (appProduct?.category._id)
+        setSelectedCategory(appProduct?.category._id);
+
+      imgsList.current?.setInitImgs(appProduct.imgs);
+    }
+
+    if (!appCategories || !appCategories.length) getCategories();
+    if (!appBrands || !appBrands.length) getBrands();
+
     if (isEditMode) {
+      // if the page is edit product => fill in form inputs with product data
       if (id) {
         if (product) {
           type KeysArrType = (keyof Omit<
@@ -211,64 +356,57 @@ const NewProductPage = () => {
 
           keysArr.forEach((key) => setValue(key, product[key]));
 
-          imgsList.current?.setImgsList(product.imgs);
+          imgsList.current?.setInitImgs(product.imgs);
         }
       }
     }
   }, []);
 
-  // showing spinner inside submit btn while sending request to the server to adding new product
   useEffect(() => {
-    submitBtnRef.current?.classList.toggle(
-      "active",
-      productLoading || editLoading
-    );
-  }, [productLoading, editLoading]);
+    if (resProduct) {
+      setProduct(resProduct);
+      Object.entries(resProduct).forEach(([key, val]) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setValue(key as keyof requestProductType, val as any)
+      );
+      setSelectedBrand(resProduct.brand._id);
+      setSelectedCategory(resProduct.category._id);
 
-  useEffect(() => {
-    if (productStatus !== "idle") {
-      if (productData) {
-        msgRef.current?.setMessageData?.({
-          clr: "green",
-          content: "product created successfully",
-          show: true,
-          time: 3500,
-        });
-        disaptch(addProducts([productData]));
-        reset();
-        imgsList.current?.setImgsList([]);
-      }
-
-      if (productErr) {
-        handleError(
-          productErrData,
-          msgRef,
-          { forAllStates: "something went wrong while makeing a new product" },
-          5000
-        );
-      }
+      imgsList.current?.setInitImgs(resProduct.imgs);
     }
-  }, [productData, productStatus, productErr, disaptch, productErrData, reset]);
+  }, [resProduct]);
 
   useEffect(() => {
-    if (editStatus !== "idle") {
-      if (editSuccess) {
-        navigate("/dashboard/products", { relative: "path" });
-      }
-
-      if (editErr) {
-        handleError(
-          editErrData,
-          msgRef,
-          { forAllStates: "something went wrong while updating product info" },
-          5000
-        );
-      }
+    if (resBrands) {
+      dispatch(
+        setCategoriesOrBrand({ type: "brands", categoriesOrBrands: resBrands })
+      );
     }
-  }, [editStatus, editErr, editErrData, editSuccess, navigate]);
+  }, [resBrands]);
 
-  if (isEditMode && resProductLoading && resProductFetchStatus !== "idle") {
+  useEffect(() => {
+    if (resCategories) {
+      dispatch(
+        setCategoriesOrBrand({
+          type: "categories",
+          categoriesOrBrands: resCategories,
+        })
+      );
+    }
+  }, [resCategories]);
+
+  if (
+    isEditMode &&
+    resProductLoading &&
+    resProductFetchStatus !== "idle" &&
+    isFirestRender.current
+  ) {
+    isFirestRender.current = false;
     return <SplashScreen children="Loading The Product..." />;
+  }
+
+  if (resBrandsLoading || resCategoriesLoading) {
+    return <Spinner fullWidth>Loading...</Spinner>;
   }
 
   if (isEditMode && !id) {
@@ -286,6 +424,15 @@ const NewProductPage = () => {
       <DisplayError
         error={resProductErrData}
         initMsg="Can't get the product at the moment"
+      />
+    );
+  }
+
+  if (resCategoriesErr || resBrandsErr) {
+    return (
+      <DisplayError
+        error={resCategoriesErrData || resBrandsErrData}
+        initMsg="something went wrong, try again later"
       />
     );
   }
@@ -315,20 +462,55 @@ const NewProductPage = () => {
             required: "price is required",
           })}
         />
-        <FormInput
-          errorMsg={catErr?.message}
-          placeholder="product category"
-          {...register("category", {
-            required: "category is required",
-          })}
-        />
-        <FormInput
-          errorMsg={brandErr?.message}
-          placeholder="brand name"
-          {...register("brand", {
-            required: "brand name is required",
-          })}
-        />
+
+        <div>
+          <span className="select-list-label">category :</span>
+          <SelectList
+            ref={categoriesListRef}
+            label="choose category"
+            disabled={{
+              value: productLoading,
+              text: "Loading...",
+            }}
+            listOptsArr={appCategories.map((cat) => {
+              return {
+                selected: cat._id === selectedCategory,
+                text: cat.name,
+              };
+            })}
+            optClickFunc={(e) => {
+              const categoryId = appCategories.find(
+                (cat) => cat.name === e.currentTarget.dataset.opt
+              )?._id;
+
+              if (categoryId) setSelectedCategory(categoryId);
+            }}
+          />
+        </div>
+
+        <div>
+          <span className="select-list-label">brand :</span>
+          <SelectList
+            ref={brandsListRef}
+            label="choose brand"
+            disabled={{
+              value: productLoading,
+              text: "Loading...",
+            }}
+            listOptsArr={appBrands.map((brand) => ({
+              selected: brand._id === selectedBrand,
+              text: brand.name,
+            }))}
+            optClickFunc={(e) => {
+              const brandId = appBrands.find(
+                (brand) => brand.name === e.currentTarget.dataset.opt
+              )?._id;
+
+              if (brandId) setSelectedBrand(brandId);
+            }}
+          />
+        </div>
+
         <FormInput
           type="number"
           errorMsg={qtyErr?.message}
@@ -373,13 +555,13 @@ const NewProductPage = () => {
 
         <ImgInputPreview
           ref={imgsList}
-          register={register}
-          imgErr={imgErr?.message}
+          imgErr={imgErr}
+          product={product}
+          setProduct={setProduct}
         />
 
         <button
           title={isEditMode ? "save new changes" : "add product"}
-          ref={submitBtnRef}
           disabled={productLoading || editLoading}
           className="btn"
           style={{
@@ -397,8 +579,6 @@ const NewProductPage = () => {
           {isEditMode ? "Save Changes" : "Add product"}
         </button>
       </form>
-
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

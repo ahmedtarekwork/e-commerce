@@ -67,10 +67,10 @@
   }
 }
 
-// brands list
+// brands and categories list
 
-// brands list loading component
-.home-page-brands-list-loading-holder {
+// brands and categories list loading component
+.home-page-brands-and-categories-list-loading-holder {
   @include flex(center, center, 5px);
   flex-wrap: wrap;
   text-align: center;
@@ -81,27 +81,21 @@
   }
 }
 
-.brands-list-wrapper {
+.brands-and-categories-list-wrapper {
   @include flex;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.home-page-brands-list {
+.home-page-brands-and-categories-list {
   flex: 1;
 
   a {
     width: 100%;
-    text-align: center;
-    padding: 10px;
-    background: var(--trans);
-    border-radius: var(--radius);
-    overflow: hidden;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
   }
 }
 
+// home page bottom banner
 .home-page-bottom-banner {
   text-align: center;
   margin-top: 30px !important;

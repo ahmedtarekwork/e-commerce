@@ -10,6 +10,9 @@ import { store } from "./store/store";
 // App.tsx
 import App from "./App";
 
+// components
+import TopMessage from "./components/TopMessage";
+
 // css
 import "./sass/main.css";
 
@@ -27,6 +30,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <App />
+
+      <TopMessage />
     </QueryClientProvider>
   </Provider>
 );

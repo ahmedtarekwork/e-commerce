@@ -16,7 +16,7 @@ import GridListSearch, { type GridListSearchProps } from "./GridListSearch";
 import { TfiLayoutGrid3, TfiLayoutGrid3Alt } from "react-icons/tfi";
 import { PiRowsBold, PiRowsFill } from "react-icons/pi";
 
-// utiles
+// utils
 import { nanoid } from "@reduxjs/toolkit";
 
 type ListType = "row" | "column";

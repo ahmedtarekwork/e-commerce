@@ -10,25 +10,25 @@ import {
   type SetStateAction,
 } from "react";
 import { createPortal } from "react-dom";
+
+// redux
+import useDispatch from "../hooks/redux/useDispatch";
+import useSelector from "../hooks/redux/useSelector";
+// redux actions
+import { setTopMessageShowFn } from "../store/fetures/topMessageSlice";
+
+// types
+import type { ShowMsgFnType } from "../utils/types";
+
+// framer motion
 import { AnimatePresence, motion } from "framer-motion";
 
-type timeAndRemove =
-  | {
-      remove?: never;
-      time: number;
-    }
-  | {
-      remove: false;
-      time?: never;
-    };
-
-type MessageDataType =
-  | (timeAndRemove & {
-      show: true;
-      clr: "green" | "red";
-      content: string;
-    })
-  | { show: false };
+export type MessageDataType = {
+  time: number;
+  show: boolean;
+  clr: "green" | "red";
+  content: string;
+};
 
 export type TopMessageRefType = {
   message: HTMLDivElement | null;
@@ -36,15 +36,35 @@ export type TopMessageRefType = {
 };
 
 const TopMessage = forwardRef<TopMessageRefType>((_, ref) => {
+  const dispatch = useDispatch();
+  const appShowMsg = useSelector((state) => state.topMessage.showMsg);
+
   const messageRef = useRef<HTMLDivElement>(null);
   const [messageData, setMessageData] = useState<MessageDataType>({
     show: false,
+    clr: "green",
+    content: "",
+    time: 3500,
   });
 
   const closeMsg = (msgEl: HTMLDivElement) => {
-    if (msgEl === messageRef.current) setMessageData({ show: false });
+    if (msgEl === messageRef.current)
+      setMessageData({ show: false, clr: "green", content: "", time: 3500 });
     else msgEl.remove();
   };
+
+  const showMsg: ShowMsgFnType = ({ time = 3500, clr, content }) => {
+    setMessageData({
+      show: true,
+      clr,
+      content,
+      time,
+    });
+  };
+
+  useEffect(() => {
+    if (!appShowMsg) dispatch(setTopMessageShowFn(showMsg));
+  }, []);
 
   useEffect(() => {
     const msgEl = messageRef.current;

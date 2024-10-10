@@ -1,29 +1,24 @@
 // react
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 
 // react router dom
 import { useNavigate } from "react-router-dom";
 
 // components
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../../components/TopMessage";
+import BtnWithSpinner from "../../../../components/animatedBtns/BtnWithSpinner";
+import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
 
 // hooks
 import useGetPaymentSessionURL from "../../../../hooks/ReactQuery/useGetPaymentSessionURL";
+import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
 
 // icons
 import { FaCrown } from "react-icons/fa6";
 import { BiTransferAlt } from "react-icons/bi";
 import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
 
-// utils
-import handleError from "../../../../utiles/functions/handleError";
-
 // types
-import type { UserType } from "../../../../utiles/types";
-import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
-import BtnWithSpinner from "../../../../components/animatedBtns/BtnWithSpinner";
+import type { UserType } from "../../../../utils/types";
 
 export type DonatePlanCardComponentProps = {
   name: Exclude<UserType["donationPlan"], undefined>;
@@ -39,13 +34,10 @@ const DonatePlanCard = ({
   user,
 }: DonatePlanCardComponentProps) => {
   const navigation = useNavigate();
-
-  // refs
-  const msgRef = useRef<TopMessageRefType>(null);
+  const handleError = useHandleErrorMsg();
 
   // hooks
-  const { handlePayment, isPending, data, error } =
-    useGetPaymentSessionURL(msgRef);
+  const { handlePayment, isPending, data, error } = useGetPaymentSessionURL();
 
   const description = `This is the ${name} plan, it's ${price} only, harry up before price gets change.`;
 
@@ -75,7 +67,7 @@ const DonatePlanCard = ({
   // useEffects
   useEffect(() => {
     if (error) {
-      handleError(error, msgRef, {
+      handleError(error, {
         forAllStates: "something went wrong while handle the payment",
       });
     }
@@ -129,8 +121,6 @@ const DonatePlanCard = ({
           {subscripeBtnContent}
         </TagName>
       </li>
-
-      <TopMessage ref={msgRef} />
     </>
   );
 };

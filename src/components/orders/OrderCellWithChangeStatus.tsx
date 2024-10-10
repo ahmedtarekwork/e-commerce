@@ -1,25 +1,23 @@
-// react
-import { useEffect, useRef } from "react";
-
 // react-router-dom
 import { useLocation } from "react-router-dom";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+// hooks
+import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
+
 // components
 import SelectList, {
   type selectListOptionType,
 } from "../selectList/SelectList";
-import TopMessage, { type TopMessageRefType } from "../TopMessage";
 import OrderCard from "./OrderCard";
 
 // types
-import type { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utils/types";
 
 // utils
-import axios from "../../utiles/axios";
-import handleError from "../../utiles/functions/handleError";
+import axios from "../../utils/axios";
 
 type Props = {
   order: OrderType;
@@ -33,18 +31,10 @@ const changeOrderStatusMutationFn = async ({
   orderId: string;
   newStatus: OrderType["orderStatus"];
 }) => {
-  return (
-    await axios.patch("orders/" + orderId, {
-      status: newStatus,
-    })
-  ).data;
+  return (await axios.patch("orders/" + orderId, { newStatus })).data;
 };
 
 const statusList: selectListOptionType<OrderType["orderStatus"]>[] = [
-  {
-    selected: false,
-    text: "Not Processed",
-  },
   {
     selected: false,
     text: "Processing",
@@ -64,35 +54,32 @@ const statusList: selectListOptionType<OrderType["orderStatus"]>[] = [
 ];
 
 const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
+  const handleError = useHandleErrorMsg();
+
   const { pathname } = useLocation();
 
-  const msgRef = useRef<TopMessageRefType>(null);
   const queryClient = useQueryClient();
 
-  const {
-    mutate: changeOrderStatus,
-    isError: newOrderErr,
-    error: newOrderErrData,
-    isPending: newOrderLoading,
-  } = useMutation({
-    mutationKey: ["changeStatus", order._id],
-    mutationFn: changeOrderStatusMutationFn,
-    onSuccess: () =>
-      queryClient.prefetchQuery({ queryKey: ["getOrders", pathname] }),
-  });
-
-  useEffect(() => {
-    if (newOrderErr) {
-      handleError(
-        newOrderErrData,
-        msgRef,
-        {
-          forAllStates: "something went wrong while change order status",
-        },
-        5000
-      );
+  const { mutate: changeOrderStatus, isPending: newOrderLoading } = useMutation(
+    {
+      mutationKey: ["changeStatus", order._id],
+      mutationFn: changeOrderStatusMutationFn,
+      onSuccess: () => {
+        queryClient.prefetchQuery({
+          queryKey: ["getOrders", pathname.includes("dashboard")],
+        });
+      },
+      onError(error) {
+        handleError(
+          error,
+          {
+            forAllStates: "something went wrong while change order status",
+          },
+          5000
+        );
+      },
     }
-  }, [newOrderErr, newOrderErrData]);
+  );
 
   return (
     <>
@@ -103,7 +90,6 @@ const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
           value: newOrderLoading,
           text: "loading...",
         }}
-        // id={nanoid()}
         label="change status"
         listOptsArr={statusList.map((o) =>
           o.text === order.orderStatus ? { ...o, selected: true } : o
@@ -115,8 +101,6 @@ const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
           });
         }}
       />
-
-      <TopMessage ref={msgRef} />
     </>
   );
 };

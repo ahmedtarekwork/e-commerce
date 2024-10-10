@@ -1,56 +1,64 @@
 // react
-import { type RefObject, useEffect } from "react";
+import { useEffect } from "react";
 
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../redux/useDispatch";
+import useSelector from "../../redux/useSelector";
 // redux actions
 import { setCart, setCartLoading } from "../../../store/fetures/userSlice";
 
+// hooks
+import useHandleErrorMsg from "../../useHandleErrorMsg";
+
 // utils
-import axios from "../../../utiles/axios";
-import handleError from "../../../utiles/functions/handleError";
+import axios from "../../../utils/axios";
 
-// types
-import type { TopMessageRefType } from "../../../components/TopMessage";
+const AddToCartMutationFn = async (
+  product: {
+    productId: string;
+    wantedQty?: number;
+  },
+  userId: string
+) => {
+  if (!userId)
+    throw new axios.AxiosError(
+      "you need to login before modify your cart",
+      "403"
+    );
 
-const addToCartMutationFn = async (product: {
-  productId: string;
-  count: number;
-}) => {
-  return (
-    await axios.post("carts", {
-      cart: [product],
-    })
-  ).data;
+  return (await axios.post(`carts/${userId}`, product)).data;
 };
 
-const useAddToCart = (msgRef: RefObject<TopMessageRefType>) => {
+const useAddToCart = () => {
   const queryClient = useQueryClient();
+
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+
+  const handleError = useHandleErrorMsg();
 
   const mutate = useMutation({
     mutationKey: ["addToCart"],
-    mutationFn: (product: { productId: string; count: number }) =>
-      addToCartMutationFn(product),
+    mutationFn: (product: { productId: string; wantedQty?: number }) =>
+      AddToCartMutationFn(product, user?._id || ""),
 
-    onSuccess: () => {
+    onSuccess: (data) => {
+      dispatch(setCart(data));
+
       queryClient.prefetchQuery({ queryKey: ["getCart", ""] });
       queryClient.prefetchQuery({ queryKey: ["getProducts"] });
     },
+    onError(error) {
+      handleError(error, {
+        forAllStates: "something went wrong while modifying your cart",
+      });
+    },
   });
 
-  const { data, error, isPending } = mutate;
-
-  useEffect(() => {
-    if (data) dispatch(setCart(data));
-    if (error)
-      handleError(error, msgRef, {
-        forAllStates: "something went wrong while adding product to cart",
-      });
-  }, [data, error]);
+  const { isPending } = mutate;
 
   useEffect(() => {
     dispatch(setCartLoading(isPending));

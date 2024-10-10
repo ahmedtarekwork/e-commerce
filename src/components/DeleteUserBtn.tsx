@@ -1,29 +1,38 @@
 // react
-import { type ComponentProps, useRef, useEffect } from "react";
+import {
+  useRef,
+  useEffect,
+
+  // types
+  type ComponentProps,
+  type ReactNode,
+} from "react";
+
+// redux
+import useDeleteUser from "../hooks/ReactQuery/useDeleteUser";
+import useSelector from "../hooks/redux/useSelector";
 
 // components
 import BtnWithSpinner from "./animatedBtns/BtnWithSpinner";
 import AreYouSureModal, { type SureModalRef } from "./modals/AreYouSureModal";
 
-// types
-import { type UseMutateFunction } from "@tanstack/react-query";
-
-export type DeleteUserBtnProps = Record<"username" | "itemId", string> & {
-  deleteLoading: boolean;
-  deleteItem: UseMutateFunction<unknown, Error, string, unknown>;
+export type DeleteUserBtnProps = Record<"username" | "userId", string> & {
+  children: ReactNode;
 } & ComponentProps<"button">;
 
-const DeleteItemBtn = ({
+const DeleteUserBtn = ({
   username,
-  itemId,
-  deleteLoading,
-  deleteItem,
+  userId,
   children,
   className,
-  onClick,
   ...attr
 }: DeleteUserBtnProps) => {
+  const { user } = useSelector((state) => state.user);
+
+  // refs
   const sureModal = useRef<SureModalRef>(null);
+
+  const { mutate: deleteUser, isPending: deleteLoading } = useDeleteUser();
 
   useEffect(() => {
     sureModal.current?.setShowYesSpinner(deleteLoading);
@@ -38,7 +47,7 @@ const DeleteItemBtn = ({
         className={`red-btn${className ? ` ${className}` : ""}`}
         disabled={deleteLoading}
         onClick={(e) => {
-          onClick?.(e);
+          attr.onClick?.(e);
 
           sureModal.current?.toggleModal(true);
         }}
@@ -54,17 +63,26 @@ const DeleteItemBtn = ({
           allBtns.forEach((btn) => (btn.disabled = deleteLoading));
         }}
         toggleClosingFunctions={!deleteLoading}
-        functionToMake={() => deleteItem(itemId)}
+        functionToMake={() => deleteUser(userId)}
         ref={sureModal}
       >
-        Are you sure you want to delete "
-        <span style={{ color: "var(--dark)", fontWeight: "bold" }}>
-          {username}
-        </span>
-        " user
+        Are you sure you want to{" "}
+        {user?._id === userId ? (
+          <span style={{ fontWeight: "bold", color: "var(--danger)" }}>
+            delete your account
+          </span>
+        ) : (
+          <>
+            delete "
+            <span style={{ color: "var(--danger)", fontWeight: "bold" }}>
+              {username}
+            </span>
+            " user
+          </>
+        )}
       </AreYouSureModal>
     </>
   );
 };
 
-export default DeleteItemBtn;
+export default DeleteUserBtn;

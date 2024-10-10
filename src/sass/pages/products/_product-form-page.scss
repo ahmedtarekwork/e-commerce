@@ -1,3 +1,8 @@
+.select-list-label {
+  color: var(--main);
+  font-size: 14px;
+}
+
 .product-imgs-area {
   @include cardBorder;
   padding: 10px;

@@ -28,6 +28,7 @@ export type AppModalProps = ComponentProps<"div"> & {
 
 export type AppModalRefType = {
   toggleModal: (open: boolean) => void;
+  appModalEl: HTMLDivElement | null;
 };
 
 const toggleModals = async (
@@ -136,7 +137,11 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
       }
     }, [openModal, afterMountFn, toggleClosingFunctions]);
 
-    useImperativeHandle(ref, () => ({ toggleModal }), []);
+    useImperativeHandle(
+      ref,
+      () => ({ toggleModal, appModalEl: appModalEl.current }),
+      []
+    );
 
     return (
       <>

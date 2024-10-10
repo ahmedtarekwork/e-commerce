@@ -1,9 +1,15 @@
 import {
   useState,
   useRef,
+  useImperativeHandle,
+  forwardRef,
 
   // types
   type MouseEvent,
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  memo,
 } from "react";
 
 // components
@@ -12,7 +18,7 @@ import ListWrapper, {
   type ListWrapperComponentsProps,
 } from "../ListWrapper";
 
-// utiles
+// utils
 import { nanoid } from "@reduxjs/toolkit";
 
 export type selectListOptionType<T extends string = string> = {
@@ -26,63 +32,71 @@ export type SelectListComponentProps = {
   label?: string;
 } & Pick<ListWrapperComponentsProps, "disabled" | "closeOptions" | "outOfFlow">;
 
-const SelectList = ({
-  listOptsArr,
-  label,
-  optClickFunc,
-  disabled,
-  outOfFlow,
-}: SelectListComponentProps) => {
-  // states
-  const [list, setList] = useState(listOptsArr);
-
-  // refs
-  const listWrapperRef = useRef<ListWrapperRefType>(null);
-
-  return (
-    <ListWrapper
-      ref={listWrapperRef}
-      outOfFlow={outOfFlow}
-      disabled={disabled}
-      btnData={{
-        children: (
-          <p className="select-list-selected-opt">
-            {(disabled?.value ? disabled.text : "") ||
-              list.find((o) => o.selected)?.text ||
-              label}
-          </p>
-        ),
-      }}
-    >
-      <ul className="select-list">
-        {list.map((opt) => (
-          <li className="select-list-opt" key={nanoid()}>
-            <button
-              title="select list option"
-              data-selected={opt.selected}
-              data-opt={opt.text} // it's necessary to can access it when calling the component and set the "optClickFunc"
-              onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                optClickFunc?.(e);
-
-                listWrapperRef.current?.setToggleList(false);
-
-                setList((prev) =>
-                  prev.map((o) =>
-                    o.text === opt.text
-                      ? { ...o, selected: true }
-                      : { ...o, selected: false }
-                  )
-                );
-              }}
-              type="button"
-            >
-              {opt.text}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </ListWrapper>
-  );
+export type SelectListComponentRefType = {
+  setList: Dispatch<SetStateAction<selectListOptionType<string>[]>>;
 };
+
+const SelectList = memo(
+  forwardRef<SelectListComponentRefType, SelectListComponentProps>(
+    ({ listOptsArr, label, optClickFunc, disabled, outOfFlow }, ref) => {
+      // states
+      const [list, setList] = useState(listOptsArr);
+
+      // refs
+      const listWrapperRef = useRef<ListWrapperRefType>(null);
+
+      useImperativeHandle(ref, () => ({ setList }), []);
+
+      useEffect(() => {
+        setList(listOptsArr);
+      }, [listOptsArr]);
+
+      return (
+        <ListWrapper
+          ref={listWrapperRef}
+          outOfFlow={outOfFlow}
+          disabled={disabled}
+          btnData={{
+            children: (
+              <p className="select-list-selected-opt">
+                {(disabled?.value ? disabled.text : "") ||
+                  list.find((o) => o.selected)?.text ||
+                  label}
+              </p>
+            ),
+          }}
+        >
+          <ul className="select-list">
+            {list.map((opt) => (
+              <li className="select-list-opt" key={nanoid()}>
+                <button
+                  title="select list option"
+                  data-selected={opt.selected}
+                  data-opt={opt.text} // it's necessary to can access it when calling the component and set the "optClickFunc"
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                    optClickFunc?.(e);
+
+                    listWrapperRef.current?.setToggleList(false);
+
+                    setList((prev) =>
+                      prev.map((o) =>
+                        o.text === opt.text
+                          ? { ...o, selected: true }
+                          : { ...o, selected: false }
+                      )
+                    );
+                  }}
+                  type="button"
+                >
+                  {opt.text}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </ListWrapper>
+      );
+    }
+  )
+);
 
 export default SelectList;

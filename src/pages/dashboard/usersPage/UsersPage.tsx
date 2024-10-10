@@ -22,16 +22,12 @@ import OrderCard from "../../../components/orders/OrderCard";
 import AppModal, {
   type AppModalRefType,
 } from "../../../components/modals/appModal/AppModal";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../../components/TopMessage";
 
-// utiles
-import axios from "../../../utiles/axios";
+// utils
+import axios from "../../../utils/axios";
 
 // types
-import type { OrderType, UserType } from "../../../utiles/types";
-import type { AxiosResponse } from "axios";
+import type { OrderType, UserType } from "../../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../../layouts/AnimatedLayout";
@@ -43,22 +39,7 @@ const errMsg = "something went wrong while getting users list";
 const getAllUsers = async (): Promise<
   (UserType & { orders: OrderType[] })[]
 > => {
-  let users = (await axios("users")).data;
-
-  if (!users) throw new Error("users not found");
-
-  const usersOrders: { orders: OrderType[]; orderby: string }[] = (
-    (await axios.all(
-      users.map(({ _id }: UserType) => axios("/orders/user-orders/" + _id))
-    )) as AxiosResponse[]
-  ).map((order) => order.data);
-
-  users = users.map((user: UserType) => ({
-    ...user,
-    orders: usersOrders.find((orders) => orders.orderby === user._id)?.orders,
-  }));
-
-  return users;
+  return (await axios("users")).data;
 };
 
 const UsersPage = () => {
@@ -66,7 +47,6 @@ const UsersPage = () => {
 
   // refs
   const modalRef = useRef<AppModalRefType>(null);
-  const msgRef = useRef<TopMessageRefType>(null);
 
   // states
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -103,14 +83,12 @@ const UsersPage = () => {
         {usersList.map((user) => {
           return (
             <UsersPageCell
-              msgRef={msgRef}
               key={user._id}
               cells={cells}
               modalRef={modalRef}
               user={user}
               setSelectedUsername={setSelectedUsername}
               setSelectedUserId={setSelectedUserId}
-              selectedUserId={selectedUserId}
             />
           );
         })}
@@ -129,8 +107,6 @@ const UsersPage = () => {
             );
           })}
       </AppModal>
-
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

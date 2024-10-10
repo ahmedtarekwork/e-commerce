@@ -1,5 +1,5 @@
 // react
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 // react router
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -9,11 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 
 // redux
 import useSelector from "../../hooks/redux/useSelector";
-import useDispatch from "../../hooks/redux/useDispatch";
-// redux actions
-import { logoutUser } from "../../store/fetures/userSlice";
 
 // components
+import DeleteUserBtn from "../../components/DeleteUserBtn";
 import ProfilePageCell from "./ProfilePageCell";
 import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
 import CartArea from "../../components/cartArea/CartArea";
@@ -23,23 +21,16 @@ import TabsList from "../../components/TabsList";
 import WishlistArea from "../../components/WishlistArea";
 import PropCell from "../../components/PropCell";
 import DangerZone from "../../components/dangerZone/DangerZone";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../components/TopMessage";
 
 // icons
 import { FaDonate } from "react-icons/fa";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 
-// hooks
-import useDeleteUserBtn from "../../hooks/ReactQuery/useDeleteUserBtn";
-
-// utiles
-import axios from "../../utiles/axios";
-import handleError from "../../utiles/functions/handleError";
+// utils
+import axios from "../../utils/axios";
 
 // types
-import type { UserType } from "../../utiles/types";
+import type { UserType } from "../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
@@ -55,14 +46,21 @@ const getUserQueryFn = async ({
 };
 
 const ProfilePage = () => {
-  const dispatch = useDispatch();
-
-  const msgRef = useRef<TopMessageRefType>(null);
-
+  // react router
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { id } = useParams();
   const isCurrentUserProfile = !pathname.includes("singleUser");
+
+  // states
+  const { user: appUser } = useSelector((state) => state.user);
+
+  const allUsers = useSelector((state) => state.user.allUsers);
+  const singleUser = allUsers.find(({ _id }) => _id === id) || null;
+
+  const [user, setUser] = useState<UserType | null>(
+    isCurrentUserProfile ? appUser : singleUser
+  );
 
   const {
     data: resUser,
@@ -75,31 +73,18 @@ const ProfilePage = () => {
     enabled: false,
   });
 
-  const { user: appUser } = useSelector((state) => state.user);
-
-  const allUsers = useSelector((state) => state.user.allUsers);
-  const singleUser = allUsers.find(({ _id }) => _id === id) || null;
-
-  const [user, setUser] = useState<UserType | null>(
-    isCurrentUserProfile ? appUser : singleUser
-  );
-  const withId = isCurrentUserProfile ? {} : { userId: id };
-
-  // delete user account hook
-  const { deleteBtn, deleteErr, deleteErrData, deleteSuccess, reset } =
-    useDeleteUserBtn(user?._id);
-
   // useEffects
-  // if no user => send request to get user
+
   useEffect(() => {
     if (!isCurrentUserProfile) {
       if (id === appUser?._id) {
-        navigate("/profile", { relative: "path" });
+        navigate("/profile", { relative: "path", replace: false });
       } else {
-        if (!user) getUser();
+        if (!user || user._id !== id) getUser();
       }
     }
 
+    // if no user => send request to get user
     if (isCurrentUserProfile && !user) getUser();
   }, [isCurrentUserProfile, appUser, user, navigate, getUser, id]);
 
@@ -108,39 +93,13 @@ const ProfilePage = () => {
   }, [resUser]);
 
   useEffect(() => {
-    if (deleteErr) {
-      handleError(
-        deleteErrData,
-        msgRef,
-        {
-          forAllStates:
-            "something went wrong while trying to delete your account",
-        },
-        4000
-      );
-      setTimeout(() => reset(), 4000);
-    }
-  }, [deleteErr, deleteErrData, reset]);
-
-  useEffect(() => {
-    if (deleteSuccess) {
-      dispatch(logoutUser());
-      reset();
-    }
-  }, [deleteSuccess, dispatch, reset]);
+    if (isCurrentUserProfile) setUser(appUser);
+  }, [appUser, isCurrentUserProfile]);
 
   if (userLoading && fetchStatus !== "idle") return <SplashScreen />;
-  if (!user) return <h1>No User Has Been Founded</h1>;
+  if (!user) return <h1>No user has been founded</h1>;
 
   const { username, email, _id } = user;
-
-  const DeleteBtn = () =>
-    deleteBtn({
-      itemId: _id,
-      username,
-      children: "delete your account",
-      style: { marginInline: "auto" },
-    });
 
   return (
     <AnimatedLayout>
@@ -148,16 +107,27 @@ const ProfilePage = () => {
         {isCurrentUserProfile ? "Your Profile" : "Profile Page"}
       </Heading>
 
-      <ProfilePageCell user={user} propName={"username"} content={username} />
-      <ProfilePageCell user={user} propName={"email"} content={email} />
+      <ProfilePageCell
+        user={user}
+        propName="username"
+        content={username}
+        isCurrentUserProfile={isCurrentUserProfile}
+      />
+      <ProfilePageCell
+        user={user}
+        propName="email"
+        content={email}
+        isCurrentUserProfile={isCurrentUserProfile}
+      />
 
       <ProfilePageCell
         user={user}
-        propName={"address"}
+        propName="address"
         content={user?.address || "no address found!"}
+        isCurrentUserProfile={isCurrentUserProfile}
       />
       <PropCell
-        name={"donationPlan"}
+        name="donationPlan"
         val={
           <p className="profile-page-donation-cell">
             {user?.donationPlan ? (
@@ -203,7 +173,7 @@ const ProfilePage = () => {
             lists={[
               {
                 tabName: "User Cart",
-                tabContent: <CartArea {...withId} />,
+                tabContent: <CartArea userId={user._id} />,
               },
               {
                 tabName: "User Orders",
@@ -235,11 +205,17 @@ const ProfilePage = () => {
         title="Danger Zone"
         deleteBtn={{
           type: "custom",
-          deleteBtn: <DeleteBtn />,
+          deleteBtn: (
+            <DeleteUserBtn
+              style={{ marginInline: "auto" }}
+              userId={_id}
+              username={username}
+            >
+              Delete your account
+            </DeleteUserBtn>
+          ),
         }}
       />
-
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

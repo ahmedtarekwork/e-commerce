@@ -6,10 +6,8 @@ import Heading from "../../../../components/Heading";
 import EmptySpinner from "../../../../components/spinners/EmptySpinner";
 
 // hooks
-import useGetBrands from "../../../../hooks/ReactQuery/products/useGetBrands";
+import useGetBrandsOrCategories from "../../../../hooks/ReactQuery/useGetBrandsOrCategories";
 
-// utils
-import { nanoid } from "@reduxjs/toolkit";
 // swiper.js
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Navigation } from "swiper/modules";
@@ -20,13 +18,22 @@ import "swiper/css/navigation";
 // icons
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
-const BrandsList = () => {
-  const { data, isPending } = useGetBrands(15);
+type Props = {
+  type: "Brands" | "Categories";
+};
 
-  if (isPending)
+const AvailableCategoriesAndBrands = ({ type }: Props) => {
+  const singleModelName = type === "Categories" ? "category" : "brand";
+
+  const { data, isPending } = useGetBrandsOrCategories(
+    type.toLowerCase() as Parameters<typeof useGetBrandsOrCategories>[0],
+    15
+  );
+
+  if (isPending) {
     return (
-      <div className="home-page-brands-list-loading-holder">
-        <strong>Loading Available Brands</strong>
+      <div className="home-page-brands-and-categories-list-loading-holder">
+        <strong>Loading Available {type}</strong>
 
         <EmptySpinner
           settings={{
@@ -37,22 +44,23 @@ const BrandsList = () => {
         />
       </div>
     );
+  }
 
-  if (data)
+  if (data?.length) {
     return (
       <>
-        <Heading>Available Brands</Heading>
+        <Heading>Available {type}</Heading>
 
-        <div className="brands-list-wrapper">
+        <div className="brands-and-categories-list-wrapper">
           <button
             className="swiper-button-custom-prev"
-            title="slide to previous brand"
+            title={`slide to previous ${singleModelName}`}
           >
             <BiChevronLeft />
           </button>
 
           <Swiper
-            className="home-page-brands-list"
+            className="home-page-brands-and-categories-list"
             modules={[FreeMode, Navigation]}
             freeMode={true}
             navigation={{
@@ -73,10 +81,20 @@ const BrandsList = () => {
               },
             }}
           >
-            {data.map((b) => (
-              <SwiperSlide key={nanoid()}>
-                <Link to={`/products?brand=${b}`} relative="path">
-                  {b}
+            {data.map(({ _id, name, image: { secure_url } }) => (
+              <SwiperSlide key={_id}>
+                <Link
+                  to={`/products?${singleModelName}=${name}`}
+                  relative="path"
+                  className="category-or-brand-card"
+                >
+                  <img
+                    src={secure_url}
+                    alt={`${name} ${type} image`}
+                    width={150}
+                    height={120}
+                  />
+                  <p>{name}</p>
                 </Link>
               </SwiperSlide>
             ))}
@@ -84,12 +102,15 @@ const BrandsList = () => {
 
           <button
             className="swiper-button-custom-next"
-            title="slide to next brand"
+            title={`slide to next ${singleModelName}`}
           >
             <BiChevronRight />
           </button>
         </div>
       </>
     );
+  }
+
+  return null;
 };
-export default BrandsList;
+export default AvailableCategoriesAndBrands;

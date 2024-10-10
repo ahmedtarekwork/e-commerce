@@ -10,56 +10,27 @@ import useDispatch from "../../redux/useDispatch";
 import { setCartLoading } from "../../../store/fetures/userSlice";
 
 // types
-import type { CartType, ProductType } from "../../../utiles/types";
+import type { CartType } from "../../../utils/types";
 
 // utils
-import axios from "../../../utiles/axios";
-
-// we know the user that's will get his cart with token
-type CartResponseType = Omit<CartType, "products"> & {
-  products: {
-    count: number;
-    price: number;
-    productId: ProductType;
-  }[];
-};
-
-const removeQty = (
-  prd: Omit<ProductType, "quantity"> & { quantity?: number }
-) => {
-  delete prd.quantity;
-  return prd;
-};
+import axios from "../../../utils/axios";
 
 const getCartQueryFn = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  queryKey: [_key, id],
+  queryKey: [_key, userId],
 }: {
   queryKey: string[];
-}): Promise<CartType | { msg: string }> => {
-  const cart: CartResponseType | { msg: string } = (
-    await axios(`carts/get-user-cart${id ? `/${id}` : ""}`)
-  ).data;
+}): Promise<CartType> => {
+  if (!userId) throw new axios.AxiosError("user id is required", "400");
 
-  const emptyMsg = id
-    ? "user has no items in his cart"
-    : "you don't have items in your cart";
-
-  if ("msg" in cart) return { msg: (cart.msg as string) || emptyMsg };
-
-  // returning object and spreding product properties on it && replace quantity with cart item count
-  (cart.products as unknown) = cart.products.map(({ count, productId }) => ({
-    ...removeQty(productId),
-    count,
-  })) as unknown as CartType["products"][];
-
-  return cart as unknown as CartType | { msg: string };
+  return (await axios(`carts/${userId}`)).data;
 };
 
-const useGetUserCart = (id?: string, enabled: boolean = false) => {
+const useGetUserCart = (userId: string, enabled: boolean = false) => {
   const dispatch = useDispatch();
+
   const cartQuery = useQuery({
-    queryKey: ["getCart", id || ""],
+    queryKey: ["getCart", userId],
     queryFn: getCartQueryFn,
     enabled,
   });

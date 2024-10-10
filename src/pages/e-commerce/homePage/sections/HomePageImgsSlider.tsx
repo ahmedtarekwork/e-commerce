@@ -77,7 +77,7 @@ const HomePageImgsSlider = () => {
           <ImgsSlider
             isHomeSlider
             imgWidth="100%"
-            imgs={imgs.map((img) => img.image)}
+            imgs={imgs}
             withTimer={{
               value: true,
               time: 5000,

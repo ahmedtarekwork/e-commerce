@@ -15,8 +15,6 @@
 }
 
 .list-wrapper {
-  overflow: hidden;
-
   &.out-of-flow {
     position: relative;
 
@@ -29,6 +27,7 @@
       max-height: var(--max-height);
       border-bottom-right-radius: var(--radius);
       border-bottom-left-radius: var(--radius);
+      overflow: auto;
 
       &.custom-width {
         min-width: max-content !important;
@@ -67,8 +66,9 @@
   &-first-holder {
     width: 100%;
     transition: grid-template-rows 0.3s;
-    display: grid;
-    grid-template-rows: 0fr;
+    overflow: hidden;
+    height: 0;
+    transition: 0.3s;
   }
 
   &-last-holder {
@@ -85,9 +85,6 @@
   }
 
   &.active {
-    .list-wrapper-first-holder {
-      grid-template-rows: 1fr;
-    }
     .list-wrapper-last-holder {
       border: var(--brdr);
     }

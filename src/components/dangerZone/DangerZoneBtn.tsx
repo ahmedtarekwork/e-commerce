@@ -2,7 +2,6 @@
 import { useRef, useState } from "react";
 
 // components
-import TopMessage, { type TopMessageRefType } from "../TopMessage";
 import AreYouSureModal, { type SureModalRef } from "../modals/AreYouSureModal";
 
 // types
@@ -14,7 +13,6 @@ const DangerZoneBtn = ({
   onAcceptFn,
 }: InlineDeleteBtnType) => {
   const sureModalRef = useRef<SureModalRef>(null);
-  const msgRef = useRef<TopMessageRefType>(null);
   const [toggleClosingFunctions, setToggleClosingFunctions] = useState(true);
 
   return (
@@ -46,8 +44,6 @@ const DangerZoneBtn = ({
       >
         {modalMsg}
       </AreYouSureModal>
-
-      <TopMessage ref={msgRef} />
     </>
   );
 };

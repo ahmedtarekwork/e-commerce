@@ -38,6 +38,8 @@ import NeedLoginLayout from "../layouts/NeedLoginLayout";
 
 // SVGs
 import ErrSvg from "../../imgs/404.svg";
+import CategoriesAndBrandsPage from "../pages/e-commerce/CategoriesAndBrandsPage";
+import CategoriesAndBrandsConfigPage from "../pages/dashboard/CategoriesAndBrandsConfigPage";
 
 const useAppRouter = (checkUserLoading: boolean) => {
   return createBrowserRouter(
@@ -47,6 +49,15 @@ const useAppRouter = (checkUserLoading: boolean) => {
         <Route element={<EcommerceHomePage />} index />
         <Route element={<ProductsPage />} path="products" />
         <Route path="product/:id" element={<SingleProductPage />} />
+
+        <Route
+          element={<CategoriesAndBrandsPage type="categories" />}
+          path="categories"
+        />
+        <Route
+          element={<CategoriesAndBrandsPage type="brands" />}
+          path="brands"
+        />
 
         {/* payment routes */}
         <Route
@@ -103,6 +114,24 @@ const useAppRouter = (checkUserLoading: boolean) => {
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:id" element={<SingleOrderPage />} />
           <Route path="homePageSettings" element={<HomePageSettingsPage />} />
+
+          <Route
+            path="categories"
+            element={<CategoriesAndBrandsPage type="categories" />}
+          />
+          <Route
+            path="brands"
+            element={<CategoriesAndBrandsPage type="brands" />}
+          />
+
+          <Route
+            path="categoriesForm"
+            element={<CategoriesAndBrandsConfigPage type="categories" />}
+          />
+          <Route
+            path="brandsForm"
+            element={<CategoriesAndBrandsConfigPage type="brands" />}
+          />
         </Route>
 
         <Route

@@ -15,8 +15,9 @@ type Props = {
 const DisplayError = ({ error, initMsg }: Props) => {
   let msg = initMsg || "something went wrong!";
 
-  if (isAxiosError(error))
-    msg = error.response?.data.msg || error.response?.data;
+  if (isAxiosError(error) && error.response?.data.message) {
+    msg = error.response.data.message;
+  }
 
   return (
     <EmptyPage content={msg} svg={ErrorSvg} withBtn={{ type: "GoToHome" }} />

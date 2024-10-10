@@ -1,11 +1,11 @@
-// types
 import {
   useEffect,
+
+  // types
   type Dispatch,
   type RefObject,
   type SetStateAction,
 } from "react";
-import { type PayMethods } from "./CartOrWishlistPageBtns";
 
 // components
 import FormList from "../../../../components/appForm/FormList";
@@ -13,14 +13,17 @@ import FormList from "../../../../components/appForm/FormList";
 // utils
 import { nanoid } from "@reduxjs/toolkit";
 
+// types
+import type { OrderType } from "../../../../utils/types";
+
 type Props = {
-  setPayMethod: Dispatch<SetStateAction<PayMethods>>;
-  payMethod: PayMethods;
+  setPayMethod: Dispatch<SetStateAction<OrderType["method"]>>;
+  payMethod: OrderType["method"];
   cartBtnRef: RefObject<HTMLButtonElement>;
 };
 
 const CartCheckoutMethod = ({ setPayMethod, payMethod, cartBtnRef }: Props) => {
-  const payMethods: PayMethods[] = ["Cash on Delivery", "Card"];
+  const payMethods: OrderType["method"][] = ["Cash on Delivery", "Card"];
 
   useEffect(() => {
     if (cartBtnRef.current) cartBtnRef.current.disabled = false;

@@ -9,8 +9,7 @@ import ProductsPageFilterCell, {
 } from "./ProductsPageFilterCell";
 
 // hooks
-import useGetBrands from "../../../../../hooks/ReactQuery/products/useGetBrands";
-import useGetCategories from "../../../../../hooks/ReactQuery/products/useGetCategories";
+import useGetBrandsOrCategories from "../../../../../hooks/ReactQuery/useGetBrandsOrCategories";
 
 type Props = Pick<ListCellType, "defaultValues"> &
   Pick<SharedProductsPageFilterCellProps, "title"> &
@@ -26,12 +25,12 @@ const FilterBySpecificTopicCell = forwardRef<
     data: brands,
     isPending: brandsLoading,
     refetch: getBrands,
-  } = useGetBrands(undefined, false);
+  } = useGetBrandsOrCategories("brands", undefined, false);
   const {
     data: categories,
     isPending: categoriesLoading,
     refetch: getCategories,
-  } = useGetCategories(undefined, false);
+  } = useGetBrandsOrCategories("categories", undefined, false);
 
   useEffect(() => {
     query === "brands" ? getBrands() : getCategories();
@@ -41,7 +40,9 @@ const FilterBySpecificTopicCell = forwardRef<
     <ProductsPageFilterCell
       defaultValues={defaultValues}
       ref={ref}
-      optionsList={query === "brands" ? brands : categories}
+      optionsList={(query === "brands" ? brands : categories)?.map(
+        ({ name }) => name
+      )}
       title={title}
       type={type || "check-list"}
       loading={query === "brands" ? brandsLoading : categoriesLoading}

@@ -15,12 +15,13 @@ import { setOrders } from "../../store/fetures/ordersSlice";
 // components
 import Heading from "../../components/Heading";
 import OrdersArea from "../../components/orders/OrdersArea";
+import DisplayError from "../../components/layout/DisplayError";
 
 // utils
-import axios from "../../utiles/axios";
+import axios from "../../utils/axios";
 
 // types
-import type { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
@@ -28,31 +29,30 @@ import AnimatedLayout from "../../layouts/AnimatedLayout";
 // fetchers
 const getOrdersQueryFn = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  queryKey: [_key, pathname],
+  queryKey: [_key, allOrders],
 }: {
-  queryKey: string[];
+  queryKey: [string, boolean];
 }): Promise<OrderType[]> => {
-  const endpoint = `orders${
-    pathname.includes("dashboard") ? "" : "/user-orders"
-  }`;
-  const res = (await axios(endpoint + "?withUser=true")).data;
-  const finalRes = (res.orders || res).reverse();
-
-  return finalRes;
+  return (await axios(`orders${allOrders ? `?allOrders=${allOrders}` : ""}`))
+    .data;
 };
 
 const OrdersPage = () => {
-  const dispatch = useDispatch();
+  // react router
   const { pathname } = useLocation();
   const isDashboard = pathname.includes("dashboard");
+
+  // redux
+  const dispatch = useDispatch();
 
   // get orders
   const {
     data: orders,
+    error,
     isError,
     isPending: isLoading,
   } = useQuery({
-    queryKey: ["getOrders", pathname],
+    queryKey: ["getOrders", isDashboard],
     queryFn: getOrdersQueryFn,
   });
 
@@ -60,9 +60,18 @@ const OrdersPage = () => {
     if (orders?.length) dispatch(setOrders(orders));
   }, [orders, dispatch]);
 
+  if (error) {
+    return (
+      <DisplayError
+        error={error}
+        initMsg={"can't get the orders at the momment"}
+      />
+    );
+  }
+
   return (
     <AnimatedLayout>
-      {!isError && (
+      {!!(!isError && orders?.length) && (
         <Heading>{isDashboard ? "Orders Page" : "Your Orders"}</Heading>
       )}
 
@@ -73,8 +82,8 @@ const OrdersPage = () => {
         orders={orders || []}
         withId
         noOrdersMsg={
-          pathname.includes("dashboard")
-            ? "this user hasn't any orders yet"
+          isDashboard
+            ? "there aren't any orders yet"
             : "you don't have any orders yet"
         }
       />

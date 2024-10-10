@@ -8,10 +8,11 @@ import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import useSelector from "../../hooks/redux/useSelector";
 import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
-import { setUser } from "../../store/fetures/userSlice";
+import { setUserWishlist } from "../../store/fetures/userSlice";
+import { removeProduct } from "../../store/fetures/productsSlice";
 
 // react query
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // components
 import ImgsSlider from "../../components/ImgsSlider";
@@ -27,15 +28,11 @@ import IconAndSpinnerSwitcher from "../../components/animatedBtns/IconAndSpinner
 import AreYouSureModal, {
   type SureModalRef,
 } from "../../components/modals/AreYouSureModal";
-import TopMessage, {
-  type TopMessageRefType,
-} from "../../components/TopMessage";
 
-// utiles
-import axios from "../../utiles/axios";
-import handleError from "../../utiles/functions/handleError";
-import getAppColors from "../../utiles/functions/getAppColors";
-import activeFillIcon from "../../utiles/activeFillIcon";
+// utils
+import axios from "../../utils/axios";
+import getAppColors from "../../utils/functions/getAppColors";
+import activeFillIcon from "../../utils/activeFillIcon";
 
 // charts.js
 import { Chart as ChartJS, Legend, Tooltip, ArcElement } from "chart.js";
@@ -44,9 +41,10 @@ import chartDataLabel from "chartjs-plugin-datalabels";
 
 // hooks
 import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
+import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 
 // types
-import type { ChartDataType, ProductType } from "../../utiles/types";
+import type { ChartDataType, ProductType } from "../../utils/types";
 
 // icons
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -77,23 +75,29 @@ const deleteProductMutationFn = async (productId: string) => {
 };
 
 const SingleProductPage = () => {
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
+  // react router
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isDashboard = pathname.includes("dashboard");
 
+  // hooks
+  const handleError = useHandleErrorMsg();
+
   // refs
-  const msgRef = useRef<TopMessageRefType>(null);
   const sureToDeleteModalRef = useRef<SureModalRef>(null);
 
+  // redux
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
   const isInWishlist = useSelector((state) =>
     state.user.user?.wishlist?.some((prdId: string) => prdId === id)
   );
 
+  // states
   const [product, setProduct] = useState<ProductType | undefined>(
     useSelector((state) =>
       state.products.products.find((prd) => prd._id === id)
@@ -115,24 +119,42 @@ const SingleProductPage = () => {
   });
 
   // delete product
-  const {
-    mutate: deleteProduct,
-    isSuccess,
-    isPending: isLoading,
-    error,
-    isError,
-  } = useMutation({
+  const { mutate: deleteProduct, isPending: isLoading } = useMutation({
     mutationKey: ["deleteProduct", id],
     mutationFn: deleteProductMutationFn,
+    onSuccess() {
+      if (id) dispatch(removeProduct(id));
+      queryClient.refetchQueries({ queryKey: ["getProducts"] });
+      navigate(`${isDashboard ? "/dashboard" : ""}/products`, {
+        relative: "path",
+      });
+    },
+    onError(error) {
+      handleError(
+        error,
+        {
+          forAllStates: "something went wrong while deleting the product",
+        },
+        5000
+      );
+    },
   });
 
   // toggle from wishlist
-  const {
-    toggleFromWishlist,
-    data: finalUser,
-    error: wishlistErrData,
-    isPending: wishlistLoading,
-  } = useToggleFromWishlist(id || "");
+  const { toggleFromWishlist, isPending: wishlistLoading } =
+    useToggleFromWishlist(
+      id || "",
+
+      (data: string[]) => {
+        dispatch(setUserWishlist(data));
+      },
+
+      (error: unknown) => {
+        handleError(error, {
+          forAllStates: "something went wrong while doing this proccess",
+        });
+      }
+    );
 
   // get product if it's not found in app state
   useEffect(() => {
@@ -143,31 +165,6 @@ const SingleProductPage = () => {
   useEffect(() => {
     if (resProduct) setProduct(resProduct);
   }, [resProduct]);
-
-  // delete product
-  useEffect(() => {
-    if (isSuccess) navigate("/products", { relative: "path" });
-
-    if (isError)
-      handleError(
-        error,
-        msgRef,
-        {
-          forAllStates: "something went wrong while deleting the product",
-        },
-        5000
-      );
-  }, [isError, error, isSuccess, navigate]);
-
-  // toggle productfrom wishlist
-  useEffect(() => {
-    if (finalUser) dispatch(setUser(finalUser));
-
-    if (wishlistErrData)
-      handleError(wishlistErrData, msgRef, {
-        forAllStates: "something went wrong while doing this proccess",
-      });
-  }, [finalUser, wishlistErrData, dispatch]);
 
   if (prdLoading && fetchStatus !== "idle")
     return <SplashScreen>Loading the Product...</SplashScreen>;
@@ -249,7 +246,13 @@ const SingleProductPage = () => {
 
         <div className="single-product-data">
           <h1 className="single-product-title">{title}</h1>
-          <PropCell name="brand" val={brand} />
+          <PropCell
+            name="brand"
+            valueAsLink={{
+              path: `/products?brand=${brand.name}`,
+            }}
+            val={brand.name}
+          />
           <PropCell name="price" val={price + "$"} />
           <PropCell
             className="single-product-color"
@@ -264,9 +267,9 @@ const SingleProductPage = () => {
           <PropCell
             name="category"
             valueAsLink={{
-              path: `/products?category=${category}`,
+              path: `/products?category=${category.name}`,
             }}
-            val={category}
+            val={category.name}
           />
           <PropCell
             name="quantity"
@@ -349,11 +352,7 @@ const SingleProductPage = () => {
           </>
         ) : (
           <>
-            <AddProductToCartBtn
-              msgRef={msgRef}
-              productId={id}
-              productQty={quantity}
-            />
+            <AddProductToCartBtn productId={id} productQty={quantity} />
 
             {/* toggle from wishlist btn */}
             {user && (
@@ -410,8 +409,6 @@ const SingleProductPage = () => {
         </span>
         " product ?
       </AreYouSureModal>
-
-      <TopMessage ref={msgRef} />
     </AnimatedLayout>
   );
 };

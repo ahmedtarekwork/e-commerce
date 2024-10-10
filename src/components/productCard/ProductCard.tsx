@@ -1,6 +1,3 @@
-// react
-import { useEffect, useRef } from "react";
-
 // react-router-dom
 import { Link, useLocation } from "react-router-dom";
 
@@ -11,13 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import useSelector from "../../hooks/redux/useSelector";
 import useDispatch from "../../hooks/redux/useDispatch";
 // redux actions
-import {
-  setUser,
-
-  // user cart
-  setCart,
-  resteCart,
-} from "../../store/fetures/userSlice";
+import { setUserWishlist, setCart } from "../../store/fetures/userSlice";
 
 // components
 import ImgsSlider from "../ImgsSlider";
@@ -26,29 +17,28 @@ import FillIcon from "../FillIcon";
 import ProductCardQtyList from "./ProductCardQtyList";
 import IconAndSpinnerSwitcher from "../animatedBtns/IconAndSpinnerSwitcher";
 import ProductCardAddToCartBtn from "../AddProductToCartBtn";
-import TopMessage, { type TopMessageRefType } from "../TopMessage";
 
 // icons
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { AiOutlineDelete, AiFillDelete } from "react-icons/ai";
 
 // utils
-import handleError from "../../utiles/functions/handleError";
-import axios from "../../utiles/axios";
+import axios from "../../utils/axios";
 
 // types
-import type { OrderProductType, ProductType } from "../../utiles/types";
+import type { OrderProductType, ProductType } from "../../utils/types";
 
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
 import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
+import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 
 export type ProductCardDeleteBtn = {
   withDeleteBtn?: "cart" | "wishlist";
 };
 
 type Props = ProductCardDeleteBtn & {
-  product: ProductType | OrderProductType;
+  product: ProductType;
   cells?: (keyof Partial<ProductType> | string)[];
   withAddToCart?: boolean;
   withAddToWishList?: boolean;
@@ -60,8 +50,18 @@ type Props = ProductCardDeleteBtn & {
 };
 
 // fetchers
-const removeItemFromCartMutationFn = async (prdId: string) => {
-  return (await axios.delete("/carts/cartProduct/" + prdId)).data;
+const removeItemFromCartMutationFn = async ({
+  productId,
+  userId,
+}: {
+  productId: string;
+  userId: string;
+}) => {
+  return (
+    await axios.delete(`/carts/${userId}/removeProduct`, {
+      data: { productId },
+    })
+  ).data;
 };
 
 const ProductCard = ({
@@ -76,8 +76,10 @@ const ProductCard = ({
   TagName = "li",
   className,
 }: Props) => {
-  const dispatch = useDispatch();
   const { _id, imgs, title } = product;
+
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
 
   // react router dom
   const { pathname } = useLocation();
@@ -85,76 +87,46 @@ const ProductCard = ({
 
   // hooks
   const { productCardCells } = useInitProductsCells();
-
-  const filterdCells = (cells || productCardCells).filter((prop) => {
-    if (withQty) return prop;
-    if (!withQty && prop === "quantity") return;
-    return prop;
-  });
-
-  const msgRef = useRef<TopMessageRefType>(null);
-
-  const { user } = useSelector((state) => state.user);
+  const handleError = useHandleErrorMsg();
 
   // react query \\
 
   // remove item from cart
-  const {
-    mutate: removeFromCart,
-    data: newCart,
-    isPending: removeFromCartLoading,
-    error: removeFromCartErrData,
-    isError: removeFromCartErr,
-  } = useMutation({
-    mutationKey: ["removeItemFromCart", _id],
-    mutationFn: removeItemFromCartMutationFn,
-  });
+  const { mutate: removeFromCart, isPending: removeFromCartLoading } =
+    useMutation({
+      mutationKey: ["removeItemFromCart", _id],
+      mutationFn: removeItemFromCartMutationFn,
+
+      onSuccess(data) {
+        dispatch(setCart(data));
+      },
+
+      onError(error) {
+        handleError(error, {
+          forAllStates:
+            "something went wrong while removing the item from your cart",
+        });
+      },
+    });
 
   // add to wishlist
-  const {
-    toggleFromWishlist,
-    data: finalUser,
-    isError: wishlistErr,
-    error: wishlistErrData,
-    isPending: wishlistLoading,
-  } = useToggleFromWishlist(_id);
-
-  // useEffects \\
-
-  useEffect(() => {
-    if (wishlistErr)
-      handleError(
-        wishlistErrData,
-        msgRef,
-        {
-          forAllStates:
-            "something went wrong while adding the product to wishlist",
-        },
-        4000
-      );
-  }, [wishlistErr, wishlistErrData]);
-
-  useEffect(() => {
-    if (finalUser) dispatch(setUser(finalUser));
-  }, [finalUser, dispatch]);
-
-  // set new cart after deleting item from it
-  useEffect(() => {
-    if (newCart) {
-      if ("msg" in newCart) dispatch(resteCart(newCart.msg));
-      else {
-        console.log(newCart);
-
-        dispatch(setCart(newCart));
+  const { toggleFromWishlist, isPending: wishlistLoading } =
+    useToggleFromWishlist(
+      _id,
+      (data: string[]) => {
+        dispatch(setUserWishlist(data));
+      },
+      (error: unknown) => {
+        handleError(
+          error,
+          {
+            forAllStates:
+              "something went wrong while adding the product to wishlist",
+          },
+          4000
+        );
       }
-    }
-
-    if (removeFromCartErr)
-      handleError(removeFromCartErrData, msgRef, {
-        forAllStates:
-          "something went wrong while removing the item from your cart",
-      });
-  }, [dispatch, newCart, removeFromCartErr, removeFromCartErrData]);
+    );
 
   return (
     <>
@@ -168,7 +140,7 @@ const ProductCard = ({
             <button
               title="add to wishlist btn"
               disabled={wishlistLoading}
-              className={`add-to-wishlist`}
+              className="add-to-wishlist"
               onClick={toggleFromWishlist}
             >
               <IconAndSpinnerSwitcher
@@ -176,7 +148,7 @@ const ProductCard = ({
                 icon={
                   <FillIcon
                     className={
-                      user?.wishlist.some((prdId) => prdId === _id)
+                      user?.wishlist?.some((prdId) => prdId === _id)
                         ? " active"
                         : ""
                     }
@@ -202,25 +174,40 @@ const ProductCard = ({
         <div className="product-data-big-holder">
           <strong className="product-card-title">{title}</strong>
 
-          {filterdCells.map((prop) => {
+          {(cells || productCardCells).map((prop) => {
+            if (!withQty && prop === "quantity") return;
+
             if (withAddMore && prop === "count") {
               return (
                 <ProductCardQtyList
-                  msgRef={msgRef}
-                  product={product}
-                  propName={prop}
+                  product={product as OrderProductType}
+                  propName="count"
                   key={prop}
                 />
               );
+            }
+
+            let propValue = product[prop as keyof typeof product];
+
+            if (prop === "price") propValue += "$";
+
+            const isCategoryOrBrandProp =
+              ["brand", "category"].includes(prop) &&
+              (propValue as ProductType["category" | "brand"])?.name;
+
+            if (isCategoryOrBrandProp) {
+              propValue = (propValue as ProductType["category" | "brand"]).name;
             }
 
             return (
               <PropCell
                 key={prop}
                 name={prop}
-                val={
-                  product[prop as keyof typeof product]?.toString() +
-                  (prop === "price" ? "$" : "")
+                val={propValue?.toString()}
+                valueAsLink={
+                  isCategoryOrBrandProp
+                    ? { path: `/products?${prop}=${propValue}` }
+                    : undefined
                 }
               />
             );
@@ -238,7 +225,6 @@ const ProductCard = ({
 
             {withAddToCart && (
               <ProductCardAddToCartBtn
-                msgRef={msgRef}
                 productId={product._id}
                 productQty={(product as ProductType).quantity}
               />
@@ -252,8 +238,9 @@ const ProductCard = ({
             disabled={wishlistLoading || removeFromCartLoading}
             className="red-btn delete-product-btn"
             onClick={() => {
-              if (withDeleteBtn === "cart") removeFromCart(_id);
-              else toggleFromWishlist();
+              if (withDeleteBtn === "cart") {
+                if (user) removeFromCart({ productId: _id, userId: user._id });
+              } else toggleFromWishlist();
             }}
           >
             <IconAndSpinnerSwitcher
@@ -268,8 +255,6 @@ const ProductCard = ({
           </button>
         )}
       </TagName>
-
-      <TopMessage ref={msgRef} />
     </>
   );
 };

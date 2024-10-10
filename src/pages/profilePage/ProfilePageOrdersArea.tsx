@@ -7,12 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 // components
 import OrdersArea from "../../components/orders/OrdersArea";
 import UserAreaLoading from "../../components/UserAreaLoading";
+import ProfilePageTabsError from "../../components/ProfilePageTabsError";
 
 // utils
-import axios from "../../utiles/axios";
+import axios from "../../utils/axios";
 
 // types
-import type { OrderType, UserType } from "../../utiles/types";
+import type { OrderType, UserType } from "../../utils/types";
 
 // icons
 import { TbMailboxOff } from "react-icons/tb";
@@ -60,19 +61,19 @@ const ProfilePageOrdersArea = ({ user, isCurrentUserProfile }: Props) => {
 
     if (!userOrders?.orders?.length) {
       return (
-        <div className="no-specific-user-orders-holder">
-          <TbMailboxOff />
-          <strong>this user hasn't any orders yet</strong>
-        </div>
+        <ProfilePageTabsError
+          Icon={TbMailboxOff}
+          content="this user doesn't have any orders yet"
+        />
       );
     }
 
     if (userOrdersErr) {
       return (
-        <div className="no-specific-user-orders-holder">
-          <TbMailboxOff />
-          <strong>can't get this user orders at the moment</strong>
-        </div>
+        <ProfilePageTabsError
+          Icon={TbMailboxOff}
+          content="can't get this user orders at the moment"
+        />
       );
     }
   }

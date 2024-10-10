@@ -32,6 +32,9 @@
 @import "pages/products/product-form-page";
 @import "pages/products/single-product-page";
 
+// categories and brands
+@import "pages/categories-and-brands-page";
+
 // profile page
 @import "pages/profile-page";
 
@@ -61,6 +64,9 @@
 @import "components/layout/app-footer";
 
 // components \\
+// category and card card
+@import "components/category-or-brand-card";
+
 // insight wrapper
 @import "components/insight-wrapper";
 
@@ -83,7 +89,6 @@
 // forms
 @import "components/form/app-form";
 @import "components/form/form-list";
-@import "components/form/form-table";
 
 // app lists wrapper
 @import "components/list-wrapper";

@@ -1,6 +1,3 @@
-// react
-import { type RefObject } from "react";
-
 // react query
 import { useMutation } from "@tanstack/react-query";
 
@@ -8,12 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 import useSelector from "../redux/useSelector";
 
 // utils
-import axios from "../../utiles/axios";
+import axios from "../../utils/axios";
 
 // types
-import type { LineItemType } from "../../utiles/types";
-import { type TopMessageRefType } from "../../components/TopMessage";
-import { AxiosInstance } from "axios";
+import type { LineItemType } from "../../utils/types";
 
 type GetCheckoutSessionUrlFnType = (params: {
   customer_email: string;
@@ -26,7 +21,7 @@ const getCheckoutSessionUrlMutationFn: GetCheckoutSessionUrlFnType = async ({
   line_items,
   sessionType,
 }) => {
-  const method: keyof Pick<AxiosInstance, "post" | "patch"> =
+  const method: "post" | "patch" =
     sessionType === "changeDonatePlan" ? "patch" : "post";
 
   return (
@@ -40,13 +35,19 @@ const getCheckoutSessionUrlMutationFn: GetCheckoutSessionUrlFnType = async ({
   ).data;
 };
 
-const useGetPaymentSessionURL = (msgRef: RefObject<TopMessageRefType>) => {
+const useGetPaymentSessionURL = (
+  onSuccess?: (data: { url: string }) => void,
+  onError?: (error: unknown) => void
+) => {
   const mutation = useMutation({
     mutationKey: ["goToCheckout"],
     mutationFn: getCheckoutSessionUrlMutationFn,
+    onSuccess,
+    onError,
   });
 
   const { user, userCart } = useSelector((state) => state.user);
+  const showMsg = useSelector((state) => state.topMessage.showMsg);
 
   type HandlePaymentParams =
     | {
@@ -70,10 +71,9 @@ const useGetPaymentSessionURL = (msgRef: RefObject<TopMessageRefType>) => {
     recurring,
   }: HandlePaymentParams) => {
     if (!user)
-      return msgRef.current?.setMessageData({
+      return showMsg?.({
         clr: "red",
         content: "you need to login first",
-        show: true,
         time: 6000,
       });
 
@@ -81,22 +81,22 @@ const useGetPaymentSessionURL = (msgRef: RefObject<TopMessageRefType>) => {
 
     if (sessionType === "payment") {
       if (!userCart?.products?.length)
-        return msgRef.current?.setMessageData({
+        return showMsg?.({
           clr: "red",
           content: "you cart is empty",
-          show: true,
           time: 6000,
         });
 
       line_items = userCart.products.map(
-        ({ count, price, title, description }): LineItemType => ({
-          quantity: count,
+        ({ wantedQty, price, title, description, imgs }): LineItemType => ({
+          quantity: wantedQty,
           price_data: {
             currency: "usd",
             unit_amount: price * 100,
             product_data: {
               name: title,
               description,
+              images: imgs.map((img) => img.secure_url).slice(0, 8),
             },
           },
         })

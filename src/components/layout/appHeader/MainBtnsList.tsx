@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import useSelector from "../../../hooks/redux/useSelector";
 import useDispatch from "../../../hooks/redux/useDispatch";
 // redux actions
-import { logoutUser, setCart } from "../../../store/fetures/userSlice";
+import { setCart } from "../../../store/fetures/userSlice";
 
 // components
 import EmptySpinner from "../../spinners/EmptySpinner";
@@ -18,17 +18,20 @@ import { FaUserAlt, FaShoppingCart } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 
 // types
-import type { OrderProductType } from "../../../utiles/types";
+import type { OrderProductType } from "../../../utils/types";
 
 // hooks
 import useGetUserCart from "../../../hooks/ReactQuery/CartRequest/useGetUserCart";
+import useLogoutUser from "../../../hooks/useLogoutUser";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
-import { scaleUpDownVariant } from "../../../utiles/variants";
+import { scaleUpDownVariant } from "../../../utils/variants";
 
 const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
+  const logoutUser = useLogoutUser();
+
   const dispatch = useDispatch();
   const { user, userCart, cartLoading } = useSelector((state) => state.user);
 
@@ -36,7 +39,7 @@ const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
     refetch: getCart,
     data: cart,
     isPending: initCartLoading,
-  } = useGetUserCart();
+  } = useGetUserCart(user?._id || "");
 
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -52,17 +55,17 @@ const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
   }, []);
 
   useEffect(() => {
-    if (cart && !("msg" in cart)) dispatch(setCart(cart));
-  }, [cart, dispatch]);
-
-  useEffect(() => {
     if (user) getCart();
   }, [user]);
+
+  useEffect(() => {
+    if (cart) dispatch(setCart(cart));
+  }, [cart, dispatch]);
 
   let productsLength = 0;
 
   const userCartCount = userCart?.products?.map(
-    (prd: OrderProductType) => prd.count
+    (prd: OrderProductType) => prd.wantedQty
   );
   if (userCartCount?.length)
     productsLength = userCartCount.reduce((a: number, b: number) => a + b);
@@ -128,7 +131,7 @@ const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
           </li>
 
           <li>
-            <button title="logout btn" onClick={() => dispatch(logoutUser())}>
+            <button title="logout btn" onClick={async () => await logoutUser()}>
               <IoLogOut className="logOut-icon" />
               signout
             </button>

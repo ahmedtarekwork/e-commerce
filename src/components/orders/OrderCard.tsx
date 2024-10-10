@@ -7,7 +7,7 @@ import PropCell from "../PropCell";
 import useSelector from "../../hooks/redux/useSelector";
 
 // types
-import type { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utils/types";
 
 type Props = {
   order: OrderType;
@@ -20,7 +20,8 @@ const OrderCard = ({
     _id,
     orderStatus,
     products,
-    paymentIntent: { amount, method },
+    totalPrice,
+    method,
     createdAt,
     orderby,
     removedProductsCount,
@@ -51,13 +52,13 @@ const OrderCard = ({
           <PropCell
             name="Items Count"
             val={
-              products.map((p) => p.count).reduce((a, b) => a + b, 0) +
+              products.map((p) => p.wantedQty).reduce((a, b) => a + b, 0) +
               removedProductsCount
             }
           />
         </li>
         <li>
-          <PropCell name="Total Price" val={amount + "$"} />
+          <PropCell name="Total Price" val={totalPrice + "$"} />
         </li>
         <li>
           <PropCell name="payment method" val={method} />

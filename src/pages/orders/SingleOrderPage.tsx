@@ -19,11 +19,11 @@ import GridList from "../../components/gridList/GridList";
 import ProductCard from "../../components/productCard/ProductCard";
 import EmptyPage from "../../components/layout/EmptyPage";
 
-// utiles
-import axios from "../../utiles/axios";
+// utils
+import axios from "../../utils/axios";
 
 // types
-import type { OrderType } from "../../utiles/types";
+import type { OrderType } from "../../utils/types";
 
 // hooks
 import useInitProductsCells from "../../hooks/useInitProductsCells";
@@ -38,22 +38,28 @@ const getOrderQueryFn = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   queryKey: [_key, id],
 }: {
-  queryKey: string[];
+  queryKey: [string, string];
 }) => {
   if (!id) throw new Error("order id required");
-  return (await axios("orders/" + id)).data;
+
+  return (await axios(`orders/${id}`)).data;
 };
 
 const SingleOrderPage = () => {
+  // react router
   const { id } = useParams();
+
+  // states
   const { user } = useSelector((state) => state.user);
   const appStateOrder = useSelector((state) =>
     state.orders.orders.find((order) => order._id === id)
   );
   const [order, setOrder] = useState<OrderType | undefined>(appStateOrder);
 
+  // hooks
   const { listCell, productCardCells } = useInitProductsCells();
 
+  // react query
   const {
     refetch: getOrder,
     data: resOrder,
@@ -67,6 +73,7 @@ const SingleOrderPage = () => {
     enabled: false,
   });
 
+  // useEffects
   useEffect(() => {
     if (id && !appStateOrder) getOrder();
   }, []);
@@ -105,7 +112,9 @@ const SingleOrderPage = () => {
   const {
     _id,
     orderStatus,
-    paymentIntent: { amount, currency, method },
+    totalPrice,
+    currency,
+    method,
     products,
     orderby,
     createdAt,
@@ -130,7 +139,7 @@ const SingleOrderPage = () => {
           <PropCell name="order status" val={orderStatus} />
         </li>
         <li>
-          <PropCell name="total price" val={amount + "$"} />
+          <PropCell name="total price" val={totalPrice + "$"} />
         </li>
         <li>
           <PropCell name="currency" val={currency} />
@@ -146,7 +155,9 @@ const SingleOrderPage = () => {
             name="items count"
             val={
               removedProductsCount +
-              products.map(({ count }) => count).reduce((a, b) => a + b, 0)
+              products
+                .map(({ wantedQty }) => wantedQty)
+                .reduce((a, b) => a + b, 0)
             }
           />
         </li>
@@ -179,7 +190,7 @@ const SingleOrderPage = () => {
             <ProductCard
               key={prd._id}
               cells={productCardCells.map((cell) =>
-                cell === "quantity" ? "count" : cell
+                cell === "wantedQty" ? "count" : cell
               )}
               product={prd}
             />

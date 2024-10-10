@@ -1,5 +1,5 @@
 // react
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // react router dom
 import { Link, useLocation } from "react-router-dom";
@@ -8,13 +8,14 @@ import { Link, useLocation } from "react-router-dom";
 import useDispatch from "../../hooks/redux/useDispatch";
 import useSelector from "../../hooks/redux/useSelector";
 // redux actions
-import { resteCart, setCart } from "../../store/fetures/userSlice";
+import { resetCart, setCart } from "../../store/fetures/userSlice";
 
 // hooks
 import useGetUserCart from "../../hooks/ReactQuery/CartRequest/useGetUserCart";
 import useInitProductsCells from "../../hooks/useInitProductsCells";
 
 // components
+import ProfilePageTabsError from "../ProfilePageTabsError";
 import GridList from "../gridList/GridList";
 import DisplayError from "../layout/DisplayError";
 import UserAreaLoading from "../UserAreaLoading";
@@ -31,18 +32,15 @@ import { BsFillCartXFill } from "react-icons/bs";
 import cartSvg from "../../../imgs/cart.svg";
 
 // types
-import type { CartType } from "../../utiles/types";
+import type { CartType } from "../../utils/types";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
-import {
-  // cartOrWishlistAreasVariants,
-  slideOutVariant,
-} from "../../utiles/variants";
+import { slideOutVariant } from "../../utils/variants";
 
 type Props = ProductCardDeleteBtn & {
-  userId?: string;
+  userId: string;
   withAddMore?: boolean;
   showTotal?: boolean;
 };
@@ -61,10 +59,7 @@ const CartArea = ({
 
   // redux
   const dispatch = useDispatch();
-  const { userCart, cartMsg } = useSelector((state) => state.user);
-
-  // states
-  const [specificUserCartMsg, setSpecificUserCartMsg] = useState("");
+  const { userCart } = useSelector((state) => state.user);
 
   // hooks
   const { listCell, productCardCells } = useInitProductsCells();
@@ -83,36 +78,36 @@ const CartArea = ({
     | undefined;
 
   useEffect(() => {
-    if (isCurrentUserCart) {
-      getCart();
-    } else {
+    if (isCurrentUserCart) getCart();
+    else {
       if (userId) getCart();
     }
   }, [isCurrentUserCart, userId]);
 
   useEffect(() => {
-    if (cart) {
-      if (isCurrentUserCart) {
-        if ("msg" in cart) dispatch(resteCart(cart.msg));
-        else {
-          const isSame = () => {
-            const sameLength =
-              userCart?.products?.length === cart?.products?.length;
+    if (cart && isCurrentUserCart) {
+      const isSame = () => {
+        const sameLength =
+          userCart?.products?.length === cart?.products?.length;
 
-            if (!sameLength) return false;
+        if (!sameLength) return false;
 
-            return userCart?.products.every((prd) => {
-              return cart.products.some((p) => p._id === prd._id);
-            });
-          };
+        return userCart?.products.every((prd) => {
+          return cart.products.some((p) => p._id === prd._id);
+        });
+      };
 
-          if (!isSame) dispatch(setCart(cart));
-        }
-      } else {
-        if ("msg" in cart) setSpecificUserCartMsg(cart.msg);
-      }
+      if (!isSame()) dispatch(setCart(cart));
     }
   }, [cart, dispatch]);
+
+  useEffect(() => {
+    if (isCurrentUserCart && userCart?.products.length) {
+      if (cartErr || !cart || (isCurrentUserCart && !userCart)) {
+        dispatch(resetCart());
+      }
+    }
+  }, [cartErr, cart, isCurrentUserCart, userCart]);
 
   if (!isCurrentUserCart && !userId) {
     return (
@@ -130,13 +125,11 @@ const CartArea = ({
     );
   }
 
-  if (cartErr || !cart || (isCurrentUserCart && !userCart && !cartMsg)) {
+  if (cartErr || !cart || (isCurrentUserCart && !userCart)) {
     if (isCurrentUserCart) {
-      userCart?.products.length ? dispatch(resteCart()) : null;
-
       return (
         <DisplayError
-          error={cartErrData!}
+          error={cartErrData}
           initMsg="Can't get your cart items at the moment"
         />
       );
@@ -172,17 +165,24 @@ const CartArea = ({
       : undefined
   ) as WithBtnType;
 
-  if (isCurrentUserCart && cartMsg) {
-    userCart?.products.length ? dispatch(resteCart()) : null;
-  }
+  if (!cart.products.length) {
+    if (isCurrentUserCart) {
+      return (
+        <EmptyPage
+          svg={cartSvg}
+          content={`${
+            isCurrentUserCart ? "you do" : "this user does"
+          }n't have items in ${isCurrentUserCart ? "your" : "his"} cart`}
+          withBtn={withBtn}
+        />
+      );
+    }
 
-  if (!isCurrentUserCart && specificUserCartMsg) {
     return (
-      <div className="no-specific-user-cart-holder">
-        <BsFillCartXFill />
-
-        <strong>{specificUserCartMsg}</strong>
-      </div>
+      <ProfilePageTabsError
+        Icon={BsFillCartXFill}
+        content="this user dosen't have any products in his cart"
+      />
     );
   }
 
@@ -219,20 +219,24 @@ const CartArea = ({
         {!(choosedCart as CartType)?.products?.length && (
           <motion.div
             key="one"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             variants={slideOutVariant}
             initial="initial"
             animate="animate"
             exit="exit"
           >
-            <EmptyPage svg={cartSvg} content={cartMsg} withBtn={withBtn} />
+            <EmptyPage
+              svg={cartSvg}
+              content={`${
+                isCurrentUserCart ? "you do" : "this user does"
+              }n't have items in ${isCurrentUserCart ? "your" : "his"} cart`}
+              withBtn={withBtn}
+            />
           </motion.div>
         )}
 
         {(choosedCart as CartType)?.products?.length && (
           <motion.div
             key="two"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             variants={slideOutVariant}
             initial="initial"
             animate="animate"

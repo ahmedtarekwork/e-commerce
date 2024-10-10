@@ -17,8 +17,8 @@ import DashboardSquare, { type DashboardSqaureProps } from "./DashboardSquare";
 
 // utils
 import { nanoid } from "@reduxjs/toolkit";
-import axios from "../../../utiles/axios";
-import colors from "../../../utiles/functions/getAppColors";
+import axios from "../../../utils/axios";
+import colors from "../../../utils/functions/getAppColors";
 
 // charts.js
 import {
@@ -44,7 +44,11 @@ import { TbCategory } from "react-icons/tb";
 import storeWithArrow from "../../../../imgs/strore_with_arrow.svg";
 
 // types
-import type { ProductType, ChartDataType } from "../../../utiles/types";
+import type {
+  ProductType,
+  ChartDataType,
+  CategoryAndBrandType,
+} from "../../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../../layouts/AnimatedLayout";
@@ -60,27 +64,31 @@ ChartJS.register(
   ChartDataLabels
 );
 
+type InsightsReturnType = {
+  orders: { all: number; insights: Record<string, number> };
+
+  products: Record<"all" | "outOfStock" | "inStock", number> & {
+    bestSell: ProductType[];
+  };
+
+  users: {
+    all: number;
+    insights: Record<"admins" | "nonAdmins", number>;
+  };
+} & Record<
+  "brands" | "categories",
+  {
+    all: number;
+    insights: Pick<CategoryAndBrandType, "name" | "productsCount">[];
+  }
+>;
+
 // fetchers
-const getInsightsQueryFn = async () => {
-  const endPoints = [
-    "/products",
-    "/categories",
-    "/users",
-    "/orders",
-    "/brands",
-  ];
-
-  const res = (
-    await axios.all(
-      endPoints.map((point) => axios.get(`dashboard/insights${point}`))
-    )
-  ).map(({ data, config: { url } }) => ({
-    data,
-    endPoint: url?.split("/").at(-1),
-  }));
-
-  return res;
+const getInsightsQueryFn = async (): Promise<InsightsReturnType> => {
+  return (await axios("dashboard/insights")).data;
 };
+
+const dashboardSquaresIDs = Array.from({ length: 5 }).map(() => nanoid());
 
 const DashboardHomePage = () => {
   // get insights
@@ -112,79 +120,61 @@ const DashboardHomePage = () => {
     }
   }, [isPending]);
 
-  if (isError)
+  if (isError) {
     return (
       <DisplayError
         error={error}
         initMsg="can't get the insights at the moment"
       />
     );
-
-  const extractData = (wantedEndpoint: string) =>
-    data?.find(({ endPoint }) => endPoint === wantedEndpoint)?.data;
+  }
 
   const squares: DashboardSqaureProps[] = [
     {
       title: "Products",
       Icon: BiSolidComponent,
       path: "/dashboard/products",
-      number: extractData("products")?.all,
-      noNum:
-        extractData("products")?.all !== 0 &&
-        !extractData("products")?.all &&
-        isError,
+      number: data?.products?.all || 0,
+      noNum: data?.products?.all !== 0 && !data?.products?.all && isError,
     },
     {
       title: "Orders",
       path: "/dashboard/orders",
       Icon: FaListAlt,
-      number: extractData("orders")?.all,
-      noNum:
-        extractData("orders")?.all !== 0 &&
-        !extractData("orders")?.all &&
-        isError,
+      number: data?.orders?.all || 0,
+      noNum: data?.orders?.all !== 0 && !data?.orders?.all && isError,
     },
     {
       title: "Users",
       Icon: FaUser,
       path: "/dashboard/users",
-      number: extractData("users")?.all,
-      noNum:
-        extractData("users")?.all !== 0 &&
-        !extractData("users")?.all &&
-        isError,
+      number: data?.users?.all || 0,
+      noNum: data?.users?.all !== 0 && !data?.users?.all && isError,
     },
-  ];
-
-  const nonAnchorSquares = [
     {
+      path: "/dashboard/categories",
       title: "Categories",
       Icon: TbCategory,
-      number: extractData("categories")?.all,
-      noNum:
-        extractData("categories")?.all !== 0 &&
-        !extractData("categories")?.all &&
-        isError,
+      number: data?.categories?.all || 0,
+      noNum: data?.categories?.all !== 0 && !data?.categories?.all && isError,
     },
     {
+      path: "/dashboard/brands",
       title: "Brands",
       Icon: SiBrandfolder,
-      number: extractData("brands")?.all,
-      noNum:
-        extractData("brands")?.all !== 0 &&
-        !extractData("brands")?.all &&
-        isError,
+      number: data?.brands?.all || 0,
+      noNum: data?.brands?.all !== 0 && !data?.brands?.all && isError,
     },
   ];
 
   const bestSellChartsData = (): ChartDataType<"bar"> => {
-    const bestSellData = extractData("products").bestSell as Pick<
+    const bestSellData = data?.products.bestSell as Pick<
       ProductType,
       "title" | "_id" | "sold"
     >[];
 
     return {
-      labels: bestSellData.map(
+      labels: bestSellData?.map(
         ({ title }) =>
           title.slice(0, 18).trim() + (title.length > 18 ? "..." : "")
       ),
@@ -195,7 +185,7 @@ const DashboardHomePage = () => {
             backgroundColor: colors(),
             padding: { top: 7 },
           },
-          data: bestSellData.map(({ sold }) => sold),
+          data: bestSellData?.map(({ sold }) => sold),
           backgroundColor: colors(),
           hoverBackgroundColor: colors(["--dark-trans"]),
           borderColor: colors(),
@@ -207,8 +197,8 @@ const DashboardHomePage = () => {
   };
 
   const productsAvilability = (): ChartDataType<"pie"> => {
-    const inStock = extractData("products").inStock;
-    const outOfStock = extractData("products").outOfStock;
+    const inStock = data?.products.inStock || 0;
+    const outOfStock = data?.products.outOfStock || 0;
 
     return {
       labels: ["In Stock", "Out Of Stock"],
@@ -224,12 +214,14 @@ const DashboardHomePage = () => {
 
   const brandsData = (): ChartDataType<"doughnut"> => {
     return {
-      labels: Object.keys(extractData("brands").insights),
+      labels: (data?.brands?.insights || []).map(({ name }) => name),
       datasets: [
         {
           hoverBorderColor: colors(),
           backgroundColor: colors(),
-          data: Object.values(extractData("brands").insights),
+          data: (data?.brands?.insights || []).map(
+            ({ productsCount }) => productsCount
+          ),
           datalabels: {
             formatter: (_, args) => {
               const index = args.dataIndex;
@@ -249,10 +241,8 @@ const DashboardHomePage = () => {
   };
 
   const categoriesData = (): ChartDataType<"bar"> => {
-    const categoriesData = extractData("categories").insights;
-
     return {
-      labels: Object.keys(categoriesData),
+      labels: (data?.categories?.insights || []).map(({ name }) => name),
 
       datasets: [
         {
@@ -264,7 +254,9 @@ const DashboardHomePage = () => {
           },
           backgroundColor: colors(),
           hoverBackgroundColor: colors(["--dark-trans"]),
-          data: Object.values(categoriesData),
+          data: (data?.categories?.insights || []).map(
+            ({ productsCount }) => productsCount
+          ),
           borderColor: "transparent",
           borderWidth: 2,
           hoverBorderColor: colors(),
@@ -274,7 +266,7 @@ const DashboardHomePage = () => {
   };
 
   const adminsData = (): ChartDataType<"doughnut"> => {
-    const usersData = extractData("users");
+    const usersData = data?.users;
 
     return {
       labels: ["Admins", "NonAdmins"],
@@ -285,13 +277,13 @@ const DashboardHomePage = () => {
           circumference: 180,
           hoverBorderColor: colors(["--dark", "--light"]),
           backgroundColor: colors(["--dark", "--light"]),
-          data: Object.values(usersData.insights),
+          data: Object.values(usersData?.insights || {}),
           datalabels: {
             formatter: (_, args) => {
               const index = args.dataIndex;
               const count = args.dataset.data[index];
 
-              return ((count as number) / usersData.all) * 100 + "%";
+              return ((count as number) / (usersData?.all || 0)) * 100 + "%";
             },
             backgroundColor: colors(["--dark", "--light"]),
             color: ["white", "black"],
@@ -303,6 +295,26 @@ const DashboardHomePage = () => {
         },
       ],
     };
+  };
+
+  const isShowInsight = <T extends "bar" | "pie" | "doughnut">(
+    data: ChartDataType<T>
+  ) => {
+    return !!(
+      data.labels?.length &&
+      data.datasets[0].data.length &&
+      (data.datasets[0].data as number[]).reduce((a, b) => a + b, 0) > 0
+    );
+  };
+
+  const showAllInsight = () => {
+    return (
+      isShowInsight(bestSellChartsData()) &&
+      isShowInsight(productsAvilability()) &&
+      isShowInsight(brandsData()) &&
+      isShowInsight(categoriesData()) &&
+      isShowInsight(adminsData())
+    );
   };
 
   return (
@@ -363,165 +375,185 @@ const DashboardHomePage = () => {
           <AnimatedLayout key="two">
             <div className="dashboard-squares-main-holder">
               <ul className="dashboard-squares-list">
-                {squares.map((square) => (
-                  <DashboardSquare {...square} key={nanoid()} />
+                {squares.slice(0, 3).map((square, i) => (
+                  <DashboardSquare {...square} key={dashboardSquaresIDs[i]} />
                 ))}
               </ul>
 
               <ul className="dashboard-squares-list">
-                {nonAnchorSquares.map((square) => (
-                  <DashboardSquare {...square} key={nanoid()} />
+                {squares.slice(3).map((square, i) => (
+                  <DashboardSquare
+                    {...square}
+                    key={
+                      dashboardSquaresIDs[i + (squares.slice(0, 3).length - 1)]
+                    }
+                  />
                 ))}
               </ul>
             </div>
 
-            <ul className="insights-list">
-              <InsightWrapper title="Top 5 selling products">
-                <Bar
-                  options={{
-                    indexAxis: "y",
-                    responsive: true,
-                    maintainAspectRatio: false,
+            {showAllInsight() && (
+              <ul className="insights-list">
+                {isShowInsight(bestSellChartsData()) && (
+                  <InsightWrapper title="Top 5 selling products">
+                    <Bar
+                      options={{
+                        indexAxis: "y",
+                        responsive: true,
+                        maintainAspectRatio: false,
 
-                    scales: {
-                      x: {
-                        ticks: {
-                          color: colors(["--dark"])[0],
-                          font: {
-                            size: 14,
-                            weight: "bold",
+                        scales: {
+                          x: {
+                            ticks: {
+                              color: colors(["--dark"])[0],
+                              font: {
+                                size: 14,
+                                weight: "bold",
+                              },
+                            },
+                          },
+                          y: {
+                            ticks: {
+                              color: colors(),
+                              font: {
+                                size: 14,
+                                weight: "bold",
+                              },
+                            },
                           },
                         },
-                      },
-                      y: {
-                        ticks: {
-                          color: colors(),
-                          font: {
-                            size: 14,
-                            weight: "bold",
+
+                        plugins: {
+                          legend: {
+                            display: false,
+                          },
+                          datalabels: {
+                            color: ["white", "white", "black"],
+                            font: {
+                              size: 18,
+                              weight: "bold",
+                            },
                           },
                         },
-                      },
-                    },
+                      }}
+                      plugins={[ChartDataLabels]}
+                      data={bestSellChartsData()}
+                    />
+                  </InsightWrapper>
+                )}
 
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      datalabels: {
-                        color: ["white", "white", "black"],
-                        font: {
-                          size: 18,
-                          weight: "bold",
-                        },
-                      },
-                    },
-                  }}
-                  plugins={[ChartDataLabels]}
-                  data={bestSellChartsData()}
-                />
-              </InsightWrapper>
+                {isShowInsight(productsAvilability()) && (
+                  <InsightWrapper
+                    title="Products Availability"
+                    diminsion="800px"
+                  >
+                    <Pie
+                      options={{
+                        maintainAspectRatio: false,
 
-              <InsightWrapper title="Products Availability" diminsion="800px">
-                <Pie
-                  options={{
-                    maintainAspectRatio: false,
-
-                    layout: {
-                      padding: {
-                        top: 40,
-                        bottom: 40,
-                        right: 40,
-                        left: 40,
-                      },
-                    },
-
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      datalabels: {
-                        color: colors(["--dark", "--danger"]),
-                        font: {
-                          weight: "bold",
-                          size: 16,
-                        },
-
-                        formatter: (_, args) => {
-                          const index = args.dataIndex;
-                          return args.chart.data.labels?.[index];
-                        },
-                        anchor: "end",
-                        align: "end",
-                      },
-                    },
-                  }}
-                  data={productsAvilability()}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  plugins={[ChartDataLabels as any]}
-                />
-              </InsightWrapper>
-
-              <InsightWrapper title="Most brands has many products">
-                <Doughnut
-                  data={brandsData()}
-                  options={{
-                    layout: {
-                      padding: 25,
-                    },
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                  }}
-                />
-              </InsightWrapper>
-
-              <InsightWrapper title="Most categories has many products">
-                <Bar
-                  data={categoriesData()}
-                  options={{
-                    scales: {
-                      y: {
-                        ticks: {
-                          color: colors(["--dark"])[0],
-                          font: {
-                            size: 14,
-                            weight: "bold",
+                        layout: {
+                          padding: {
+                            top: 40,
+                            bottom: 40,
+                            right: 40,
+                            left: 40,
                           },
                         },
-                      },
-                      x: {
-                        ticks: {
-                          color: colors(),
-                          font: {
-                            size: 14,
-                            weight: "bold",
+
+                        plugins: {
+                          legend: {
+                            display: false,
+                          },
+                          datalabels: {
+                            color: colors(["--dark", "--danger"]),
+                            font: {
+                              weight: "bold",
+                              size: 16,
+                            },
+
+                            formatter: (_, args) => {
+                              const index = args.dataIndex;
+                              return args.chart.data.labels?.[index];
+                            },
+                            anchor: "end",
+                            align: "end",
                           },
                         },
-                      },
-                    },
+                      }}
+                      data={productsAvilability()}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      plugins={[ChartDataLabels as any]}
+                    />
+                  </InsightWrapper>
+                )}
 
-                    layout: {
-                      padding: 25,
-                    },
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                  }}
-                />
-              </InsightWrapper>
+                {isShowInsight(brandsData()) && (
+                  <InsightWrapper title="Most brands has many products">
+                    <Doughnut
+                      data={brandsData()}
+                      options={{
+                        layout: {
+                          padding: 25,
+                        },
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                      }}
+                    />
+                  </InsightWrapper>
+                )}
 
-              <InsightWrapper title="Admins Percentage" diminsion="800px">
-                <Doughnut
-                  data={adminsData()}
-                  options={{
-                    aspectRatio: 2,
-                    maintainAspectRatio: false,
-                    layout: {
-                      padding: 15,
-                    },
-                  }}
-                />
-              </InsightWrapper>
-            </ul>
+                {isShowInsight(categoriesData()) && (
+                  <InsightWrapper title="Most categories has many products">
+                    <Bar
+                      data={categoriesData()}
+                      options={{
+                        scales: {
+                          y: {
+                            ticks: {
+                              color: colors(["--dark"])[0],
+                              font: {
+                                size: 14,
+                                weight: "bold",
+                              },
+                            },
+                          },
+                          x: {
+                            ticks: {
+                              color: colors(),
+                              font: {
+                                size: 14,
+                                weight: "bold",
+                              },
+                            },
+                          },
+                        },
+
+                        layout: {
+                          padding: 25,
+                        },
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                      }}
+                    />
+                  </InsightWrapper>
+                )}
+
+                {isShowInsight(adminsData()) && (
+                  <InsightWrapper title="Admins Percentage" diminsion="800px">
+                    <Doughnut
+                      data={adminsData()}
+                      options={{
+                        aspectRatio: 2,
+                        maintainAspectRatio: false,
+                        layout: {
+                          padding: 15,
+                        },
+                      }}
+                    />
+                  </InsightWrapper>
+                )}
+              </ul>
+            )}
           </AnimatedLayout>
         )}
       </AnimatePresence>

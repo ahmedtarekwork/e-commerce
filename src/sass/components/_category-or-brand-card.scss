@@ -1,0 +1,45 @@
+.category-or-brand-card {
+  text-align: center;
+  background: var(--trans);
+  width: fit-content;
+  padding: 10px;
+  border-radius: var(--radius);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: 0.3s;
+  color: #063575 !important;
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background: var(--dark-trans);
+    font-weight: bolder;
+
+    img {
+      scale: 0.9;
+    }
+  }
+
+  img {
+    margin-inline: auto;
+    max-width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    margin-top: auto;
+    transition: 0.3s;
+  }
+
+  // for dashboard card
+  .category-and-brand-card-btns-holder {
+    display: flex;
+    gap: 7px;
+
+    & > * {
+      flex: 1;
+      font-weight: normal;
+    }
+  }
+}

@@ -1,6 +1,8 @@
+// react
 import { useRef, forwardRef } from "react";
+
+// react router
 import { Link, useLocation } from "react-router-dom";
-import { motion, useAnimationControls } from "framer-motion";
 
 // icons
 import { FaBars } from "react-icons/fa";
@@ -10,7 +12,12 @@ import logo from "../../../../assets/favicon.svg";
 import MainBtnsList from "./MainBtnsList";
 import AppSidebar from "../appSidebar/AppSidebar";
 import AppHeaderLogoText from "./AppHeaderLogoText";
+
+// types
 import { type SidebarWraperComponentRefType } from "../SidebarWrapper";
+
+// framer motion
+import { motion } from "framer-motion";
 
 const Header = forwardRef<HTMLElement>((_, ref) => {
   const { pathname } = useLocation();
@@ -19,8 +26,6 @@ const Header = forwardRef<HTMLElement>((_, ref) => {
   const emergencyRef = useRef<HTMLElement>(null);
   const headerRef = ref || emergencyRef;
   const sidebarRef = useRef<SidebarWraperComponentRefType>(null);
-
-  const controles = useAnimationControls();
 
   return (
     <>
@@ -31,13 +36,7 @@ const Header = forwardRef<HTMLElement>((_, ref) => {
               title="toggle app sidebar btn"
               id="open-side-bar"
               onClick={() => {
-                sidebarRef.current?.setToggleSidebar((prev) => {
-                  controles.start({
-                    x: !prev ? 0 : "-100%",
-                  });
-
-                  return !prev;
-                });
+                sidebarRef.current?.setToggleSidebar((prev) => !prev);
               }}
             >
               <FaBars />
@@ -73,7 +72,7 @@ const Header = forwardRef<HTMLElement>((_, ref) => {
         </div>
       </header>
 
-      <AppSidebar ref={sidebarRef} sidebarItemControlls={controles} />
+      <AppSidebar ref={sidebarRef} />
     </>
   );
 });
