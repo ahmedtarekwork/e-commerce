@@ -19,7 +19,7 @@ const DangerZoneBtn = ({
     <>
       <button
         title="danger zone red"
-        onClick={() => sureModalRef.current?.toggleModal(true)}
+        onClick={() => sureModalRef.current?.setOpenModal(true)}
         className="red-btn danger-zone-btn"
       >
         {content}

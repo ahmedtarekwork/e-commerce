@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // react-router-dom
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate, Link } from "react-router-dom";
 
 // react-hook-form
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -50,6 +50,7 @@ import type { ProductType } from "../../../utils/types";
 
 // icons
 import { IoIosAddCircle } from "react-icons/io";
+import { IoCaretBackCircleSharp } from "react-icons/io5";
 
 // SVGs
 import IdRequiredSvg from "../../../../imgs/ID_required.svg";
@@ -135,10 +136,10 @@ const NewProductPage = () => {
   // states
   const [product, setProduct] = useState<ProductType | undefined>(appProduct);
   const [selectedCategory, setSelectedCategory] = useState<string>(
-    product?.category._id || ""
+    product?.category?._id || ""
   );
   const [selectedBrand, setSelectedBrand] = useState<string>(
-    product?.brand._id || ""
+    product?.brand?._id || ""
   );
   const [imgErr, setImgErr] = useState("");
 
@@ -300,7 +301,7 @@ const NewProductPage = () => {
           const newValue = productData[oldKey as keyof typeof productData];
 
           const finalOldValue = ["category", "brand"].includes(oldKey)
-            ? (oldValue as ProductType["brand" | "category"])._id
+            ? (oldValue as ProductType["brand" | "category"])?._id
             : oldValue;
 
           if (newValue === finalOldValue) {
@@ -330,9 +331,9 @@ const NewProductPage = () => {
         setValue(key as keyof requestProductType, val as any)
       );
 
-      if (appProduct?.brand._id) setSelectedBrand(appProduct?.brand._id);
-      if (appProduct?.category._id)
-        setSelectedCategory(appProduct?.category._id);
+      if (appProduct?.brand?._id) setSelectedBrand(appProduct.brand._id);
+      if (appProduct?.category?._id)
+        setSelectedCategory(appProduct.category._id);
 
       imgsList.current?.setInitImgs(appProduct.imgs);
     }
@@ -370,8 +371,9 @@ const NewProductPage = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setValue(key as keyof requestProductType, val as any)
       );
-      setSelectedBrand(resProduct.brand._id);
-      setSelectedCategory(resProduct.category._id);
+      if (resProduct.brand?._id) setSelectedBrand(resProduct.brand._id);
+      if (resProduct.category?._id)
+        setSelectedCategory(resProduct.category._id);
 
       imgsList.current?.setInitImgs(resProduct.imgs);
     }
@@ -440,6 +442,22 @@ const NewProductPage = () => {
 
   return (
     <AnimatedLayout>
+      <Link
+        to="/dashboard/products"
+        relative="path"
+        className="btn"
+        style={{
+          marginBottom: 10,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+        }}
+      >
+        <IoCaretBackCircleSharp size={20} />
+        back to products
+      </Link>
+
       <Heading>
         {isEditMode
           ? `Edit ${product?.title ? `"${product.title}"` : "The Product"}`
@@ -471,7 +489,6 @@ const NewProductPage = () => {
             label="choose category"
             disabled={{
               value: productLoading,
-              text: "Loading...",
             }}
             listOptsArr={appCategories.map((cat) => {
               return {
@@ -496,7 +513,6 @@ const NewProductPage = () => {
             label="choose brand"
             disabled={{
               value: productLoading,
-              text: "Loading...",
             }}
             listOptsArr={appBrands.map((brand) => ({
               selected: brand._id === selectedBrand,

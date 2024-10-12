@@ -87,7 +87,7 @@ const DonationPage = () => {
     },
 
     onSettled() {
-      sureModalRef.current?.toggleModal(false);
+      sureModalRef.current?.setOpenModal(false);
     },
   });
 

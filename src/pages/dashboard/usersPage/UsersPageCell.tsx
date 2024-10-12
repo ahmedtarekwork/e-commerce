@@ -50,7 +50,7 @@ const ShowOrdersBtn = ({
     title="show user orders btn"
     className="btn"
     onClick={() => {
-      modalRef.current?.toggleModal(true);
+      modalRef.current?.setOpenModal(true);
       setSelectedUserId(userId);
       setSelectedUsername(username);
     }}

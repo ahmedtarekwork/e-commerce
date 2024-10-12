@@ -78,50 +78,46 @@ const DonatePlanCard = ({
   const TagName = user?.donationPlan ? "button" : BtnWithSpinner;
 
   return (
-    <>
-      <li className={`donate-plan-card${specialType ? ` ${specialType}` : ""}`}>
-        {specialType === "popular" && (
-          <p className="porpular-mark">
-            <FaCrown />
-            most popular
-          </p>
-        )}
-
-        <h3 className="donate-plan-card-name">{name}</h3>
-        <p className="donate-plan-card-price">
-          {price}
-          {price !== "Free" ? <span>$ / month</span> : ""}
+    <li className={`donate-plan-card${specialType ? ` ${specialType}` : ""}`}>
+      {specialType === "popular" && (
+        <p className="porpular-mark">
+          <FaCrown />
+          most popular
         </p>
-        <p className="donate-plan-card-description">{description}</p>
+      )}
 
-        <TagName
-          toggleSpinner={!user?.donationPlan && isPending}
-          title="subscripe to this donate plan"
-          disabled={isCurrentPlan || isPending}
-          onClick={() => {
-            if (user) {
-              handlePayment({
-                sessionType: !user.donationPlan
-                  ? "donation"
-                  : "changeDonatePlan",
-                donationPlan: {
-                  description,
-                  name,
-                  price,
-                },
-                recurring: {
-                  interval: "month",
-                  interval_count: 1,
-                },
-              });
-            } else navigation("/login", { relative: "path" });
-          }}
-          className="donate-plan-card-btn btn"
-        >
-          {subscripeBtnContent}
-        </TagName>
-      </li>
-    </>
+      <h3 className="donate-plan-card-name">{name}</h3>
+      <p className="donate-plan-card-price">
+        {price}
+        {price !== "Free" ? <span>$ / month</span> : ""}
+      </p>
+      <p className="donate-plan-card-description">{description}</p>
+
+      <TagName
+        toggleSpinner={!user?.donationPlan && isPending}
+        title="subscripe to this donate plan"
+        disabled={isCurrentPlan || isPending}
+        onClick={() => {
+          if (user) {
+            handlePayment({
+              sessionType: !user.donationPlan ? "donation" : "changeDonatePlan",
+              donationPlan: {
+                description,
+                name,
+                price,
+              },
+              recurring: {
+                interval: "month",
+                interval_count: 1,
+              },
+            });
+          } else navigation("/login", { relative: "path" });
+        }}
+        className="donate-plan-card-btn btn"
+      >
+        {subscripeBtnContent}
+      </TagName>
+    </li>
   );
 };
 export default DonatePlanCard;

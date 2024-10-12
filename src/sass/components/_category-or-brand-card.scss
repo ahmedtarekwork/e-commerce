@@ -30,6 +30,10 @@
     object-fit: contain;
     margin-top: auto;
     transition: 0.3s;
+
+    ~ div > * + * {
+      margin-top: 10px;
+    }
   }
 
   // for dashboard card

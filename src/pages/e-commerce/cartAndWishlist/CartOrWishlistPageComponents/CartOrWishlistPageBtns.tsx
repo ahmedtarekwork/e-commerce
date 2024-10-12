@@ -187,87 +187,81 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   return (
     <AnimatePresence initial={false}>
       {isShow && (
-        <>
-          <motion.div
-            variants={slideOutVariant}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="cart-or-wishlist-down-holder"
+        <motion.div
+          variants={slideOutVariant}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="cart-or-wishlist-down-holder"
+        >
+          {showCartComponents && (
+            <>
+              <CartCheckoutMethod
+                payMethod={payMethod}
+                setPayMethod={setPayMethod}
+                cartBtnRef={makeOrderBtnRef}
+              />
+              <CartAreaDownInfo userCart={userCart} />
+            </>
+          )}
+
+          <div
+            className="cart-or-wishlist-btns"
+            style={{
+              marginTop: 15,
+            }}
           >
             {showCartComponents && (
-              <>
-                <CartCheckoutMethod
-                  payMethod={payMethod}
-                  setPayMethod={setPayMethod}
-                  cartBtnRef={makeOrderBtnRef}
-                />
-                <CartAreaDownInfo userCart={userCart} />
-              </>
-            )}
-
-            <div
-              className="cart-or-wishlist-btns"
-              style={{
-                marginTop: 15,
-              }}
-            >
-              {showCartComponents && (
-                <button
-                  title="submit order btn"
-                  ref={makeOrderBtnRef}
-                  className="btn submit-user-order-btn"
-                  onClick={() => {
-                    if (payMethod === "Card")
-                      return handlePayment({ sessionType: "payment" });
-
-                    makeOrder();
-                  }}
-                  disabled={
-                    sessionUrlLoading || clearCartLoading || orderLoading
-                  }
-                >
-                  <IconAndSpinnerSwitcher
-                    toggleIcon={sessionUrlLoading || orderLoading}
-                    icon={
-                      payMethod === "Cash on Delivery" ? (
-                        <IoBagCheckOutline />
-                      ) : (
-                        <FaCreditCard />
-                      )
-                    }
-                  />
-
-                  {payMethod === "Cash on Delivery"
-                    ? "Submit Order"
-                    : "Checkout"}
-                </button>
-              )}
-
               <button
-                title="clear your cart or wishlist"
-                className="red-btn"
+                title="submit order btn"
+                ref={makeOrderBtnRef}
+                className="btn submit-user-order-btn"
                 onClick={() => {
-                  if (isCartPage) return clearCart();
-                  if (user) deleteWishlist();
+                  if (payMethod === "Card")
+                    return handlePayment({ sessionType: "payment" });
+
+                  makeOrder();
                 }}
-                disabled={clearCartLoading || deleteWishlistLoading}
+                disabled={sessionUrlLoading || clearCartLoading || orderLoading}
               >
                 <IconAndSpinnerSwitcher
-                  toggleIcon={clearCartLoading || deleteWishlistLoading}
+                  toggleIcon={sessionUrlLoading || orderLoading}
                   icon={
-                    isCartPage ? (
-                      <MdOutlineRemoveShoppingCart />
+                    payMethod === "Cash on Delivery" ? (
+                      <IoBagCheckOutline />
                     ) : (
-                      <IoMdHeartDislike />
+                      <FaCreditCard />
                     )
                   }
                 />
-                Clear Your {isCartPage ? "Cart" : "Wishlist"}
+
+                {payMethod === "Cash on Delivery" ? "Submit Order" : "Checkout"}
               </button>
-            </div>
-          </motion.div>
-        </>
+            )}
+
+            <button
+              title="clear your cart or wishlist"
+              className="red-btn"
+              onClick={() => {
+                if (isCartPage) return clearCart();
+                if (user) deleteWishlist();
+              }}
+              disabled={clearCartLoading || deleteWishlistLoading}
+            >
+              <IconAndSpinnerSwitcher
+                toggleIcon={clearCartLoading || deleteWishlistLoading}
+                icon={
+                  isCartPage ? (
+                    <MdOutlineRemoveShoppingCart />
+                  ) : (
+                    <IoMdHeartDislike />
+                  )
+                }
+              />
+              Clear Your {isCartPage ? "Cart" : "Wishlist"}
+            </button>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

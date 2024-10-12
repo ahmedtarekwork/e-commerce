@@ -281,11 +281,13 @@ a.btn:is([disabled], [data-disabled=true]):active,
   background: rgba(43, 42, 42, 0.85);
   position: fixed;
   inset: 0;
+}
+.overlay:not(.no-animation) {
   pointer-events: none;
   opacity: 0;
   transition: 0.3s;
 }
-.overlay.active {
+.overlay:not(.no-animation).active {
   opacity: 1;
   pointer-events: all;
 }
@@ -1892,6 +1894,9 @@ form#auth-form {
   margin-top: auto;
   transition: 0.3s;
 }
+.category-or-brand-card img ~ div > * + * {
+  margin-top: 10px;
+}
 .category-or-brand-card .category-and-brand-card-btns-holder {
   display: flex;
   gap: 7px;
@@ -2201,18 +2206,9 @@ form#auth-form {
   gap: 10px;
   flex-direction: column;
   position: fixed;
-  transition: 0.3s;
-  scale: 0;
 }
 .app-modal:not(.are-you-sure-modal) {
   inset: 10px;
-}
-.app-modal.active {
-  scale: 1;
-}
-.app-modal.full-screen {
-  inset: 10px;
-  translate: unset;
 }
 .app-modal-cells-holder {
   background: #fff;
@@ -2249,9 +2245,6 @@ form#auth-form {
 }
 .app-modal-cell-val a {
   width: 100%;
-}
-.app-modal-table-holder {
-  margin-top: 10px;
 }
 .app-modal-btns-holder {
   border: var(--brdr);
@@ -2304,16 +2297,11 @@ form#auth-form {
   padding: 0;
   width: 35px;
   height: 35px;
+  border-radius: 50%;
   font-weight: 800;
   font-size: 18px;
-  border-radius: 50%;
-  transition: 0.2s;
   margin-right: auto;
   aspect-ratio: 1;
-  translate: 0 45px;
-}
-.modal-close-btn.active {
-  translate: 0;
 }
 
 form {
@@ -2421,8 +2409,29 @@ input {
   transition: 0.3s;
   border-radius: var(--radius);
 }
-textarea::-moz-placeholder, input::-moz-placeholder {
+textarea:not([disabled])::-moz-placeholder, input:not([disabled])::-moz-placeholder {
   color: var(--main);
+}
+textarea:not([disabled])::placeholder,
+input:not([disabled])::placeholder {
+  color: var(--main);
+}
+textarea[disabled],
+input[disabled] {
+  cursor: not-allowed;
+}
+textarea[disabled]:hover,
+input[disabled]:hover {
+  border-color: rgb(126, 126, 126);
+}
+textarea[disabled]::-moz-placeholder, input[disabled]::-moz-placeholder {
+  color: gray;
+}
+textarea[disabled]::placeholder,
+input[disabled]::placeholder {
+  color: gray;
+}
+textarea::-moz-placeholder, input::-moz-placeholder {
   -moz-transition: 0.3s;
   transition: 0.3s;
   -moz-user-select: none;
@@ -2430,7 +2439,6 @@ textarea::-moz-placeholder, input::-moz-placeholder {
 }
 textarea::placeholder,
 input::placeholder {
-  color: var(--main);
   transition: 0.3s;
   -webkit-user-select: none;
      -moz-user-select: none;

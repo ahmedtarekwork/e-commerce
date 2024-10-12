@@ -28,28 +28,26 @@ const FormList = ({
   const { className } = listAttr;
 
   return (
-    <>
-      <ul
-        {...listAttr}
-        className={`form-list${className ? ` ${className}` : ""}`}
-      >
-        {inputsList.map(({ label, ...input }) => (
-          <li key={nanoid()}>
-            <input
-              {...input}
-              type={ListType === "radio-list" ? "radio" : "checkbox"}
-            />
-            <label htmlFor={input.id}>
-              <span>
-                <BsCheckLg />
-              </span>
+    <ul
+      {...listAttr}
+      className={`form-list${className ? ` ${className}` : ""}`}
+    >
+      {inputsList.map(({ label, ...input }) => (
+        <li key={nanoid()}>
+          <input
+            {...input}
+            type={ListType === "radio-list" ? "radio" : "checkbox"}
+          />
+          <label htmlFor={input.id}>
+            <span>
+              <BsCheckLg />
+            </span>
 
-              {label}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </>
+            {label}
+          </label>
+        </li>
+      ))}
+    </ul>
   );
 };
 

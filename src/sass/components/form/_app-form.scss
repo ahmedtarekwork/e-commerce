@@ -99,8 +99,22 @@ input {
 
   border-radius: var(--radius);
 
-  &::placeholder {
+  &:not([disabled])::placeholder {
     color: var(--main);
+  }
+  &[disabled] {
+    cursor: not-allowed;
+
+    &:hover {
+      border-color: rgb(126, 126, 126);
+    }
+
+    &::placeholder {
+      color: gray;
+    }
+  }
+
+  &::placeholder {
     transition: 0.3s;
     user-select: none;
   }

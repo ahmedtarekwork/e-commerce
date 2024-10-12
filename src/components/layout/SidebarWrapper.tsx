@@ -22,7 +22,7 @@ type Props = {
 
   /* "closeList property": {
       list[] property => if the element inside it has been clicked it will close the sidebar
-      reversedList[] => if the element inside it has been clicked it willn't close the sidebar, but if any other element has been clicked it will close the sidebar
+      reversedList[] => if the element inside it has been clicked it won't close the sidebar, but if any other element has been clicked it will close the sidebar
     }
   */
 

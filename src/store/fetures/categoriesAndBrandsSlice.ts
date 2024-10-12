@@ -23,27 +23,6 @@ const categoriesAndBrandsSlice = createSlice({
       state[payload.type] = payload.categoriesOrBrands;
     },
 
-    removeCategoryOrBrand: (
-      state,
-      { payload }: PayloadType<{ id: string }>
-    ) => {
-      state[payload.type] = state.categories.filter(
-        (cat) => cat._id !== payload.id
-      );
-    },
-
-    editCategoryOrBrand: (
-      state,
-      { payload }: PayloadType<{ newCategoryOrBrand: CategoryAndBrandType }>
-    ) => {
-      state[payload.type] = state.categories.map((cat) => {
-        if (cat._id === payload.newCategoryOrBrand._id)
-          cat = payload.newCategoryOrBrand;
-
-        return cat;
-      });
-    },
-
     addCategoryOrBrand: (
       state,
       { payload }: PayloadType<{ newCategoryOrBrand: CategoryAndBrandType }>
@@ -57,9 +36,5 @@ const categoriesAndBrandsSlice = createSlice({
 });
 
 export default categoriesAndBrandsSlice.reducer;
-export const {
-  setCategoriesOrBrand,
-  removeCategoryOrBrand,
-  addCategoryOrBrand,
-  editCategoryOrBrand,
-} = categoriesAndBrandsSlice.actions;
+export const { setCategoriesOrBrand, addCategoryOrBrand } =
+  categoriesAndBrandsSlice.actions;

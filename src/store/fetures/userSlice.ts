@@ -27,9 +27,6 @@ const userSlice = createSlice({
     setUser: (state, { payload }: PayloadAction<UserType>) => {
       state.user = payload;
     },
-    removeUser: (state) => {
-      state.user = null;
-    },
     logoutUser: (state) => {
       state.user = null;
     },
@@ -37,9 +34,6 @@ const userSlice = createSlice({
     // all users
     setAllUsers: (state, { payload }: PayloadAction<UserType[]>) => {
       state.allUsers = payload;
-    },
-    resetAllUsers: (state) => {
-      state.allUsers = [];
     },
 
     // current user wishlist
@@ -71,7 +65,6 @@ const userSlice = createSlice({
 export const {
   // current user
   setUser,
-  removeUser,
   logoutUser,
 
   // current user wishlist
@@ -81,7 +74,6 @@ export const {
 
   // all users
   setAllUsers,
-  resetAllUsers,
 
   // current user cart
   setCart,

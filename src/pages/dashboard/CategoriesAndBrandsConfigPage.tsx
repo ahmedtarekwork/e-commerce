@@ -10,7 +10,7 @@ import {
 } from "react";
 
 // react router
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 // components
 import Spinner from "../../components/spinners/Spinner";
@@ -18,16 +18,13 @@ import BtnWithSpinner from "../../components/animatedBtns/BtnWithSpinner";
 import InputComponent from "../../components/appForm/Input/InputComponent";
 
 // react query
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
 import useSelector from "../../hooks/redux/useSelector";
 // redux actions
-import {
-  addCategoryOrBrand,
-  editCategoryOrBrand,
-} from "../../store/fetures/categoriesAndBrandsSlice";
+import { addCategoryOrBrand } from "../../store/fetures/categoriesAndBrandsSlice";
 
 // utils
 import axios from "axios";
@@ -38,6 +35,9 @@ import type { CategoryAndBrandType } from "../../utils/types";
 // hooks
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import useShowMsg from "../../hooks/useShowMsg";
+
+// icons
+import { IoCaretBackCircleSharp } from "react-icons/io5";
 
 type Props = {
   type: "categories" | "brands";
@@ -103,6 +103,8 @@ const editModelMutationFn = async ({
 };
 
 const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
+  const queryClient = useQueryClient();
+
   // react router
   const navigate = useNavigate();
   const id = useSearchParams()[0].get("id");
@@ -122,6 +124,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
 
   // refs
   const formRef = useRef<HTMLFormElement>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
 
   // states
   const [editableModel, setEditableModel] = useState<
@@ -145,6 +148,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
       dispatch(addCategoryOrBrand({ type, newCategoryOrBrand: data }));
 
       formRef.current?.reset();
+      if (imgInputRef.current) imgInputRef.current.value = "";
       setName("");
       setImage(null);
     },
@@ -171,13 +175,14 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
   const { mutate: editModel, isPending: editModelLoading } = useMutation({
     mutationKey: [`add new ${modelName}`],
     mutationFn: editModelMutationFn,
-    onSuccess(data) {
+    onSuccess() {
       showMsg?.({
         content: `${modelName} updated successfully`,
         clr: "green",
         time: 4000,
       });
-      dispatch(editCategoryOrBrand({ type, newCategoryOrBrand: data }));
+
+      queryClient.prefetchQuery({ queryKey: [`get ${type}`] });
 
       navigate(`/dashboard/${type}`, { relative: "path" });
     },
@@ -232,11 +237,29 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
 
   return (
     <>
+      <Link
+        data-disabled={modelLoading || editModelLoading}
+        className="btn"
+        to={`/dashboard/${type}`}
+        relative="path"
+        style={{
+          marginBottom: 10,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+        }}
+      >
+        <IoCaretBackCircleSharp size={20} />
+        back to {type}
+      </Link>
+
       <form onSubmit={handleSubmit}>
         <InputComponent
           placeholder={`${modelName} name...`}
           value={name}
           onChange={(e) => setName(e.currentTarget.value)}
+          disabled={modelLoading}
         />
 
         {(image || editableModel?.image.secure_url) && (
@@ -262,6 +285,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
         )}
 
         <input
+          ref={imgInputRef}
           type="file"
           id="category-or-brand-img"
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -279,11 +303,13 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
           }}
           data-disabled={modelLoading}
         >
-          {image ? "change" : "choose"} image for this {modelName}
+          {image || editableModel?.image.secure_url ? "change" : "choose"} image
+          for this {modelName}
         </label>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <button
+            disabled={modelLoading || editModelLoading}
             style={{ flex: 1 }}
             className="red-btn"
             type="button"
@@ -300,10 +326,14 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
             toggleSpinner={modelLoading || editModelLoading}
             className="btn"
             disabled={
-              (!image && !!id) || !name || modelLoading || editModelLoading
+              (!!id && name === editableModel?.name) ||
+              (!image && !name && !!id) ||
+              (!name && !id) ||
+              modelLoading ||
+              editModelLoading
             }
           >
-            {id ? "update" : "submit"} category
+            {id ? "update" : "submit"} {modelName}
           </BtnWithSpinner>
         </div>
       </form>

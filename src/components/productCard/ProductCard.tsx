@@ -129,133 +129,136 @@ const ProductCard = ({
     );
 
   return (
-    <>
-      <TagName
-        key={_id}
-        className={`product-card${className ? ` ${className}` : ""}`}
-      >
-        {withAddToWishList &&
-          !isDashboard &&
-          (user ? (
-            <button
-              title="add to wishlist btn"
-              disabled={wishlistLoading}
-              className="add-to-wishlist"
-              onClick={toggleFromWishlist}
-            >
-              <IconAndSpinnerSwitcher
-                toggleIcon={wishlistLoading}
-                icon={
-                  <FillIcon
-                    className={
-                      user?.wishlist?.some((prdId) => prdId === _id)
-                        ? " active"
-                        : ""
-                    }
-                    fill={<FaHeart />}
-                    stroke={<FaRegHeart />}
-                  />
-                }
-              />
-            </button>
-          ) : (
-            <Link
-              title="add product to wishlist btn"
-              className="add-to-wishlist"
-              to="/login"
-              relative="path"
-            >
-              <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
-            </Link>
-          ))}
-
-        <ImgsSlider imgWidth={imgWidth || "150px"} imgs={imgs} />
-
-        <div className="product-data-big-holder">
-          <strong className="product-card-title">{title}</strong>
-
-          {(cells || productCardCells).map((prop) => {
-            if (!withQty && prop === "quantity") return;
-
-            if (withAddMore && prop === "count") {
-              return (
-                <ProductCardQtyList
-                  product={product as OrderProductType}
-                  propName="count"
-                  key={prop}
-                />
-              );
-            }
-
-            let propValue = product[prop as keyof typeof product];
-
-            if (prop === "price") propValue += "$";
-
-            const isCategoryOrBrandProp =
-              ["brand", "category"].includes(prop) &&
-              (propValue as ProductType["category" | "brand"])?.name;
-
-            if (isCategoryOrBrandProp) {
-              propValue = (propValue as ProductType["category" | "brand"]).name;
-            }
-
-            return (
-              <PropCell
-                key={prop}
-                name={prop}
-                val={propValue?.toString()}
-                valueAsLink={
-                  isCategoryOrBrandProp
-                    ? { path: `/products?${prop}=${propValue}` }
-                    : undefined
-                }
-              />
-            );
-          })}
-
-          <div className="product-card-btns-holder">
-            <Link
-              title="go to single product page btn"
-              relative="path"
-              to={`${isDashboard ? "/dashboard" : ""}/product/${_id}`}
-              className="product-card-more-info btn"
-            >
-              more info
-            </Link>
-
-            {withAddToCart && (
-              <ProductCardAddToCartBtn
-                productId={product._id}
-                productQty={(product as ProductType).quantity}
-              />
-            )}
-          </div>
-        </div>
-
-        {withDeleteBtn && (
+    <TagName
+      key={_id}
+      className={`product-card${className ? ` ${className}` : ""}`}
+    >
+      {withAddToWishList &&
+        !isDashboard &&
+        (user ? (
           <button
-            title="remove product from cart red btn"
-            disabled={wishlistLoading || removeFromCartLoading}
-            className="red-btn delete-product-btn"
-            onClick={() => {
-              if (withDeleteBtn === "cart") {
-                if (user) removeFromCart({ productId: _id, userId: user._id });
-              } else toggleFromWishlist();
-            }}
+            title="add to wishlist btn"
+            disabled={wishlistLoading}
+            className="add-to-wishlist"
+            onClick={toggleFromWishlist}
           >
             <IconAndSpinnerSwitcher
-              toggleIcon={wishlistLoading || removeFromCartLoading}
+              toggleIcon={wishlistLoading}
               icon={
                 <FillIcon
-                  stroke={<AiOutlineDelete />}
-                  fill={<AiFillDelete />}
+                  className={
+                    user?.wishlist?.some((prdId) => prdId === _id)
+                      ? " active"
+                      : ""
+                  }
+                  fill={<FaHeart />}
+                  stroke={<FaRegHeart />}
                 />
               }
             />
           </button>
-        )}
-      </TagName>
-    </>
+        ) : (
+          <Link
+            title="add product to wishlist btn"
+            className="add-to-wishlist"
+            to="/login"
+            relative="path"
+          >
+            <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
+          </Link>
+        ))}
+
+      <ImgsSlider imgWidth={imgWidth || "150px"} imgs={imgs} />
+
+      <div className="product-data-big-holder">
+        <strong className="product-card-title">{title}</strong>
+
+        {(cells || productCardCells).map((prop) => {
+          if (!withQty && prop === "quantity") return;
+
+          if (withAddMore && prop === "count") {
+            return (
+              <ProductCardQtyList
+                product={product as OrderProductType}
+                propName="count"
+                key={prop}
+              />
+            );
+          }
+
+          let propValue = product[prop as keyof typeof product];
+
+          if (prop === "price") propValue += "$";
+
+          const isCategoryOrBrandProp = ["brand", "category"].includes(prop);
+
+          if (isCategoryOrBrandProp) {
+            propValue =
+              (propValue as ProductType["category" | "brand"])?.name ||
+              "not specified";
+          }
+
+          return (
+            <PropCell
+              key={prop}
+              name={prop}
+              val={
+                isCategoryOrBrandProp && propValue === "not specified" ? (
+                  <span style={{ color: "var(--danger)", fontWeight: "500" }}>
+                    {propValue?.toString()}
+                  </span>
+                ) : (
+                  propValue?.toString()
+                )
+              }
+              valueAsLink={
+                propValue !== "not specified" && isCategoryOrBrandProp
+                  ? { path: `/products?${prop}=${propValue}` }
+                  : undefined
+              }
+            />
+          );
+        })}
+
+        <div className="product-card-btns-holder">
+          <Link
+            title="go to single product page btn"
+            relative="path"
+            to={`${isDashboard ? "/dashboard" : ""}/product/${_id}`}
+            className="product-card-more-info btn"
+          >
+            more info
+          </Link>
+
+          {withAddToCart && (
+            <ProductCardAddToCartBtn
+              productId={product._id}
+              productQty={(product as ProductType).quantity}
+            />
+          )}
+        </div>
+      </div>
+
+      {withDeleteBtn && (
+        <button
+          title="remove product from cart red btn"
+          disabled={wishlistLoading || removeFromCartLoading}
+          className="red-btn delete-product-btn"
+          onClick={() => {
+            if (withDeleteBtn === "cart") {
+              if (user) removeFromCart({ productId: _id, userId: user._id });
+            } else toggleFromWishlist();
+          }}
+        >
+          <IconAndSpinnerSwitcher
+            toggleIcon={wishlistLoading || removeFromCartLoading}
+            icon={
+              <FillIcon stroke={<AiOutlineDelete />} fill={<AiFillDelete />} />
+            }
+          />
+        </button>
+      )}
+    </TagName>
   );
 };
 export default ProductCard;

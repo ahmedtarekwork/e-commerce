@@ -1,9 +1,7 @@
 // react
 import {
   useRef,
-  useState,
   useImperativeHandle,
-  useEffect,
   forwardRef,
   memo,
 
@@ -37,6 +35,7 @@ type Props = {
   setFiltersList: Dispatch<SetStateAction<FiltersListType>>;
   initCategories?: string[];
   initBrands?: string[];
+  filtersList: FiltersListType;
 };
 
 export type ProductsPageFiltersListRefType = {
@@ -54,14 +53,7 @@ const availabilityOptionsList: AvailabilityOption[] = [
 const ProductsPageFiltersList = memo(
   forwardRef<ProductsPageFiltersListRefType, Props>(
     (
-      {
-        setPage,
-        sidebarCloseList,
-        apiPriceRange,
-        setFiltersList,
-        initCategories,
-        initBrands,
-      },
+      { setPage, sidebarCloseList, apiPriceRange, setFiltersList, filtersList },
       ref
     ) => {
       // refs
@@ -74,17 +66,6 @@ const ProductsPageFiltersList = memo(
       const sidebarRef = useRef<SidebarWraperComponentRefType>(null);
       const MinPriceRef = useRef<HTMLInputElement>(null);
       const MaxPriceRef = useRef<HTMLInputElement>(null);
-
-      const filtersListStorage = useRef<FiltersListType>({
-        categories: initCategories,
-        brands: initBrands,
-        availability: "both",
-      });
-
-      // states
-      const [filtersListCloseList, setFiltersListCloseList] = useState<
-        (HTMLElement | null)[]
-      >([]);
 
       // handlers
       const preventWrongValues = (e: ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +108,6 @@ const ProductsPageFiltersList = memo(
         };
 
         isResetProductsRef.current = true;
-        filtersListStorage.current = finalValues;
         setFiltersList(finalValues);
         setPage(1);
 
@@ -143,7 +123,6 @@ const ProductsPageFiltersList = memo(
         };
 
         isResetProductsRef.current = true;
-        filtersListStorage.current = resetedValues;
         setFiltersList(resetedValues);
         setPage(1);
 
@@ -152,20 +131,12 @@ const ProductsPageFiltersList = memo(
 
       useImperativeHandle(ref, () => ({ sidebarRef, isResetProductsRef }), []);
 
-      useEffect(() => {
-        const isSame = sidebarCloseList.sort().every((el, i) => {
-          return el?.isEqualNode(filtersListCloseList.sort()[i]);
-        });
-
-        if (!isSame) setFiltersListCloseList(sidebarCloseList);
-      }, [sidebarCloseList, filtersListCloseList]);
-
       return (
         <SidebarWrapper
           insideClose={false}
           ref={sidebarRef}
           closeList={{
-            reversedList: filtersListCloseList,
+            reversedList: sidebarCloseList,
           }}
           id="filters-list-sidebar"
         >
@@ -173,13 +144,13 @@ const ProductsPageFiltersList = memo(
 
           <ul className="products-page-filters-list">
             <FilterBySpecificTopicCell
-              defaultValues={filtersListStorage.current["categories"]}
+              defaultValues={filtersList["categories"]}
               ref={catsListRef}
               query="categories"
               title="Categories"
             />
             <FilterBySpecificTopicCell
-              defaultValues={filtersListStorage.current["brands"]}
+              defaultValues={filtersList["brands"]}
               ref={brandsListRef}
               query="brands"
               title="Brands"
@@ -187,8 +158,8 @@ const ProductsPageFiltersList = memo(
 
             <ProductsPageFilterCell
               defaultValues={
-                filtersListStorage.current["availability"]
-                  ? [filtersListStorage.current["availability"]]
+                filtersList["availability"]
+                  ? [filtersList["availability"]]
                   : undefined
               }
               ref={availabilityOptionRef}

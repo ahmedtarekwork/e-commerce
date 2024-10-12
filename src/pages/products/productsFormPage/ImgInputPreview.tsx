@@ -68,8 +68,6 @@ const removeSingleProductImageMutationFn = async ({
 
 const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
   ({ imgErr, product, setProduct }, ref) => {
-    const handleError = useHandleErrorMsg();
-
     const queryClient = useQueryClient();
 
     // react router
@@ -77,7 +75,10 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
 
     // redux
     const dispatch = useDispatch();
+
+    // hooks
     const showMsg = useShowMsg();
+    const handleError = useHandleErrorMsg();
 
     // states
     const [imgsList, setImgsList] = useState<{ img: File; _id: string }[]>([]);
@@ -143,7 +144,6 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
     });
 
     // refs
-    const imgInputRef = useRef<HTMLInputElement | null>(null);
     const listRef = useRef<HTMLUListElement>(null);
 
     useImperativeHandle(
@@ -234,7 +234,6 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
                     setImgsList((prev) => [...prev, ...finalImgs]);
                   }
                 }}
-                ref={imgInputRef}
                 disabled={imgsList.length === imgsMaxLegnth}
                 id="imgs"
                 type="file"

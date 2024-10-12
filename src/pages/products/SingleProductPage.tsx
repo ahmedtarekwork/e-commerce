@@ -124,7 +124,7 @@ const SingleProductPage = () => {
     mutationFn: deleteProductMutationFn,
     onSuccess() {
       if (id) dispatch(removeProduct(id));
-      queryClient.refetchQueries({ queryKey: ["getProducts"] });
+      queryClient.prefetchQuery({ queryKey: ["getProducts"] });
       navigate(`${isDashboard ? "/dashboard" : ""}/products`, {
         relative: "path",
       });
@@ -248,28 +248,68 @@ const SingleProductPage = () => {
           <h1 className="single-product-title">{title}</h1>
           <PropCell
             name="brand"
-            valueAsLink={{
-              path: `/products?brand=${brand.name}`,
-            }}
-            val={brand.name}
+            valueAsLink={
+              brand?.name
+                ? {
+                    path: `/products?brand=${brand?.name || "not specified"}`,
+                  }
+                : undefined
+            }
+            val={
+              brand?.name || (
+                <span style={{ color: "var(--danger)", fontWeight: 500 }}>
+                  not specified
+                </span>
+              )
+            }
           />
           <PropCell name="price" val={price + "$"} />
           <PropCell
             className="single-product-color"
             name="color"
-            val={""}
+            val={
+              <span
+                style={{
+                  filter: "invert(1)",
+                  mixBlendMode: "difference",
+                  fontWeight: 600,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                  width: "fit-content",
+                }}
+              >
+                {color}
+              </span>
+            }
             propNameProps={{
               style: {
-                background: color,
+                backgroundColor: color,
+                padding: "5px 15px",
+                flex: "unset",
+                border: "var(--brdr)",
+                borderRadius: 4,
+                boxShadow: "var(--bx-shadow)",
               },
             }}
           />
           <PropCell
             name="category"
-            valueAsLink={{
-              path: `/products?category=${category.name}`,
-            }}
-            val={category.name}
+            val={
+              category?.name || (
+                <span style={{ color: "var(--danger)", fontWeight: 500 }}>
+                  not specified
+                </span>
+              )
+            }
+            valueAsLink={
+              category?.name
+                ? {
+                    path: `/products?category=${
+                      category?.name || "not specified"
+                    }`,
+                  }
+                : undefined
+            }
           />
           <PropCell
             name="quantity"
@@ -323,7 +363,7 @@ const SingleProductPage = () => {
               title="open modal for delete product"
               className="red-btn delete-single-product"
               disabled={isLoading}
-              onClick={() => sureToDeleteModalRef.current?.toggleModal(true)}
+              onClick={() => sureToDeleteModalRef.current?.setOpenModal(true)}
               {...activeFillIcon}
             >
               <IconAndSpinnerSwitcher
@@ -400,7 +440,7 @@ const SingleProductPage = () => {
         toggleClosingFunctions
         functionToMake={() => {
           deleteProduct(id);
-          sureToDeleteModalRef.current?.toggleModal(false);
+          sureToDeleteModalRef.current?.setOpenModal(false);
         }}
       >
         Are You sure you want to delete "

@@ -49,7 +49,7 @@ const DeleteUserBtn = ({
         onClick={(e) => {
           attr.onClick?.(e);
 
-          sureModal.current?.toggleModal(true);
+          sureModal.current?.setOpenModal(true);
         }}
       >
         {children}

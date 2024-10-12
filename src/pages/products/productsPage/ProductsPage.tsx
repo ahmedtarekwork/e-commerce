@@ -130,6 +130,8 @@ const ProductsPage = () => {
   const searchQuery = useRef("");
   const pagesCount = useRef<number | undefined>(undefined);
 
+  const changeFiltersBtnRef = useRef<HTMLButtonElement>(null);
+
   const filtersListRef = useRef<ProductsPageFiltersListRefType>(null);
 
   const openFiltersBtnRef = useRef<HTMLButtonElement>(null);
@@ -164,18 +166,65 @@ const ProductsPage = () => {
     queryFn: getProductsQueryFn,
   });
 
+  console.log("apiProducts", apiProducts);
+  console.log("paginatedProducts", paginatedProducts);
+
   const noSearchResault =
     searchMode &&
     !Object.values(paginatedProducts).flat(Infinity).length &&
     !loading;
 
-  const noFiltersResault =
+  const [noFiltersResault, setNoFiltersResault] = useState(
     (filtersList.brands?.length ||
       filtersList.categories?.length ||
       filtersList.priceRange) &&
-    !searchMode &&
-    !loading &&
-    !Object.values(paginatedProducts).flat(Infinity).length;
+      !searchMode &&
+      !loading &&
+      !Object.values(paginatedProducts).flat(Infinity).length
+  );
+
+  const [openFiltersListBtns, setOpenFiltersListBtns] = useState(
+    [openFiltersBtnRef.current, changeFiltersBtnRef.current].filter((el) => el)
+  );
+
+  const changeOpenFiltersListBtnsList = () => {
+    if (
+      ![openFiltersBtnRef.current, changeFiltersBtnRef.current]
+        .sort()
+        .every((el, i) => {
+          return el?.isEqualNode(openFiltersListBtns.sort()[i]);
+        })
+    ) {
+      setOpenFiltersListBtns(
+        [openFiltersBtnRef.current, changeFiltersBtnRef.current].filter(
+          (el) => el
+        )
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (
+      (filtersList.brands?.length ||
+        filtersList.categories?.length ||
+        filtersList.priceRange) &&
+      !searchMode &&
+      !loading &&
+      !Object.values(paginatedProducts).flat(Infinity).length
+    ) {
+      if (!noFiltersResault) setNoFiltersResault(true);
+
+      changeOpenFiltersListBtnsList();
+    } else {
+      if (noFiltersResault) setNoFiltersResault(false);
+
+      changeOpenFiltersListBtnsList();
+    }
+  }, [filtersList, searchMode, loading, paginatedProducts]);
+
+  useEffect(() => {
+    changeOpenFiltersListBtnsList();
+  }, [noFiltersResault]);
 
   useEffect(() => {
     if (!initRender.current) {
@@ -207,19 +256,9 @@ const ProductsPage = () => {
           return { [page]: apiProducts.products };
         }
 
-        const oldProducts = prev[page] || [];
-        const newProducts = apiProducts.products;
-
-        const finalProducts = [
-          ...oldProducts.filter(({ _id }) =>
-            apiProducts.products.every(({ _id: same }) => same !== _id)
-          ),
-          ...newProducts,
-        ];
-
         return {
           ...prev,
-          [page]: finalProducts,
+          [page]: apiProducts.products,
         };
       });
 
@@ -236,7 +275,12 @@ const ProductsPage = () => {
     );
 
   // if no products
-  if (!productsList.length && isSuccess) {
+  if (
+    !productsList.length &&
+    isSuccess &&
+    !noSearchResault &&
+    !noFiltersResault
+  ) {
     return (
       <EmptyPage
         content={
@@ -291,7 +335,7 @@ const ProductsPage = () => {
         title="open products filters list btn"
         className="btn open-filters-btn"
         onClick={() =>
-          filtersListRef.current?.sidebarRef.current?.setToggleSidebar?.(true)
+          filtersListRef.current?.sidebarRef.current?.setToggleSidebar(true)
         }
         ref={openFiltersBtnRef}
       >
@@ -317,6 +361,7 @@ const ProductsPage = () => {
                   type: "custom",
                   btn: (
                     <button
+                      ref={changeFiltersBtnRef}
                       className="btn no-filters-resault-sidebar-toggler"
                       onClick={() =>
                         filtersListRef.current?.sidebarRef.current?.setToggleSidebar(
@@ -372,14 +417,12 @@ const ProductsPage = () => {
       <ProductsPageFiltersList
         ref={filtersListRef}
         setPage={setPage}
-        sidebarCloseList={[
-          openFiltersBtnRef.current,
-          document.querySelector(".no-filters-resault-sidebar-toggler"),
-        ]}
+        sidebarCloseList={openFiltersListBtns}
         apiPriceRange={apiProducts?.priceRange}
         setFiltersList={setFiltersList}
         initCategories={initCategories}
         initBrands={initBrands}
+        filtersList={filtersList}
       />
     </AnimatedLayout>
   );

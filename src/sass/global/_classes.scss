@@ -89,13 +89,16 @@ $btns: (
   background: rgba(#2b2a2a, 0.85);
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: 0.3s;
 
-  &.active {
-    opacity: 1;
-    pointer-events: all;
+  &:not(.no-animation) {
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.3s;
+
+    &.active {
+      opacity: 1;
+      pointer-events: all;
+    }
   }
 }
 

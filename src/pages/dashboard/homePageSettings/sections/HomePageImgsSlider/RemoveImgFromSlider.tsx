@@ -74,7 +74,7 @@ const RemoveImgFromSlider = ({ imgId }: Props) => {
         title="remove image form home page slider btn"
         disabled={isLoading || isSuccess}
         className="red-btn"
-        onClick={() => sureModelRef.current?.toggleModal(true)}
+        onClick={() => sureModelRef.current?.setOpenModal(true)}
         style={{
           display: "flex",
           alignItems: "center",
@@ -95,7 +95,7 @@ const RemoveImgFromSlider = ({ imgId }: Props) => {
         toggleClosingFunctions
         functionToMake={() => {
           removeImgFromSlider(imgId);
-          sureModelRef.current?.toggleModal(false);
+          sureModelRef.current?.setOpenModal(false);
         }}
       >
         Are you sure you want to remove this image from home page images slider

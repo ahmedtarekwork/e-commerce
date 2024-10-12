@@ -35,7 +35,7 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
     // refs
     const acceptBtn = useRef<HTMLButtonElement>(null);
     const modalRef = useRef<AppModalRefType>({
-      toggleModal: () => {},
+      setOpenModal: () => {},
       appModalEl: null,
     });
 
@@ -81,7 +81,7 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
             title="cencel"
             className="red-btn"
             data-modal-status="cancel"
-            onClick={() => modalRef.current?.toggleModal(false)}
+            onClick={() => modalRef.current?.setOpenModal(false)}
           >
             {props.btnsContent?.no || "No"}
           </button>
