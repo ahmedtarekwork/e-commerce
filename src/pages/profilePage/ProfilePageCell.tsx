@@ -42,7 +42,7 @@ const updateUserMutationFn = async (
 ) => {
   if (!Object.keys(userData).length) {
     throw new axios.AxiosError(
-      "you need to send some data to update it",
+      "__APP_ERROR__ you need to send some data to update it",
       "400"
     );
   }

@@ -55,7 +55,7 @@ const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
   const { user, userCart } = useSelector((state) => state.user);
 
   const isProductInCart =
-    userCart?.products?.some((prd) => prd._id === productId) || false;
+    (userCart?.products || []).some((prd) => prd._id === productId) || false;
 
   const isInStock = +(productQty || 0) > 0;
 

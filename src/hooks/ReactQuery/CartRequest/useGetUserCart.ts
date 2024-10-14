@@ -21,7 +21,8 @@ const getCartQueryFn = async ({
 }: {
   queryKey: string[];
 }): Promise<CartType> => {
-  if (!userId) throw new axios.AxiosError("user id is required", "400");
+  if (!userId)
+    throw new axios.AxiosError("__APP_ERROR__ user id is required", "400");
 
   return (await axios(`carts/${userId}`)).data;
 };

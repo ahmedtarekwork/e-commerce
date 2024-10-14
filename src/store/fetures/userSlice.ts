@@ -53,7 +53,7 @@ const userSlice = createSlice({
       state.cartLoading = false;
     },
     resetCart: (state) => {
-      state.userCart = null;
+      state.userCart = { products: [], orderdby: state.user?._id || "" };
       state.cartLoading = false;
     },
     setCartLoading: (state, { payload }: PayloadAction<boolean>) => {

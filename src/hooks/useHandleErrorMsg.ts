@@ -19,11 +19,15 @@ const useHandleErrorMsg = () => {
 
   return (err: unknown, emergencyMsg?: EmergencyMsgType, time?: number) => {
     let msg: string = axios.isAxiosError(err)
-      ? err.response?.data?.message || err.response?.data
+      ? err.response?.data?.message
       : emergencyMsg?.forAllStates;
 
     if (msg?.includes("E11000"))
       msg = emergencyMsg?.duplicatedMsg || "Duplicated Data Error";
+
+    if (axios.isAxiosError(err) && err.message.startsWith("__APP_ERROR__ ")) {
+      msg = err.message.replace("__APP_ERROR__ ", "");
+    }
 
     showMsg?.({
       clr: "red",

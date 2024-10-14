@@ -166,9 +166,6 @@ const ProductsPage = () => {
     queryFn: getProductsQueryFn,
   });
 
-  console.log("apiProducts", apiProducts);
-  console.log("paginatedProducts", paginatedProducts);
-
   const noSearchResault =
     searchMode &&
     !Object.values(paginatedProducts).flat(Infinity).length &&

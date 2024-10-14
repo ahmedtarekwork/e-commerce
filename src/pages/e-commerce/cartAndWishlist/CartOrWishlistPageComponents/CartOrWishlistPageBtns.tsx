@@ -24,6 +24,7 @@ import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndS
 // hooks
 import useGetPaymentSessionURL from "../../../../hooks/ReactQuery/useGetPaymentSessionURL";
 import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../../hooks/useShowMsg";
 
 // types
 import type { OrderType } from "../../../../utils/types";
@@ -50,17 +51,17 @@ type Props = {
 const clearCartMutationFn = async (userId: string) => {
   if (!userId)
     throw new axios.AxiosError(
-      "you need to login before modify your cart",
+      "__APP_ERROR__ you need to login before modify your cart",
       "403"
     );
 
-  return await axios.delete(`carts/${userId}/resetCart`);
+  return (await axios.delete(`carts/${userId}/resetCart`)).data;
 };
 
 const deleteWishlistMutationFn = async (userId: string) => {
   if (!userId)
     throw new axios.AxiosError(
-      "you need to login before modify your wishlist",
+      "__APP_ERROR__ you need to login before modify your wishlist",
       "403"
     );
 
@@ -78,7 +79,7 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
   const handleError = useHandleErrorMsg();
 
   // states
-  const showMsg = useHandleErrorMsg();
+  const showMsg = useShowMsg();
   const { user, userCart, wishlistLoading } = useSelector(
     (state) => state.user
   );
@@ -98,11 +99,12 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
     mutationKey: ["clearCart"],
     mutationFn: () => clearCartMutationFn(user?._id || ""),
 
-    onSuccess: () => {
+    onSuccess: (data) => {
       showMsg?.({
-        content: "your cart reseted successfully",
-        show: true,
-        time: 3500,
+        content:
+          "message" in data
+            ? (data.message as string)
+            : "your cart reseted successfully",
         clr: "green",
       });
 
@@ -126,8 +128,6 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
             "message" in data
               ? data.message
               : "your wishlist deleted successfully",
-          show: true,
-          time: 3500,
           clr: "green",
         });
 
@@ -163,8 +163,6 @@ const CartOrWishlistPageBtns = ({ isCartPage }: Props) => {
       showMsg?.({
         clr: "green",
         content: "order created successfully",
-        show: true,
-        time: 3500,
       });
 
       setTimeout(() => {

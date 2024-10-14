@@ -37,8 +37,8 @@ const CartBtn = () => {
     isPending: initCartLoading,
   } = useGetUserCart(user?._id || "");
 
-  const userCartCount = userCart?.products?.map(
-    (prd: OrderProductType) => prd.wantedQty
+  const userCartCount = (userCart?.products || []).map(
+    (prd: OrderProductType) => prd?.wantedQty || 0
   );
 
   let productsLength = 0;
