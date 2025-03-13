@@ -9,3 +9,16 @@ For backend I made API with nextjs 14 and use api routes for handle HTTP request
 **API Documentation Link On Postman:** https://documenter.getpostman.com/view/26052098/2sAXxQeXiR
 
 **API Repository On Github:** https://github.com/ahmedtarekwork/e-commerce-nextjs-api
+
+# Run Project On Your Local Machine
+- clone the repo or download the files of the project
+
+- install dependencies that project stands on
+```
+  npm install
+```
+
+- run this command to make a local server on your machine to run the project
+```
+  npm run dev
+```
