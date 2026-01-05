@@ -1,16 +1,19 @@
 import type {
-  Dispatch,
-  SetStateAction,
   ChangeEvent,
   ComponentProps,
+  Dispatch,
   ReactNode,
+  SetStateAction,
 } from "react";
 
 // icons
 import { BiSolidImageAdd } from "react-icons/bi";
 
+// utils
+import { nanoid } from "@reduxjs/toolkit";
+
 type Props = {
-  setImgsToUpload: Dispatch<SetStateAction<File[]>>;
+  setImgsToUpload: Dispatch<SetStateAction<{ id: string; file: File }[]>>;
   children: ReactNode;
 } & ComponentProps<"label">;
 
@@ -20,7 +23,10 @@ const AddImgsToHomeSliderBtn = ({
   ...attr
 }: Props) => {
   const handleHomePageImgsSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.currentTarget?.files || []);
+    const files = Array.from(e.currentTarget?.files || []).map((file) => ({
+      id: nanoid(),
+      file,
+    }));
     setImgsToUpload((prev) => [...prev, ...files]);
   };
 
