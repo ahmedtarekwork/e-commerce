@@ -7,7 +7,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
         made by
         <a
           className="link white"
-          href="https://ahmed-profile.netlify.app"
+          href={
+            import.meta.env.VITE_MY_PROFILE_URL ||
+            "https://ahmed-profile.vercel.app"
+          }
           target="_blank"
           rel="nofollow"
           title="maker profile link"
