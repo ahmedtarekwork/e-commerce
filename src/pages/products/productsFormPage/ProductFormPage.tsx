@@ -2,45 +2,32 @@
 import { useEffect, useRef, useState } from "react";
 
 // react-router-dom
-import { useLocation, useParams, useNavigate, Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 // react-hook-form
-import { SubmitHandler, useForm } from "react-hook-form";
-
-// redux
-import useSelector from "../../../hooks/redux/useSelector";
-import useDispatch from "../../../hooks/redux/useDispatch";
-// actions
-import { addProducts, editProduct } from "../../../store/fetures/productsSlice";
-import { setCategoriesOrBrand } from "../../../store/fetures/categoriesAndBrandsSlice";
+import { useForm } from "react-hook-form";
 
 // react query
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 // components
-import FormInput from "../../../components/appForm/Input/FormInput";
-import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
-import SplashScreen from "../../../components/spinners/SplashScreen";
-import EmptyPage from "../../../components/layout/EmptyPage";
-import DisplayError from "../../../components/layout/DisplayError";
 import Heading from "../../../components/Heading";
 import IconAndSpinnerSwitcher from "../../../components/animatedBtns/IconAndSpinnerSwitcher";
-import Spinner from "../../../components/spinners/Spinner";
-import SelectList, {
-  type SelectListComponentRefType,
-} from "../../../components/selectList/SelectList";
+import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
+import FormInput from "../../../components/appForm/Input/FormInput";
+import DisplayError from "../../../components/layout/DisplayError";
+import EmptyPage from "../../../components/layout/EmptyPage";
+import SplashScreen from "../../../components/spinners/SplashScreen";
 
 import ImgInputPreview, {
   type ImgInputPreviewRefType,
-} from "./ImgInputPreview";
+} from "./components/ImgInputPreview";
 
 // utils
 import axios from "../../../utils/axios";
 
 // hooks
-import useGetBrandsOrCategories from "../../../hooks/ReactQuery/useGetBrandsOrCategories";
-import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
-import useShowMsg from "../../../hooks/useShowMsg";
+import useSubmitProductForm from "../../../hooks/useSubmitProductForm";
 
 // framer motion
 import { motion } from "framer-motion";
@@ -57,6 +44,9 @@ import IdRequiredSvg from "../../../../imgs/ID_required.svg";
 
 // layouts
 import AnimatedLayout from "../../../layouts/AnimatedLayout";
+import ProductSelectedCategoryAndBrand, {
+  ProductSelectedCategoryAndBrandRefType,
+} from "./components/ProductSelectedCategoryAndBrand";
 
 export type ProductFormValues = Omit<
   ProductType,
@@ -70,13 +60,6 @@ export type requestProductType = Omit<
   imgs: File[];
 };
 
-type MutateFnArgumentsType<T> = {
-  productData: Omit<requestProductType, "category" | "brand"> & {
-    category: string;
-    brand: string;
-  };
-} & (T extends "patch" ? { productId: string } : { productId?: never });
-
 // fetchers
 const getSingleProductQueryFn = async ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -87,92 +70,29 @@ const getSingleProductQueryFn = async ({
   return (await axios.get(`products/${productId}`)).data;
 };
 
-const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
-  return async ({ productData, productId }: MutateFnArgumentsType<T>) => {
-    const formData = new FormData();
-
-    Object.entries(productData).forEach(([key, value]) => {
-      if (key === "imgs") {
-        return (value as File[]).forEach((img) =>
-          formData.append("imgs[]", img)
-        );
-      }
-
-      formData.append(key, value.toString());
-    });
-
-    return (
-      await axios[type](
-        `/products${type === "patch" ? `/${productId}` : ""}`,
-        productData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      )
-    ).data;
-  };
-};
-
 const NewProductPage = () => {
-  const handleError = useHandleErrorMsg();
-  const queryClient = useQueryClient();
-
   // react-router-dom
   const { pathname } = useLocation();
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const isEditMode = pathname.includes("/edit-product");
 
-  // redux
-  const dispatch = useDispatch();
-  const showMsg = useShowMsg();
-  const appProduct = useSelector((state) =>
-    state.products.products.find((prd) => prd._id === (id || ""))
-  );
-  const appCategories = useSelector(
-    (state) => state.categoriesAndBrands.categories
-  );
-  const appBrands = useSelector((state) => state.categoriesAndBrands.brands);
-
   // states
-  const [product, setProduct] = useState<ProductType | undefined>(appProduct);
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    product?.category?._id || ""
-  );
-  const [selectedBrand, setSelectedBrand] = useState<string>(
-    product?.brand?._id || ""
-  );
+  const [product, setProduct] = useState<ProductType | undefined>(undefined);
   const [imgErr, setImgErr] = useState("");
 
   // refs
   const imgsList = useRef<ImgInputPreviewRefType>(null);
-  const categoriesListRef = useRef<SelectListComponentRefType>(null);
-  const brandsListRef = useRef<SelectListComponentRefType>(null);
+  const categoriesListRef =
+    useRef<ProductSelectedCategoryAndBrandRefType>(null);
+  const brandsListRef = useRef<ProductSelectedCategoryAndBrandRefType>(null);
 
-  const isFirestRender = useRef(true);
+  const isFirstRender = useRef(true);
 
   // react query
 
-  // get brands
-  const {
-    data: resBrands,
-    isError: resBrandsErr,
-    error: resBrandsErrData,
-    refetch: getBrands,
-    isPending: resBrandsLoading,
-  } = useGetBrandsOrCategories("brands", undefined, false);
-
-  // get categories
-  const {
-    data: resCategories,
-    isError: resCategoriesErr,
-    error: resCategoriesErrData,
-    refetch: getCategories,
-    isPending: resCategoriesLoading,
-  } = useGetBrandsOrCategories("categories", undefined, false);
-
   // get single product "if edit mode"
   const {
-    refetch: getResProduct,
     data: resProduct,
     isError: resProductErr,
     error: resProductErrData,
@@ -181,59 +101,7 @@ const NewProductPage = () => {
   } = useQuery({
     queryKey: ["getSingleProduct", id || ""],
     queryFn: getSingleProductQueryFn,
-    enabled: false,
-  });
-
-  // make a new product
-  const { isPending: productLoading, mutate: addProductMutate } = useMutation({
-    mutationKey: ["addProduct"],
-    mutationFn: addOrUpdateProductMutationFn("post"),
-    onSuccess(data) {
-      if (data) {
-        showMsg?.({
-          clr: "green",
-          content: "product created successfully",
-        });
-
-        dispatch(addProducts([data as ProductType]));
-        queryClient.invalidateQueries({ queryKey: ["getProducts"] });
-
-        reset();
-
-        setSelectedBrand("");
-        setSelectedCategory("");
-
-        imgsList.current?.setImgsList([]);
-        imgsList.current?.setInitImgs([]);
-      }
-    },
-    onError(error) {
-      handleError(
-        error,
-        { forAllStates: "something went wrong while makeing a new product" },
-        5000
-      );
-    },
-  });
-
-  // edit existing product
-  const { mutate: editProductMutate, isPending: editLoading } = useMutation({
-    mutationKey: ["edit-product", id],
-    mutationFn: addOrUpdateProductMutationFn("patch"),
-    onSuccess(data) {
-      dispatch(editProduct(data as ProductType));
-      queryClient.prefetchQuery({ queryKey: ["getProducts"] });
-      queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
-
-      navigate("/dashboard/products", { relative: "path" });
-    },
-    onError(error) {
-      handleError(
-        error,
-        { forAllStates: "something went wrong while updating product info" },
-        5000
-      );
-    },
+    enabled: isEditMode && !!id,
   });
 
   // react-hook-form
@@ -248,121 +116,16 @@ const NewProductPage = () => {
     description: disErr,
   } = errors;
 
-  const onSubmit: SubmitHandler<ProductFormValues> = (data, e) => {
-    e?.preventDefault();
-
-    if (
-      !imgsList.current?.imgsList.length &&
-      !imgsList.current?.initImgs.length
-    ) {
-      return setImgErr("product must have at least one image");
-    }
-
-    if (!selectedBrand || !selectedCategory) {
-      return showMsg?.({
-        clr: "red",
-        content: `please select a ${
-          !selectedBrand ? "brand" : "category"
-        } for this product`,
-      });
-    }
-
-    const productData = {
-      ...data,
-      category: selectedCategory,
-      brand: selectedBrand,
-      imgs: imgsList.current?.imgsList.map((img) => img.img),
-    };
-
-    if (isEditMode) {
-      if (!id) {
-        return showMsg?.({
-          clr: "red",
-          content: "product id not found",
-        });
-      }
-
-      if (product) {
-        Object.entries(product).forEach(([oldKey, oldValue]) => {
-          if (oldKey === "ratings") {
-            delete productData[oldKey as keyof typeof productData];
-
-            return;
-          }
-
-          if (oldKey === "imgs") {
-            if (!productData.imgs.length) {
-              delete productData[oldKey as keyof typeof productData];
-            }
-
-            return;
-          }
-
-          const newValue = productData[oldKey as keyof typeof productData];
-
-          const finalOldValue = ["category", "brand"].includes(oldKey)
-            ? (oldValue as ProductType["brand" | "category"])?._id
-            : oldValue;
-
-          if (newValue === finalOldValue) {
-            delete productData[oldKey as keyof typeof productData];
-          }
-        });
-
-        editProductMutate({ productData, productId: id });
-      } else
-        showMsg?.({
-          clr: "red",
-          content: "something went wrong while updating product info",
-        });
-    } else {
-      addProductMutate({
-        productData,
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (!product && id) getResProduct();
-
-    if (appProduct && id) {
-      Object.entries(appProduct!).forEach(([key, val]) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setValue(key as keyof requestProductType, val as any)
-      );
-
-      if (appProduct?.brand?._id) setSelectedBrand(appProduct.brand._id);
-      if (appProduct?.category?._id)
-        setSelectedCategory(appProduct.category._id);
-
-      imgsList.current?.setInitImgs(appProduct.imgs);
-    }
-
-    if (!appCategories || !appCategories.length) getCategories();
-    if (!appBrands || !appBrands.length) getBrands();
-
-    if (isEditMode) {
-      // if the page is edit product => fill in form inputs with product data
-      if (id) {
-        if (product) {
-          type KeysArrType = (keyof Omit<
-            ProductFormValues,
-            "_id" | "imgs" | "ratings" | "totalRatings"
-          >)[];
-
-          const keysArr = Object.keys(product).filter((key) =>
-            ["totalRatings", "ratings", "_id", "imgs"].every(
-              (prop) => prop !== key
-            )
-          ) as KeysArrType;
-
-          keysArr.forEach((key) => setValue(key, product[key]));
-
-          imgsList.current?.setInitImgs(product.imgs);
-        }
-      }
-    }
-  }, []);
+  const { handler, isLoading } = useSubmitProductForm({
+    setImgErr,
+    reset,
+    imgsList,
+    isEditMode,
+    id,
+    product,
+    categoriesListRef,
+    brandsListRef,
+  });
 
   useEffect(() => {
     if (resProduct) {
@@ -371,45 +134,24 @@ const NewProductPage = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setValue(key as keyof requestProductType, val as any)
       );
-      if (resProduct.brand?._id) setSelectedBrand(resProduct.brand._id);
+      if (resProduct.brand?._id)
+        brandsListRef.current?.setSelectedItem(resProduct.brand._id);
       if (resProduct.category?._id)
-        setSelectedCategory(resProduct.category._id);
+        categoriesListRef.current?.setSelectedItem(resProduct.category._id);
 
       imgsList.current?.setInitImgs(resProduct.imgs);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resProduct]);
-
-  useEffect(() => {
-    if (resBrands) {
-      dispatch(
-        setCategoriesOrBrand({ type: "brands", categoriesOrBrands: resBrands })
-      );
-    }
-  }, [resBrands]);
-
-  useEffect(() => {
-    if (resCategories) {
-      dispatch(
-        setCategoriesOrBrand({
-          type: "categories",
-          categoriesOrBrands: resCategories,
-        })
-      );
-    }
-  }, [resCategories]);
 
   if (
     isEditMode &&
     resProductLoading &&
     resProductFetchStatus !== "idle" &&
-    isFirestRender.current
+    isFirstRender.current
   ) {
-    isFirestRender.current = false;
+    isFirstRender.current = false;
     return <SplashScreen children="Loading The Product..." />;
-  }
-
-  if (resBrandsLoading || resCategoriesLoading) {
-    return <Spinner fullWidth>Loading...</Spinner>;
   }
 
   if (isEditMode && !id) {
@@ -427,15 +169,6 @@ const NewProductPage = () => {
       <DisplayError
         error={resProductErrData}
         initMsg="Can't get the product at the moment"
-      />
-    );
-  }
-
-  if (resCategoriesErr || resBrandsErr) {
-    return (
-      <DisplayError
-        error={resCategoriesErrData || resBrandsErrData}
-        initMsg="something went wrong, try again later"
       />
     );
   }
@@ -464,7 +197,7 @@ const NewProductPage = () => {
           : "make a new product"}
       </Heading>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handler)}>
         <FormInput
           errorMsg={titleErr?.message}
           placeholder="product name"
@@ -482,51 +215,19 @@ const NewProductPage = () => {
           })}
         />
 
-        <div>
-          <span className="select-list-label">category :</span>
-          <SelectList
-            ref={categoriesListRef}
-            label="choose category"
-            disabled={{
-              value: productLoading,
-            }}
-            listOptsArr={appCategories.map((cat) => {
-              return {
-                selected: cat._id === selectedCategory,
-                text: cat.name,
-              };
-            })}
-            optClickFunc={(e) => {
-              const categoryId = appCategories.find(
-                (cat) => cat.name === e.currentTarget.dataset.opt
-              )?._id;
+        <ProductSelectedCategoryAndBrand
+          isLoading={isLoading}
+          ref={categoriesListRef}
+          type="category"
+          product={product}
+        />
 
-              if (categoryId) setSelectedCategory(categoryId);
-            }}
-          />
-        </div>
-
-        <div>
-          <span className="select-list-label">brand :</span>
-          <SelectList
-            ref={brandsListRef}
-            label="choose brand"
-            disabled={{
-              value: productLoading,
-            }}
-            listOptsArr={appBrands.map((brand) => ({
-              selected: brand._id === selectedBrand,
-              text: brand.name,
-            }))}
-            optClickFunc={(e) => {
-              const brandId = appBrands.find(
-                (brand) => brand.name === e.currentTarget.dataset.opt
-              )?._id;
-
-              if (brandId) setSelectedBrand(brandId);
-            }}
-          />
-        </div>
+        <ProductSelectedCategoryAndBrand
+          isLoading={isLoading}
+          ref={brandsListRef}
+          type="brand"
+          product={product}
+        />
 
         <FormInput
           type="number"
@@ -579,7 +280,7 @@ const NewProductPage = () => {
 
         <button
           title={isEditMode ? "save new changes" : "add product"}
-          disabled={productLoading || editLoading}
+          disabled={isLoading}
           className="btn"
           style={{
             display: "flex",
@@ -590,7 +291,7 @@ const NewProductPage = () => {
         >
           <IconAndSpinnerSwitcher
             spinnerDiminsions="20px"
-            toggleIcon={productLoading || editLoading}
+            toggleIcon={isLoading}
             icon={<IoIosAddCircle />}
           />
           {isEditMode ? "Save Changes" : "Add product"}

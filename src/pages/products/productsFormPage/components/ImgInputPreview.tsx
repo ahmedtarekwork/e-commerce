@@ -1,15 +1,14 @@
 // react
 import {
-  useState,
-  useEffect,
-  useRef,
-  useImperativeHandle,
   forwardRef,
-
-  // types
-  type SetStateAction,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
   type Dispatch,
   type MouseEvent,
+  // types
+  type SetStateAction,
 } from "react";
 
 // react router dom
@@ -19,24 +18,24 @@ import { useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // redux
-import useDispatch from "../../../hooks/redux/useDispatch";
+import useDispatch from "../../../../hooks/redux/useDispatch";
 // redux acions
-import { editProduct } from "../../../store/fetures/productsSlice";
+import { editProduct } from "../../../../store/fetures/productsSlice";
 
 // components
-import FormInput from "../../../components/appForm/Input/FormInput";
-import ErrorDiv from "../../../components/appForm/Input/ErrorDiv";
+import ErrorDiv from "../../../../components/appForm/Input/ErrorDiv";
+import FormInput from "../../../../components/appForm/Input/FormInput";
 
 // utils
-import axios from "axios";
 import { nanoid } from "@reduxjs/toolkit";
+import axios from "axios";
 
 // types
-import type { ImageType, ProductType } from "../../../utils/types";
+import type { ImageType, ProductType } from "../../../../utils/types";
 
 // hooks
-import useHandleErrorMsg from "../../../hooks/useHandleErrorMsg";
-import useShowMsg from "../../../hooks/useShowMsg";
+import useHandleErrorMsg from "../../../../hooks/useHandleErrorMsg";
+import useShowMsg from "../../../../hooks/useShowMsg";
 
 // framer motion
 import { motion } from "framer-motion";
@@ -198,11 +197,6 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
           );
 
           if (files.length) {
-            // const fileList = new DataTransfer();
-            // files.forEach((file) => fileList.items.add(file));
-
-            // setImgsList((prev) => [...prev, ...fileList.files]);
-
             setImgsList((prev) => [
               ...prev,
               ...files.map((file) => ({ img: file, _id: nanoid() })),
