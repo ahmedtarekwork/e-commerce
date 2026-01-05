@@ -1,9 +1,6 @@
 # E-commerce website with dashboard
 
-In this project I made an e-commerce website with React.js and Typescript to sell computer
-accessories like keyboards, mice and etc..., also I made dashboard and fetch data with React Query for admins
-and give them ability to remove or update products, I used also React Hook Form for controlling big forms in
-this application, I also made some cool animations with Framer Motion to make app more beauty.
+This is a small e-commerce site with dashboard made with React.js and Typescript for type safe, if you are signed in your account info will be saved with Redux, if you are admin you can access the dashboard that contain nice insights that shows data made by charts.js library and get it’s data from API By Tanstack React Query, main e-commerce features are styled with SCSS like authentication, cart features, add new product or edit it with comfortable form managed by React Hook Form, you can also delete data from the app if you are signed in as admin and much more features with beautiful animations made by framer motion.
 
 **Live Preview Link:** https://ahmed-e-commerce.netlify.app
 
@@ -12,3 +9,16 @@ For backend I made API with nextjs 14 and use api routes for handle HTTP request
 **API Documentation Link On Postman:** https://documenter.getpostman.com/view/26052098/2sAXxQeXiR
 
 **API Repository On Github:** https://github.com/ahmedtarekwork/e-commerce-nextjs-api
+
+# Run Project On Your Local Machine
+- clone the repo or download the files of the project
+
+- install dependencies that project stands on
+```
+  npm install
+```
+
+- run this command to make a local server on your machine to run the project
+```
+  npm run dev
+```
