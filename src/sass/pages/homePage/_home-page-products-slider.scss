@@ -1,14 +1,21 @@
-.home-page-products-slider {
-  @include flex(center, center, 10px, column);
+%Home-Page-Products-Slider-Styles {
+  background: linear-gradient(to right, var(--trans), transparent);
   border-radius: 10px;
   box-shadow: inset -1px 0px 30px 10px #0756bd23;
+}
 
-  background: linear-gradient(to right, var(--trans), transparent);
+.home-page-products-slider-loading {
+  @include flex(center, center, 10px);
+  @extend %Home-Page-Products-Slider-Styles;
 
-  &-loading {
-    @include flex(center, center, 10px);
-    margin-block: 20px;
-  }
+  color: var(--dark);
+  margin-block: 20px;
+  padding: 20px;
+}
+
+.home-page-products-slider {
+  @include flex(center, center, 10px, column);
+  @extend %Home-Page-Products-Slider-Styles;
 
   + * {
     margin-top: 15px;

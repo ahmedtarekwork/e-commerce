@@ -1,12 +1,12 @@
 // react
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 
 // components
-import HomePageProductsListsTile from "./components/HomePageProductsListsTile";
-import Spinner from "../../../../../components/spinners/Spinner";
+import EmptySpinner from "../../../../../components/spinners/EmptySpinner";
 import HomePageProductsSlider, {
   type CategoryAndBestSell,
 } from "../productsLists/components/HomePageProductsSlider";
+import HomePageProductsListsTile from "./components/HomePageProductsListsTile";
 
 // utils
 import { nanoid } from "@reduxjs/toolkit";
@@ -16,19 +16,32 @@ import useGetBrandsOrCategories from "../../../../../hooks/ReactQuery/useGetBran
 
 const bestSellId = nanoid();
 
+const CATEGORIES_LENGTH = 7;
+const FINAL_RENDERED_CATEGORIES_LENGTH = CATEGORIES_LENGTH + 1;
+
 const HomePageProductsLists = memo(() => {
+  const [showTitle, setShowTitle] = useState(true);
+  const [slidersNotLoadingLength, setSlidersNotLoadingLength] = useState(0);
+
+  const changeSlidersNotLoadingLength = useCallback(() => {
+    setSlidersNotLoadingLength((prev) => prev + 1);
+  }, []);
+
   const { data: categories, isPending: categoriesLoading } =
-    useGetBrandsOrCategories("categories", 7);
+    useGetBrandsOrCategories("categories", CATEGORIES_LENGTH);
 
   if (categoriesLoading) {
     return (
-      <Spinner
-        content="Loading Categories..."
-        style={{
-          marginBlock: "20px",
-          margin: "90px auto",
-        }}
-      />
+      <strong className="home-page-products-slider-loading">
+        Loading {/*eslint-disable-next-line no-extra-boolean-cast*/}
+        {!!slidersNotLoadingLength ? "More" : "Available"} Products...
+        <EmptySpinner
+          settings={{
+            diminsions: "28px",
+            "brdr-width": "3px",
+          }}
+        />
+      </strong>
     );
   }
 
@@ -40,14 +53,30 @@ const HomePageProductsLists = memo(() => {
 
     return (
       <>
-        <HomePageProductsListsTile />
+        {showTitle && <HomePageProductsListsTile />}
 
         {sections.map(({ _id, ...slider }) => (
           <HomePageProductsSlider
             key={_id}
             filters={{ ...slider, limit: 10 }}
+            setShowTitle={setShowTitle}
+            setSlidersNotLoadingLength={changeSlidersNotLoadingLength}
           />
         ))}
+
+        {slidersNotLoadingLength < FINAL_RENDERED_CATEGORIES_LENGTH && (
+          <strong className="home-page-products-slider-loading">
+            Loading
+            {/*eslint-disable-next-line no-extra-boolean-cast*/}
+            {!!slidersNotLoadingLength ? "More" : "Available"} Products...
+            <EmptySpinner
+              settings={{
+                diminsions: "28px",
+                "brdr-width": "3px",
+              }}
+            />
+          </strong>
+        )}
       </>
     );
   }

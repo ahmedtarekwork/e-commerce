@@ -649,22 +649,28 @@ form#auth-form {
   margin-inline: auto;
 }
 
+.home-page-products-slider, .home-page-products-slider-loading {
+  background: linear-gradient(to right, var(--trans), transparent);
+  border-radius: 10px;
+  box-shadow: inset -1px 0px 30px 10px rgba(7, 86, 189, 0.137254902);
+}
+
+.home-page-products-slider-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: var(--dark);
+  margin-block: 20px;
+  padding: 20px;
+}
+
 .home-page-products-slider {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex-direction: column;
-  border-radius: 10px;
-  box-shadow: inset -1px 0px 30px 10px rgba(7, 86, 189, 0.137254902);
-  background: linear-gradient(to right, var(--trans), transparent);
-}
-.home-page-products-slider-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-block: 20px;
 }
 .home-page-products-slider + * {
   margin-top: 15px;

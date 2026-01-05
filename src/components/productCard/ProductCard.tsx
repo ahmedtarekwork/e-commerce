@@ -5,22 +5,22 @@ import { Link, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 // redux
-import useSelector from "../../hooks/redux/useSelector";
 import useDispatch from "../../hooks/redux/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
 // redux actions
-import { setUserWishlist, setCart } from "../../store/fetures/userSlice";
+import { setCart, setUserWishlist } from "../../store/fetures/userSlice";
 
 // components
+import ProductCardAddToCartBtn from "../AddProductToCartBtn";
+import IconAndSpinnerSwitcher from "../animatedBtns/IconAndSpinnerSwitcher";
+import FillIcon from "../FillIcon";
 import ImgsSlider from "../ImgsSlider";
 import PropCell from "../PropCell";
-import FillIcon from "../FillIcon";
 import ProductCardQtyList from "./ProductCardQtyList";
-import IconAndSpinnerSwitcher from "../animatedBtns/IconAndSpinnerSwitcher";
-import ProductCardAddToCartBtn from "../AddProductToCartBtn";
 
 // icons
+import { AiFillDelete, AiOutlineDelete } from "react-icons/ai";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { AiOutlineDelete, AiFillDelete } from "react-icons/ai";
 
 // utils
 import axios from "../../utils/axios";
@@ -29,9 +29,9 @@ import axios from "../../utils/axios";
 import type { OrderProductType, ProductType } from "../../utils/types";
 
 // hooks
-import useInitProductsCells from "../../hooks/useInitProductsCells";
 import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
+import useInitProductsCells from "../../hooks/useInitProductsCells";
 
 export type ProductCardDeleteBtn = {
   withDeleteBtn?: "cart" | "wishlist";
