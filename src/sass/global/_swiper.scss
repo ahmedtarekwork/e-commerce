@@ -6,8 +6,7 @@
   height: auto;
 }
 
-.swiper-button-custom-next,
-.swiper-button-custom-prev {
+.custom-swiper-button {
   display: grid;
   place-content: center;
   svg {
@@ -15,8 +14,7 @@
   }
 }
 
-.swiper-button-custom-next,
-.swiper-button-custom-prev,
+.custom-swiper-button,
 .swiper-button-next,
 .swiper-button-prev {
   background: var(--main);

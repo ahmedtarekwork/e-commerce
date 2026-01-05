@@ -270,10 +270,10 @@ a.btn:is([disabled], [data-disabled=true]):active,
   background: rgb(3, 173, 3);
 }
 .green-btn:not([disabled]):hover {
-  background: #026202;
+  background: rgb(1.6960227273, 97.8039772727, 1.6960227273);
 }
 .green-btn:not([disabled]):active {
-  background: #04f804;
+  background: rgb(4.3039772727, 248.1960227273, 4.3039772727);
 }
 
 .overlay {
@@ -425,18 +425,15 @@ strong.prop-cell-name + .prop-cell-value {
   height: auto;
 }
 
-.swiper-button-custom-next,
-.swiper-button-custom-prev {
+.custom-swiper-button {
   display: grid;
   place-content: center;
 }
-.swiper-button-custom-next svg,
-.swiper-button-custom-prev svg {
+.custom-swiper-button svg {
   font-size: 30px;
 }
 
-.swiper-button-custom-next,
-.swiper-button-custom-prev,
+.custom-swiper-button,
 .swiper-button-next,
 .swiper-button-prev {
   background: var(--main);
@@ -447,14 +444,12 @@ strong.prop-cell-name + .prop-cell-value {
   padding-top: 2px;
   transition: 0.3s;
 }
-.swiper-button-custom-next:hover,
-.swiper-button-custom-prev:hover,
+.custom-swiper-button:hover,
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
   background: var(--dark);
 }
-.swiper-button-custom-next::after,
-.swiper-button-custom-prev::after,
+.custom-swiper-button::after,
 .swiper-button-next::after,
 .swiper-button-prev::after {
   font-size: 20px;

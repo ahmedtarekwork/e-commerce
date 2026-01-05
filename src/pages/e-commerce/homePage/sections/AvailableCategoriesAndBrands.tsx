@@ -9,8 +9,8 @@ import EmptySpinner from "../../../../components/spinners/EmptySpinner";
 import useGetBrandsOrCategories from "../../../../hooks/ReactQuery/useGetBrandsOrCategories";
 
 // swiper.js
-import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 // swiper.css
 import "swiper/css";
 import "swiper/css/navigation";
@@ -53,7 +53,7 @@ const AvailableCategoriesAndBrands = ({ type }: Props) => {
 
         <div className="brands-and-categories-list-wrapper">
           <button
-            className="swiper-button-custom-prev"
+            className={`swiper-button-custom-prev-${singleModelName} custom-swiper-button`}
             title={`slide to previous ${singleModelName}`}
           >
             <BiChevronLeft />
@@ -64,8 +64,8 @@ const AvailableCategoriesAndBrands = ({ type }: Props) => {
             modules={[FreeMode, Navigation]}
             freeMode={true}
             navigation={{
-              prevEl: ".swiper-button-custom-prev",
-              nextEl: ".swiper-button-custom-next",
+              prevEl: `.swiper-button-custom-prev-${singleModelName}`,
+              nextEl: `.swiper-button-custom-next-${singleModelName}`,
             }}
             slidesPerView={4}
             spaceBetween="10px"
@@ -101,7 +101,7 @@ const AvailableCategoriesAndBrands = ({ type }: Props) => {
           </Swiper>
 
           <button
-            className="swiper-button-custom-next"
+            className={`swiper-button-custom-next-${singleModelName} custom-swiper-button`}
             title={`slide to next ${singleModelName}`}
           >
             <BiChevronRight />
