@@ -1250,9 +1250,18 @@ form#auth-form {
 }
 
 .categories-or-brands-list {
-  display: flex;
-  flex-wrap: wrap;
   gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  justify-content: center;
+}
+.categories-or-brands-list > li button {
+  width: 100%;
+}
+@media (max-width: 200px) {
+  .categories-or-brands-list {
+    grid-template-columns: 0.9fr;
+  }
 }
 
 .category-or-brand-no-data-holder {

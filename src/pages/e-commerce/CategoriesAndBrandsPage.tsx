@@ -13,10 +13,10 @@ import useDispatch from "../../hooks/redux/useDispatch";
 import { setCategoriesOrBrand } from "../../store/fetures/categoriesAndBrandsSlice";
 
 // components
-import Spinner from "../../components/spinners/Spinner";
-import DisplayError from "../../components/layout/DisplayError";
-import Heading from "../../components/Heading";
 import CategoryAndBrandCard from "../../components/CategoryAndBrandCard";
+import Heading from "../../components/Heading";
+import DisplayError from "../../components/layout/DisplayError";
+import Spinner from "../../components/spinners/Spinner";
 
 // utils
 import axios from "../../utils/axios";
@@ -66,6 +66,7 @@ const CategoriesAndBrandsPage = ({ type }: Props) => {
     if (modelArr) {
       dispatch(setCategoriesOrBrand({ type, categoriesOrBrands: modelArr }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelArr]);
 
   if (isPending) {
