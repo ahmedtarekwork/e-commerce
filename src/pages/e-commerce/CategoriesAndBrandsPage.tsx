@@ -109,6 +109,7 @@ const CategoriesAndBrandsPage = ({ type }: Props) => {
             <AnimatePresence>
               {modelArr.map((modelData) => (
                 <CategoryAndBrandCard
+                  key={modelData._id}
                   isDashboard={isDashboard}
                   modelData={modelData}
                   type={type}
