@@ -1,14 +1,11 @@
 // react-router-dom
 import { Link, useLocation } from "react-router-dom";
 
-// react query
-import { useMutation } from "@tanstack/react-query";
-
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
 import useSelector from "../../hooks/redux/useSelector";
 // redux actions
-import { setCart, setUserWishlist } from "../../store/fetures/userSlice";
+import { setUserWishlist } from "../../store/fetures/userSlice";
 
 // components
 import ProductCardAddToCartBtn from "../AddProductToCartBtn";
@@ -16,14 +13,13 @@ import IconAndSpinnerSwitcher from "../animatedBtns/IconAndSpinnerSwitcher";
 import FillIcon from "../FillIcon";
 import ImgsSlider from "../ImgsSlider";
 import PropCell from "../PropCell";
+import DeleteProductBtn, {
+  type ProductCardDeleteBtn,
+} from "./DeleteProductBtn";
 import ProductCardQtyList from "./ProductCardQtyList";
 
 // icons
-import { AiFillDelete, AiOutlineDelete } from "react-icons/ai";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-
-// utils
-import axios from "../../utils/axios";
 
 // types
 import type { OrderProductType, ProductType } from "../../utils/types";
@@ -33,11 +29,7 @@ import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist"
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import useInitProductsCells from "../../hooks/useInitProductsCells";
 
-export type ProductCardDeleteBtn = {
-  withDeleteBtn?: "cart" | "wishlist";
-};
-
-type Props = ProductCardDeleteBtn & {
+type Props = {
   product: ProductType;
   cells?: (keyof Partial<ProductType> | string)[];
   withAddToCart?: boolean;
@@ -47,21 +39,7 @@ type Props = ProductCardDeleteBtn & {
   TagName?: "div" | "li";
   withQty?: boolean;
   className?: string;
-};
-
-// fetchers
-const removeItemFromCartMutationFn = async ({
-  productId,
-  userId,
-}: {
-  productId: string;
-  userId: string;
-}) => {
-  return (
-    await axios.delete(`/carts/${userId}/removeProduct`, {
-      data: { productId },
-    })
-  ).data;
+  withDeleteBtn?: ProductCardDeleteBtn;
 };
 
 const ProductCard = ({
@@ -88,26 +66,6 @@ const ProductCard = ({
   // hooks
   const { productCardCells } = useInitProductsCells();
   const handleError = useHandleErrorMsg();
-
-  // react query \\
-
-  // remove item from cart
-  const { mutate: removeFromCart, isPending: removeFromCartLoading } =
-    useMutation({
-      mutationKey: ["removeItemFromCart", _id],
-      mutationFn: removeItemFromCartMutationFn,
-
-      onSuccess(data) {
-        dispatch(setCart(data));
-      },
-
-      onError(error) {
-        handleError(error, {
-          forAllStates:
-            "something went wrong while removing the item from your cart",
-        });
-      },
-    });
 
   // add to wishlist
   const { toggleFromWishlist, isPending: wishlistLoading } =
@@ -239,24 +197,12 @@ const ProductCard = ({
         </div>
       </div>
 
-      {withDeleteBtn && (
-        <button
-          title="remove product from cart red btn"
-          disabled={wishlistLoading || removeFromCartLoading}
-          className="red-btn delete-product-btn"
-          onClick={() => {
-            if (withDeleteBtn === "cart") {
-              if (user) removeFromCart({ productId: _id, userId: user._id });
-            } else toggleFromWishlist();
-          }}
-        >
-          <IconAndSpinnerSwitcher
-            toggleIcon={wishlistLoading || removeFromCartLoading}
-            icon={
-              <FillIcon stroke={<AiOutlineDelete />} fill={<AiFillDelete />} />
-            }
-          />
-        </button>
+      {withDeleteBtn && user && (
+        <DeleteProductBtn
+          {...withDeleteBtn}
+          productId={_id}
+          userId={user._id}
+        />
       )}
     </TagName>
   );

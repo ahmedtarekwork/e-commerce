@@ -5,8 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useSelector from "../../../hooks/redux/useSelector";
 
 // components
-import Heading from "../../../components/Heading";
 import CartArea from "../../../components/cartArea/CartArea";
+import Heading from "../../../components/Heading";
 import WishlistArea from "../../../components/WishlistArea";
 import CartOrWishlistPageBtns from "./CartOrWishlistPageComponents/CartOrWishlistPageBtns";
 
@@ -35,16 +35,12 @@ const CartOrWishlistPage = () => {
       {isCartPage ? (
         <CartArea
           withAddMore
-          withDeleteBtn="cart"
+          withDeleteBtn
           showTotal={false}
           userId={user._id}
         />
       ) : (
-        <WishlistArea
-          userId={user._id}
-          withDeleteBtn="wishlist"
-          isCurrentUserProfile
-        />
+        <WishlistArea userId={user._id} withDeleteBtn isCurrentUserProfile />
       )}
 
       <CartOrWishlistPageBtns isCartPage={isCartPage} />

@@ -18,13 +18,11 @@ import {
 
 // components
 import ProfilePageTabsError from "./ProfilePageTabsError";
-import DisplayError from "./layout/DisplayError";
-import GridList from "./gridList/GridList";
-import EmptyPage from "./layout/EmptyPage";
 import UserAreaLoading from "./UserAreaLoading";
-import ProductCard, {
-  type ProductCardDeleteBtn,
-} from "./productCard/ProductCard";
+import GridList from "./gridList/GridList";
+import DisplayError from "./layout/DisplayError";
+import EmptyPage from "./layout/EmptyPage";
+import ProductCard from "./productCard/ProductCard";
 
 // utils
 import axios from "axios";
@@ -46,9 +44,10 @@ import { AnimatePresence, motion } from "framer-motion";
 // variants
 import { slideOutVariant } from "../utils/variants";
 
-type Props = ProductCardDeleteBtn & {
-  isCurrentUserProfile: boolean;
+type Props = {
+  isCurrentUserProfile: boolean; // for dashboard
   userId: string;
+  withDeleteBtn?: boolean;
 };
 
 type getWishlistProductsFnType = (p: {
@@ -86,6 +85,7 @@ const WishlistArea = ({
 
   useEffect(() => {
     dispatch(toggleWishlistLoading(fetchStatus === "fetching"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchStatus]);
 
   useEffect(() => {
@@ -95,13 +95,17 @@ const WishlistArea = ({
       }
       setCurrentWishlist(wishlistProducts);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wishlistProducts]);
 
   useEffect(() => {
     if (wishlistProductsErr && isCurrentUserProfile) {
       dispatch(resetUserWishlist());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wishlistProductsErr, isCurrentUserProfile]);
+
+  console.log("currentWishlist:", currentWishlist);
 
   if (fetchStatus === "fetching") {
     return (
@@ -199,7 +203,12 @@ const WishlistArea = ({
                       TagName="div"
                       className="rows-list-cell"
                       withDeleteBtn={
-                        isCurrentUserProfile ? withDeleteBtn : undefined
+                        isCurrentUserProfile
+                          ? {
+                              type: "wishlist",
+                              setCurrentWishlist,
+                            }
+                          : undefined
                       }
                       product={prd}
                       cells={productCardCells}

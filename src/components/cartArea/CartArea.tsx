@@ -15,15 +15,13 @@ import useGetUserCart from "../../hooks/ReactQuery/CartRequest/useGetUserCart";
 import useInitProductsCells from "../../hooks/useInitProductsCells";
 
 // components
-import ProfilePageTabsError from "../ProfilePageTabsError";
 import GridList from "../gridList/GridList";
 import DisplayError from "../layout/DisplayError";
+import EmptyPage, { type WithBtnType } from "../layout/EmptyPage";
+import ProductCard from "../productCard/ProductCard";
+import ProfilePageTabsError from "../ProfilePageTabsError";
 import UserAreaLoading from "../UserAreaLoading";
 import CartAreaDownInfo from "./CartAreaDownInfo";
-import EmptyPage, { type WithBtnType } from "../layout/EmptyPage";
-import ProductCard, {
-  type ProductCardDeleteBtn,
-} from "../productCard/ProductCard";
 
 // icons
 import { BsFillCartXFill } from "react-icons/bs";
@@ -39,10 +37,11 @@ import { AnimatePresence, motion } from "framer-motion";
 // variants
 import { slideOutVariant } from "../../utils/variants";
 
-type Props = ProductCardDeleteBtn & {
+type Props = {
   userId: string;
   withAddMore?: boolean;
   showTotal?: boolean;
+  withDeleteBtn?: boolean;
 };
 
 const replaceQty = (arr: string[]) =>
@@ -82,6 +81,7 @@ const CartArea = ({
     else {
       if (userId) getCart();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCurrentUserCart, userId]);
 
   useEffect(() => {
@@ -99,6 +99,7 @@ const CartArea = ({
 
       if (!isSame()) dispatch(setCart(cart));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, dispatch]);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ const CartArea = ({
         dispatch(resetCart());
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartErr, cart, isCurrentUserCart, userCart]);
 
   if (!isCurrentUserCart && !userId) {
@@ -200,7 +202,7 @@ const CartArea = ({
               <ProductCard
                 className="rows-list-cell"
                 withAddMore={withAddMore}
-                withDeleteBtn={withDeleteBtn}
+                withDeleteBtn={{ type: "cart" }}
                 product={prd}
                 cells={replaceQty(productCardCells)}
               />
@@ -273,7 +275,7 @@ const CartArea = ({
                           TagName="div"
                           className="rows-list-cell"
                           withAddMore={withAddMore}
-                          withDeleteBtn={withDeleteBtn}
+                          withDeleteBtn={{ type: "cart" }}
                           product={prd}
                           cells={replaceQty(productCardCells)}
                         />
