@@ -2887,7 +2887,6 @@ input:focus:not([readonly])::placeholder {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   display: -webkit-box;
-  word-break: break-all;
 }
 .product-card .product-card-more-info {
   margin-inline: auto;
