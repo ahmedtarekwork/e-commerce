@@ -42,31 +42,13 @@ const PropCell = ({
     >
       <strong className="prop-cell-name">{name}: </strong>
       <ValueHolderTagName.tagName {...ValueHolderTagName.props}>
-        <div className="prop-cell-value" {...propNameProps}>
+        <div
+          {...propNameProps}
+          className={`prop-cell-value ${propNameProps?.className}`.trim()}
+        >
           {val}
         </div>
       </ValueHolderTagName.tagName>
-
-      {/* {valueAsLink ? (
-        <button
-          style={{ flex: 1, color: "#052d60" }}
-          title="property cell btn"
-          className="hov link"
-          onClick={() =>
-            navigate(valueAsLink.path, {
-              relative: "path",
-            })
-          }
-        >
-          <div className="prop-cell-value" {...propNameProps}>
-            {val}
-          </div>
-        </button>
-      ) : (
-        <div className="prop-cell-value" {...propNameProps}>
-          {val}
-        </div>
-      )} */}
     </div>
   );
 };

@@ -30,6 +30,7 @@ const ProductCardQtyList = ({ propName, product }: Props) => {
   return (
     <PropCell
       name={propName}
+      propNameProps={{ className: "product-card-qty" }}
       val={
         <SelectList
           disabled={{

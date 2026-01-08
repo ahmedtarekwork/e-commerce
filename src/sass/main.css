@@ -333,9 +333,11 @@ strong.prop-cell-name + .prop-cell-value {
   min-width: -moz-fit-content;
   min-width: fit-content;
   max-width: 100%;
-  overflow: hidden;
+}
+strong.prop-cell-name + .prop-cell-value:not(.product-card-qty) {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .danger-zone {
