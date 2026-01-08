@@ -136,10 +136,12 @@ strong.prop-cell-name {
   text-transform: capitalize;
 
   + .prop-cell-value {
-    word-break: break-all;
     flex: 1;
     min-width: fit-content;
     max-width: 100%;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 

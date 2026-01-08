@@ -329,11 +329,13 @@ strong.prop-cell-name {
   text-transform: capitalize;
 }
 strong.prop-cell-name + .prop-cell-value {
-  word-break: break-all;
   flex: 1;
   min-width: -moz-fit-content;
   min-width: fit-content;
   max-width: 100%;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .danger-zone {
