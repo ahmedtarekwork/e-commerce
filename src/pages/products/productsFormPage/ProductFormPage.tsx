@@ -240,16 +240,6 @@ const NewProductPage = () => {
           watch={watch}
         />
 
-        {/* <FormInput
-          type="number"
-          errorMsg={qtyErr?.message}
-          placeholder="product quantity"
-          {...register("quantity", {
-            valueAsNumber: true,
-            required: "quantity is required",
-          })}
-        /> */}
-
         <motion.div
           layout
           transition={{
