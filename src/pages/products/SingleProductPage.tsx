@@ -2,42 +2,42 @@
 import { useEffect, useRef, useState } from "react";
 
 // react-router-dom
-import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 // redux
-import useSelector from "../../hooks/redux/useSelector";
 import useDispatch from "../../hooks/redux/useDispatch";
+import useSelector from "../../hooks/redux/useSelector";
 // redux actions
-import { setUserWishlist } from "../../store/fetures/userSlice";
 import { removeProduct } from "../../store/fetures/productsSlice";
+import { setUserWishlist } from "../../store/fetures/userSlice";
 
 // react query
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // components
-import ImgsSlider from "../../components/ImgsSlider";
-import PropCell from "../../components/PropCell";
-import FillIcon from "../../components/FillIcon";
-import SplashScreen from "../../components/spinners/SplashScreen";
-import DisplayError from "../../components/layout/DisplayError";
-import EmptyPage from "../../components/layout/EmptyPage";
-import InsightWrapper from "../../components/InsightWrapper";
 import AddProductToCartBtn from "../../components/AddProductToCartBtn";
 import IconAndSpinnerSwitcher from "../../components/animatedBtns/IconAndSpinnerSwitcher";
+import FillIcon from "../../components/FillIcon";
+import ImgsSlider from "../../components/ImgsSlider";
+import InsightWrapper from "../../components/InsightWrapper";
+import DisplayError from "../../components/layout/DisplayError";
+import EmptyPage from "../../components/layout/EmptyPage";
+import PropCell from "../../components/PropCell";
+import SplashScreen from "../../components/spinners/SplashScreen";
 
 import AreYouSureModal, {
   type SureModalRef,
 } from "../../components/modals/AreYouSureModal";
 
 // utils
+import activeFillIcon from "../../utils/activeFillIcon";
 import axios from "../../utils/axios";
 import getAppColors from "../../utils/functions/getAppColors";
-import activeFillIcon from "../../utils/activeFillIcon";
 
 // charts.js
-import { Chart as ChartJS, Legend, Tooltip, ArcElement } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import chartDataLabel from "chartjs-plugin-datalabels";
+import { Doughnut } from "react-chartjs-2";
 
 // hooks
 import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
@@ -47,9 +47,9 @@ import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import type { ChartDataType, ProductType } from "../../utils/types";
 
 // icons
+import { BsTrash3, BsTrash3Fill } from "react-icons/bs";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiBallPenFill, RiBallPenLine } from "react-icons/ri";
-import { BsTrash3, BsTrash3Fill } from "react-icons/bs";
 
 // SVGs
 import IdRequired from "../../../imgs/ID_required.svg";
@@ -159,6 +159,7 @@ const SingleProductPage = () => {
   // get product if it's not found in app state
   useEffect(() => {
     if (!product) getProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // get product

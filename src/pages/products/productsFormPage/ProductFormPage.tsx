@@ -18,6 +18,7 @@ import FormInput from "../../../components/appForm/Input/FormInput";
 import DisplayError from "../../../components/layout/DisplayError";
 import EmptyPage from "../../../components/layout/EmptyPage";
 import SplashScreen from "../../../components/spinners/SplashScreen";
+import ProductQTY from "./components/ProductQTY";
 
 import ImgInputPreview, {
   type ImgInputPreviewRefType,
@@ -106,7 +107,7 @@ const NewProductPage = () => {
 
   // react-hook-form
   const form = useForm<ProductFormValues>();
-  const { handleSubmit, register, formState, reset, setValue } = form;
+  const { handleSubmit, register, formState, reset, setValue, watch } = form;
   const { errors } = formState;
   const {
     color: clrErr,
@@ -130,9 +131,11 @@ const NewProductPage = () => {
   useEffect(() => {
     if (resProduct) {
       setProduct(resProduct);
-      Object.entries(resProduct).forEach(([key, val]) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setValue(key as keyof requestProductType, val as any)
+      Object.entries(resProduct).forEach(
+        ([key, val]) =>
+          key !== "quantity" &&
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setValue(key as keyof requestProductType, val as any)
       );
       if (resProduct.brand?._id)
         brandsListRef.current?.setSelectedItem(resProduct.brand._id);
@@ -229,7 +232,15 @@ const NewProductPage = () => {
           product={product}
         />
 
-        <FormInput
+        <ProductQTY
+          register={register}
+          errorMsg={qtyErr?.message}
+          oldQTY={product?.quantity}
+          isEditMode={isEditMode}
+          watch={watch}
+        />
+
+        {/* <FormInput
           type="number"
           errorMsg={qtyErr?.message}
           placeholder="product quantity"
@@ -237,7 +248,7 @@ const NewProductPage = () => {
             valueAsNumber: true,
             required: "quantity is required",
           })}
-        />
+        /> */}
 
         <motion.div
           layout

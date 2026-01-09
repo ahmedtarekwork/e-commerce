@@ -3,6 +3,17 @@
   font-size: 14px;
 }
 
+.product-form-qty-input-holder {
+  border-radius: var(--radius);
+  border: var(--brdr);
+  padding: 15px;
+  border-width: 2px;
+
+  > * + * {
+    margin-top: 10px;
+  }
+}
+
 .product-imgs-area {
   @include cardBorder;
   padding: 10px;

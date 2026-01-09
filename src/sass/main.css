@@ -1010,6 +1010,16 @@ form#auth-form {
   font-size: 14px;
 }
 
+.product-form-qty-input-holder {
+  border-radius: var(--radius);
+  border: var(--brdr);
+  padding: 15px;
+  border-width: 2px;
+}
+.product-form-qty-input-holder > * + * {
+  margin-top: 10px;
+}
+
 .product-imgs-area {
   border-radius: var(--radius);
   border: 1px solid var(--main);
