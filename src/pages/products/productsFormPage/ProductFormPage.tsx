@@ -22,7 +22,7 @@ import ProductQTY from "./components/ProductQTY";
 
 import ImgInputPreview, {
   type ImgInputPreviewRefType,
-} from "./components/ImgInputPreview";
+} from "./components/ImgInputPreview/ImgInputPreview";
 
 // utils
 import axios from "../../../utils/axios";

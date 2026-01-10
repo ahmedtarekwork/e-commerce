@@ -16,7 +16,7 @@ import useShowMsg from "./useShowMsg";
 // types
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { SubmitHandler, UseFormReset } from "react-hook-form";
-import type { ImgInputPreviewRefType } from "../pages/products/productsFormPage/components/ImgInputPreview";
+import type { ImgInputPreviewRefType } from "../pages/products/productsFormPage/components/ImgInputPreview/ImgInputPreview";
 import type { ProductSelectedCategoryAndBrandRefType } from "../pages/products/productsFormPage/components/ProductSelectedCategoryAndBrand";
 import type {
   ProductFormValues,
