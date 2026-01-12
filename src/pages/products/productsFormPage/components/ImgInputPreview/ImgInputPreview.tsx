@@ -1,19 +1,23 @@
 // react
 import {
-  ChangeEvent,
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
-  type Dispatch,
   // types
+  type ChangeEvent,
+  type Dispatch,
   type SetStateAction,
 } from "react";
+
+// dnd kit
+import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 
 // components
 import ErrorDiv from "../../../../../components/appForm/Input/ErrorDiv";
 import FormInput from "../../../../../components/appForm/Input/FormInput";
+import ProductFormImgItem from "./ProductFormImgItem";
 
 // utils
 import { nanoid } from "@reduxjs/toolkit";
@@ -21,12 +25,8 @@ import { nanoid } from "@reduxjs/toolkit";
 // types
 import type { ImageType, ProductType } from "../../../../../utils/types";
 
-// hooks
-import useRemoveSingleImgFromProduct from "../../../../../hooks/useRemoveSingleImgFromProduct";
-
 // framer motion
 import { motion } from "framer-motion";
-import ProductFormImgItem from "./ProductFormImgItem";
 
 type Props = {
   imgErr: string;
@@ -34,14 +34,12 @@ type Props = {
   setProduct: Dispatch<SetStateAction<ProductType | undefined>>;
 };
 
-export type ImgsListItem = { img: File; _id: string };
+export type ImgsListItem = { img: File; _id: string; order: number };
+export type AllProductImgsList = (ImgsListItem | ImageType) & { order: number };
 
 export type ImgInputPreviewRefType = {
-  imgsList: ImgsListItem[];
-  setImgsList: Dispatch<SetStateAction<ImgsListItem[]>>;
-
-  initImgs: ImageType[];
-  setInitImgs: Dispatch<SetStateAction<ImageType[]>>;
+  allImgs: AllProductImgsList[];
+  setAllImgs: Dispatch<SetStateAction<AllProductImgsList[]>>;
 };
 
 const imgsMaxLegnth = 7;
@@ -49,61 +47,48 @@ const imgsMaxLegnth = 7;
 const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
   ({ imgErr, product, setProduct }, ref) => {
     // states
-    const [imgsList, setImgsList] = useState<ImgsListItem[]>([]);
-    const [initImgs, setInitImgs] = useState<ImageType[]>([]);
+    const [allImgs, setAllImgs] = useState<AllProductImgsList[]>([]);
+
+    const serverImgsList = allImgs.filter((img) => "secure_url" in img);
 
     // refs
     const listRef = useRef<HTMLUListElement>(null);
 
-    // react query
-    const {
-      mutate: removeSingleImg,
-      isPending: removeImgLoading,
-      status,
-    } = useRemoveSingleImgFromProduct({
-      listRef,
-      setInitImgs,
-      product,
-      setProduct,
-    });
+    useImperativeHandle(ref, () => ({ setAllImgs, allImgs }), [allImgs]);
 
-    useImperativeHandle(
-      ref,
-      () => ({ imgsList, setImgsList, setInitImgs, initImgs }),
-      [imgsList, initImgs]
-    );
-
-    useEffect(() => {
-      if (!removeImgLoading && status === "idle") {
-        (
-          [
-            ...listRef.current!.querySelectorAll(
-              "button.delete-product-img-btn"
-            ),
-          ] as HTMLButtonElement[]
-        ).forEach((btn) => {
-          btn.disabled = false;
-          btn.textContent = "remove";
-        });
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [removeImgLoading]);
-
+    // handlers
     const handleAddNewImg = (e: ChangeEvent<HTMLInputElement>) => {
       const files = e.currentTarget.files;
 
       if (files) {
-        const finalImgs: typeof imgsList = [];
+        const finalImgs: ImgsListItem[] = [];
 
         for (let i = 0; i < files?.length; i++) {
           finalImgs.push({
             img: files.item(i) as File,
             _id: nanoid(),
+            order: allImgs.length + i,
           });
         }
 
-        setImgsList((prev) => [...prev, ...finalImgs]);
+        setAllImgs((prev) => [...prev, ...finalImgs]);
       }
+    };
+
+    const handleSortImgs = (e: DragEndEvent) => {
+      const { active, over } = e;
+
+      if (active.id === over?.id) return;
+
+      setAllImgs((prev) => {
+        const oldIndex = prev.findIndex(({ _id }) => _id === active.id);
+        const newIndex = prev.findIndex(({ _id }) => _id === over?.id);
+
+        return arrayMove(prev, oldIndex, newIndex).map((img, i) => ({
+          ...img,
+          order: i,
+        }));
+      });
     };
 
     return (
@@ -137,15 +122,19 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
           );
 
           if (files.length) {
-            setImgsList((prev) => [
+            setAllImgs((prev) => [
               ...prev,
-              ...files.map((file) => ({ img: file, _id: nanoid() })),
+              ...files.map((file, i) => ({
+                img: file,
+                _id: nanoid(),
+                order: prev.length + i,
+              })),
             ]);
           }
         }}
       >
         <strong className="product-imgs-area-title">
-          product images: {imgsList.length + initImgs.length} / {imgsMaxLegnth}
+          product images: {allImgs.length} / {imgsMaxLegnth}
         </strong>
 
         <div className="product-imgs-real-area">
@@ -153,7 +142,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
             <li className="add-input-holder">
               <FormInput
                 onChange={handleAddNewImg}
-                disabled={imgsList.length === imgsMaxLegnth}
+                disabled={serverImgsList.length === imgsMaxLegnth}
                 id="imgs"
                 type="file"
                 multiple
@@ -162,14 +151,28 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
               />
             </li>
 
-            {[...initImgs, ...imgsList].map((img, i) => (
-              <ProductFormImgItem
-                img={img}
-                i={i}
-                removeSingleImg={removeSingleImg}
-                setImgsList={setImgsList}
-              />
-            ))}
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleSortImgs}
+            >
+              <SortableContext items={allImgs.map(({ _id }) => ({ id: _id }))}>
+                {allImgs
+                  .sort(
+                    (a: AllProductImgsList, b: AllProductImgsList) =>
+                      // TODO: REMOVE ZEROS AFTER REPLACE PRODUCTS IMAGES IN THE APPLICATION
+                      (a.order || 0) - (b.order || 0)
+                  )
+                  .map((img) => (
+                    <ProductFormImgItem
+                      key={img._id}
+                      img={img}
+                      product={product}
+                      setProduct={setProduct}
+                      setAllImgs={setAllImgs}
+                    />
+                  ))}
+              </SortableContext>
+            </DndContext>
           </ul>
         </div>
 

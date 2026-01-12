@@ -34,7 +34,7 @@ import useSubmitProductForm from "../../../hooks/useSubmitProductForm";
 import { motion } from "framer-motion";
 
 // types
-import type { ProductType } from "../../../utils/types";
+import type { ImageType, ProductType } from "../../../utils/types";
 
 // icons
 import { IoIosAddCircle } from "react-icons/io";
@@ -142,7 +142,25 @@ const NewProductPage = () => {
       if (resProduct.category?._id)
         categoriesListRef.current?.setSelectedItem(resProduct.category._id);
 
-      imgsList.current?.setInitImgs(resProduct.imgs);
+      imgsList.current?.setAllImgs((prev) =>
+        // TODO: REMOVE CHEKCS FOR TYPES AFTER REPLACE ALL PRODUCTS IMAGES IN THE APPLICATION
+        {
+          const oldServerImgs = prev.filter((img) => "public_id" in img);
+
+          if (resProduct.imgs.length < oldServerImgs.length) {
+            return [
+              ...resProduct.imgs,
+              ...prev.filter((img) => !("public_id" in img)),
+            ].sort(
+              (a: ImageType, b: ImageType) => (a.order || 0) - (b.order || 0)
+            );
+          }
+
+          return resProduct.imgs.sort(
+            (a: ImageType, b: ImageType) => (a.order || 0) - (b.order || 0)
+          );
+        }
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resProduct]);

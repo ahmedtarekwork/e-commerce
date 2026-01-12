@@ -126,7 +126,11 @@ const ProductCard = ({
           </Link>
         ))}
 
-      <ImgsSlider imgWidth={imgWidth || "150px"} imgs={imgs} />
+      <ImgsSlider
+        imgWidth={imgWidth || "150px"}
+        // TODO: REMOVE ZEROS AFTER CHANGE ALL IMAGES IN THE APPLICATION
+        imgs={imgs.slice().sort((a, b) => (a.order || 0) - (b.order || 0))}
+      />
 
       <div className="product-data-big-holder">
         <strong className="product-card-title">{title}</strong>

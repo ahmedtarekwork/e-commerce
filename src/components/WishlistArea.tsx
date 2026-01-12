@@ -105,8 +105,6 @@ const WishlistArea = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wishlistProductsErr, isCurrentUserProfile]);
 
-  console.log("currentWishlist:", currentWishlist);
-
   if (fetchStatus === "fetching") {
     return (
       <UserAreaLoading isCurrentUserProfile={isCurrentUserProfile}>

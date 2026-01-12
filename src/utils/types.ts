@@ -1,6 +1,6 @@
 import type { ChartData } from "chart.js";
-import { store } from "../store/store";
 import type { MessageDataType } from "../components/TopMessage";
+import { store } from "../store/store";
 
 export type getArrayType<T> = T extends (infer U)[] ? U : T;
 
@@ -17,7 +17,10 @@ export type showMsgFnParamsType = Pick<MessageDataType, "clr" | "content"> & {
   time?: MessageDataType["time"];
 };
 
-export type ImageType = Record<"public_id" | "secure_url" | "_id", string>;
+export type ImageType = { order?: number } & Record<
+  "public_id" | "secure_url" | "_id",
+  string
+>;
 
 export type CategoryAndBrandType = {
   name: string;

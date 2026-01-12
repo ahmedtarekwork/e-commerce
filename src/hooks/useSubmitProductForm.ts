@@ -25,9 +25,13 @@ import type {
 import type { ProductType } from "../utils/types";
 
 type MutateFnArgumentsType<T> = {
-  productData: Omit<requestProductType, "category" | "brand"> & {
+  productData: Omit<requestProductType, "category" | "brand" | "imgs"> & {
     category: string;
     brand: string;
+    imgs: ({ order: number } & (
+      | { public_id: string; img?: never }
+      | { public_id?: never; img: File }
+    ))[];
   };
 } & (T extends "patch" ? { productId: string } : { productId?: never });
 
@@ -50,9 +54,14 @@ const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
 
     Object.entries(productData).forEach(([key, value]) => {
       if (key === "imgs") {
-        return (value as File[]).forEach((img) =>
-          formData.append("imgs[]", img)
-        );
+        return (value as (typeof productData)["imgs"])
+          .sort((a, b) => a.order - b.order)
+          .forEach((img) => {
+            formData.append(
+              "imgs[]",
+              "img" in img ? (img.img as File) : img.public_id
+            );
+          });
       }
 
       formData.append(key, value.toString());
@@ -61,7 +70,7 @@ const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
     return (
       await axios[type](
         `/products${type === "patch" ? `/${productId}` : ""}`,
-        productData,
+        formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       )
     ).data;
@@ -104,11 +113,8 @@ const useSubmitProductForm = ({
 
           categoriesListRef?.current?.setSelectedItem("");
           brandsListRef?.current?.setSelectedItem("");
-          //    setSelectedBrand("");
-          //   setSelectedCategory("");
 
-          imgsList.current?.setImgsList([]);
-          imgsList.current?.setInitImgs([]);
+          imgsList.current?.setAllImgs([]);
         }
       },
       onError(error) {
@@ -150,10 +156,7 @@ const useSubmitProductForm = ({
     const selectedCategory = categoriesListRef?.current?.selectedItem;
     const selectedBrand = brandsListRef?.current?.selectedItem;
 
-    if (
-      !imgsList.current?.imgsList.length &&
-      !imgsList.current?.initImgs.length
-    ) {
+    if (!imgsList.current?.allImgs.length) {
       return setImgErr("product must have at least one image");
     }
 
@@ -170,7 +173,17 @@ const useSubmitProductForm = ({
       ...data,
       category: selectedCategory,
       brand: selectedBrand,
-      imgs: imgsList.current?.imgsList.map((img) => img.img),
+      imgs: imgsList.current?.allImgs.map((img) => {
+        const finalImg = { order: img.order } as Record<string, unknown>;
+
+        if (!("secure_url" in img)) {
+          finalImg.img = img.img;
+        } else {
+          finalImg.public_id = img.public_id;
+        }
+
+        return finalImg;
+      }) as unknown as MutateFnArgumentsType<"patch">["productData"]["imgs"],
     };
 
     if (isEditMode) {
@@ -182,17 +195,16 @@ const useSubmitProductForm = ({
       }
 
       if (product) {
+        const deletedKeys = {
+          ratings: true,
+          imgs: !productData.imgs.length,
+          quantity: isNaN(+data.quantity),
+        };
+
+        // TODO: loop in server imgs and see if the order changes or not => if not remove it from productData
         Object.entries(product).forEach(([oldKey, oldValue]) => {
-          if (oldKey === "ratings") {
+          if (deletedKeys[oldKey as keyof typeof deletedKeys]) {
             delete productData[oldKey as keyof typeof productData];
-
-            return;
-          }
-
-          if (oldKey === "imgs") {
-            if (!productData.imgs.length) {
-              delete productData[oldKey as keyof typeof productData];
-            }
 
             return;
           }

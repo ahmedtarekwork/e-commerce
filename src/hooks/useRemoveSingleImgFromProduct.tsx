@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // types
-import type { Dispatch, RefObject, SetStateAction } from "react";
-import type { ImageType, ProductType } from "../utils/types";
+import type { Dispatch, SetStateAction } from "react";
+import type { ProductType } from "../utils/types";
 
 // hooks
 import useHandleErrorMsg from "./useHandleErrorMsg";
@@ -16,8 +16,6 @@ import useShowMsg from "./useShowMsg";
 import axios from "../utils/axios";
 
 type Props = {
-  listRef: RefObject<HTMLUListElement>;
-  setInitImgs: Dispatch<SetStateAction<ImageType[]>>;
   product?: ProductType;
   setProduct: Dispatch<SetStateAction<ProductType | undefined>>;
 };
@@ -31,12 +29,7 @@ const removeSingleProductImageMutationFn = async ({
   });
 };
 
-const useRemoveSingleImgFromProduct = ({
-  listRef,
-  setInitImgs,
-  product,
-  setProduct,
-}: Props) => {
+const useRemoveSingleImgFromProduct = ({ product, setProduct }: Props) => {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const showMsg = useShowMsg();
@@ -49,15 +42,6 @@ const useRemoveSingleImgFromProduct = ({
       handleError(error, {
         forAllStates: "something went wrong while deleteing the image",
       });
-
-      (
-        [
-          ...listRef.current!.querySelectorAll("button.delete-product-img-btn"),
-        ] as HTMLButtonElement[]
-      ).forEach((btn) => {
-        btn.disabled = false;
-        btn.textContent = "remove";
-      });
     },
     onSuccess(data, { imgPublicId }) {
       showMsg?.({
@@ -69,10 +53,6 @@ const useRemoveSingleImgFromProduct = ({
       });
 
       queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
-
-      setInitImgs((prev) =>
-        prev.filter(({ public_id }) => public_id !== imgPublicId)
-      );
 
       if (product) {
         setProduct({

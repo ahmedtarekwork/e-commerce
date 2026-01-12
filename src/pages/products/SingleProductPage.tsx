@@ -243,7 +243,11 @@ const SingleProductPage = () => {
       )}
 
       <div className="single-product-wrapper">
-        <ImgsSlider imgWidth="400px" imgs={imgs} />
+        <ImgsSlider
+          imgWidth="400px"
+          // TODO : REMOVE ZEROS AFTER CHANGE ALL PRODUCTS IMAGES IN THE APPLICATION
+          imgs={imgs.slice().sort((a, b) => (a.order || 0) - (b.order || 0))}
+        />
 
         <div className="single-product-data">
           <h1 className="single-product-title">{title}</h1>
