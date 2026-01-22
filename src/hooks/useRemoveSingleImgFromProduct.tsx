@@ -52,8 +52,6 @@ const useRemoveSingleImgFromProduct = ({ product, setProduct }: Props) => {
             : "image deleted successfully",
       });
 
-      queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
-
       if (product) {
         setProduct({
           ...product,
@@ -62,6 +60,8 @@ const useRemoveSingleImgFromProduct = ({ product, setProduct }: Props) => {
           ),
         });
       }
+
+      queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
     },
   });
 };

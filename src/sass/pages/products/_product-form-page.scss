@@ -79,7 +79,7 @@
     display: none;
   }
 
-  label {
+  label[for="imgs"] {
     display: grid;
     place-content: center;
     align-self: stretch;
@@ -128,25 +128,39 @@
       isolation: isolate;
       opacity: 0;
       scale: 0.7;
-      transition: 0.3s;
+      transition: 0.2s;
     }
     &:hover::after {
       opacity: 1;
       scale: 1;
     }
 
-    button {
+    &-btns-holder {
       z-index: 3;
-      left: 50%;
-      top: 50%;
-      translate: -50% -50%;
+      inset: 0;
       position: absolute;
       opacity: 0;
       scale: 0.7;
       pointer-events: none;
       transition-delay: 100ms;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+      padding: 5px;
+      transition: 0.37s;
+
+      button {
+        display: grid;
+        place-content: center;
+
+        svg {
+          font-size: 24px;
+        }
+      }
     }
-    &:hover button {
+
+    &:hover .img-preview-cell-btns-holder {
       opacity: 1;
       scale: 1;
       pointer-events: initial;

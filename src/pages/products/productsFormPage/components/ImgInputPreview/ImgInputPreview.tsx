@@ -23,7 +23,7 @@ import ProductFormImgItem from "./ProductFormImgItem";
 import { nanoid } from "@reduxjs/toolkit";
 
 // types
-import type { ImageType, ProductType } from "../../../../../utils/types";
+import type { ProductType, ReplacementImage } from "../../../../../utils/types";
 
 // framer motion
 import { motion } from "framer-motion";
@@ -32,10 +32,13 @@ type Props = {
   imgErr: string;
   product: ProductType | undefined;
   setProduct: Dispatch<SetStateAction<ProductType | undefined>>;
+  isFormLoading: boolean;
 };
 
 export type ImgsListItem = { img: File; _id: string; order: number };
-export type AllProductImgsList = (ImgsListItem | ImageType) & { order: number };
+export type AllProductImgsList = (ImgsListItem | ReplacementImage) & {
+  order: number;
+};
 
 export type ImgInputPreviewRefType = {
   allImgs: AllProductImgsList[];
@@ -45,7 +48,7 @@ export type ImgInputPreviewRefType = {
 const imgsMaxLegnth = 7;
 
 const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
-  ({ imgErr, product, setProduct }, ref) => {
+  ({ imgErr, product, setProduct, isFormLoading }, ref) => {
     // states
     const [allImgs, setAllImgs] = useState<AllProductImgsList[]>([]);
 
@@ -118,7 +121,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
           e.currentTarget.classList.remove("drag-over");
 
           const files = [...e.dataTransfer.files].filter((file) =>
-            file.type.startsWith("image")
+            file.type.startsWith("image"),
           );
 
           if (files.length) {
@@ -142,7 +145,9 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
             <li className="add-input-holder">
               <FormInput
                 onChange={handleAddNewImg}
-                disabled={serverImgsList.length === imgsMaxLegnth}
+                disabled={
+                  serverImgsList.length === imgsMaxLegnth || isFormLoading
+                }
                 id="imgs"
                 type="file"
                 multiple
@@ -160,10 +165,11 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
                   .sort(
                     (a: AllProductImgsList, b: AllProductImgsList) =>
                       // TODO: REMOVE ZEROS AFTER REPLACE PRODUCTS IMAGES IN THE APPLICATION
-                      (a.order || 0) - (b.order || 0)
+                      (a.order || 0) - (b.order || 0),
                   )
                   .map((img) => (
                     <ProductFormImgItem
+                      isFormLoading={isFormLoading}
                       key={img._id}
                       img={img}
                       product={product}
@@ -179,7 +185,7 @@ const ImgInputPreview = forwardRef<ImgInputPreviewRefType, Props>(
         <ErrorDiv msg={imgErr} />
       </motion.div>
     );
-  }
+  },
 );
 
 export default ImgInputPreview;

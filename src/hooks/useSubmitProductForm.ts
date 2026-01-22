@@ -1,11 +1,6 @@
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-// redux
-import useDispatch from "./redux/useDispatch";
-// redux actions
-import { addProducts, editProduct } from "../store/fetures/productsSlice";
-
 // utils
 import axios from "../utils/axios";
 
@@ -22,7 +17,7 @@ import type {
   ProductFormValues,
   requestProductType,
 } from "../pages/products/productsFormPage/ProductFormPage";
-import type { ProductType } from "../utils/types";
+import type { ProductType, ReplacementImage } from "../utils/types";
 
 type MutateFnArgumentsType<T> = {
   productData: Omit<requestProductType, "category" | "brand" | "imgs"> & {
@@ -33,7 +28,9 @@ type MutateFnArgumentsType<T> = {
       | { public_id?: never; img: File }
     ))[];
   };
-} & (T extends "patch" ? { productId: string } : { productId?: never });
+} & (T extends "patch"
+  ? { productId: string; replacementImgs?: ReplacementImage[] }
+  : { productId?: never; replacementImgs?: never });
 
 type Props = {
   id?: string;
@@ -49,7 +46,11 @@ type Props = {
 
 // fetchers
 const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
-  return async ({ productData, productId }: MutateFnArgumentsType<T>) => {
+  return async ({
+    productData,
+    productId,
+    replacementImgs,
+  }: MutateFnArgumentsType<T>) => {
     const formData = new FormData();
 
     Object.entries(productData).forEach(([key, value]) => {
@@ -66,6 +67,12 @@ const addOrUpdateProductMutationFn = <T extends "patch" | "post">(type: T) => {
 
       formData.append(key, value.toString());
     });
+
+    if (type === "patch" && replacementImgs?.length) {
+      replacementImgs.forEach(({ public_id, replacementImg }) => {
+        formData.append(`replace-${public_id}`, replacementImg!);
+      });
+    }
 
     return (
       await axios[type](
@@ -91,9 +98,6 @@ const useSubmitProductForm = ({
   const handleError = useHandleErrorMsg();
   const queryClient = useQueryClient();
 
-  // redux
-  const dispatch = useDispatch();
-
   // make a new product
   const { isPending: addProductLoading, mutate: addProductMutate } =
     useMutation({
@@ -106,7 +110,6 @@ const useSubmitProductForm = ({
             content: "product created successfully",
           });
 
-          dispatch(addProducts([data as ProductType]));
           queryClient.invalidateQueries({ queryKey: ["getProducts"] });
 
           reset();
@@ -131,10 +134,13 @@ const useSubmitProductForm = ({
     useMutation({
       mutationKey: ["edit-product", id],
       mutationFn: addOrUpdateProductMutationFn("patch"),
-      onSuccess(data) {
-        dispatch(editProduct(data as ProductType));
+      onSuccess() {
         queryClient.prefetchQuery({ queryKey: ["getProducts"] });
         queryClient.prefetchQuery({ queryKey: ["getSingleProduct", id] });
+
+        imgsList.current?.setAllImgs((prev) =>
+          prev.map((img) => ({ ...img, replacementImg: undefined }))
+        );
 
         showMsg?.({
           clr: "green",
@@ -201,7 +207,8 @@ const useSubmitProductForm = ({
           quantity: isNaN(+data.quantity),
         };
 
-        // TODO: loop in server imgs and see if the order changes or not => if not remove it from productData
+        // TODO: loop on server imgs and see if the order changes or not => if not remove it from productData
+
         Object.entries(product).forEach(([oldKey, oldValue]) => {
           if (deletedKeys[oldKey as keyof typeof deletedKeys]) {
             delete productData[oldKey as keyof typeof productData];
@@ -220,7 +227,14 @@ const useSubmitProductForm = ({
           }
         });
 
-        editProductMutate({ productData, productId: id });
+        const replacementImgs = imgsList.current?.allImgs.filter(
+          (img) =>
+            "secure_url" in img &&
+            "replacementImg" in img &&
+            img.replacementImg instanceof File
+        ) as ReplacementImage[];
+
+        editProductMutate({ productData, productId: id, replacementImgs });
       } else
         showMsg?.({
           clr: "red",

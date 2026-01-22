@@ -1,6 +1,10 @@
 // react
 import {
   memo,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
   type Dispatch,
   type MouseEvent,
   type SetStateAction,
@@ -11,28 +15,43 @@ import { useParams } from "react-router-dom";
 
 // components
 import SortableItem from "../../../../../components/SortableItem";
+import IconAndSpinnerSwitcher from "../../../../../components/animatedBtns/IconAndSpinnerSwitcher";
+import InputComponent from "../../../../../components/appForm/Input/InputComponent";
 
 // types
-import type { ImageType, ProductType } from "../../../../../utils/types";
+import type {
+  ImageType,
+  ProductType,
+  ReplacementImage,
+} from "../../../../../utils/types";
 import type { AllProductImgsList, ImgsListItem } from "./ImgInputPreview";
 
 // hooks
 import useRemoveSingleImgFromProduct from "../../../../../hooks/useRemoveSingleImgFromProduct";
 import useShowMsg from "../../../../../hooks/useShowMsg";
 
+// icons
+import { BiReset } from "react-icons/bi";
+import { MdDelete, MdOutlineFindReplace } from "react-icons/md";
+
 type Props = {
-  img: ImageType | ImgsListItem;
+  img: ReplacementImage | ImgsListItem;
   product?: ProductType;
   setProduct: Dispatch<SetStateAction<ProductType | undefined>>;
   setAllImgs: Dispatch<SetStateAction<AllProductImgsList[]>>;
+  isFormLoading: boolean;
 };
 
 const ProductFormImgItem = memo(
-  ({ img, product, setProduct, setAllImgs }: Props) => {
+  ({ img, product, setProduct, setAllImgs, isFormLoading }: Props) => {
     const { id } = useParams();
 
-    const serverImg = "secure_url" in img;
+    const replaceImgInputRef = useRef<HTMLInputElement>(null);
 
+    const [replacementImg, setReplacementImg] = useState<File | undefined>();
+
+    const serverImg = "secure_url" in img;
+    const imgSrc = serverImg ? img.secure_url : URL.createObjectURL(img.img);
     const showImg = serverImg ? img.secure_url : img.img;
 
     // hooks
@@ -65,9 +84,6 @@ const ProductFormImgItem = memo(
       }
 
       if (id) {
-        e.currentTarget.disabled = true;
-        e.currentTarget.textContent = "removing...";
-
         return removeSingleImg({
           imgPublicId: (img as ImageType).public_id,
           productId: id,
@@ -80,28 +96,100 @@ const ProductFormImgItem = memo(
       });
     };
 
+    const handleReplaceImg = (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (file) {
+        if (serverImg) setReplacementImg(file);
+        setAllImgs((prev) =>
+          prev.map((imgItem) =>
+            imgItem._id === img._id
+              ? { ...imgItem, replacementImg: file }
+              : imgItem
+          )
+        );
+      }
+    };
+
+    const handleResetImg = () => {
+      setReplacementImg(undefined);
+
+      if (replaceImgInputRef.current) replaceImgInputRef.current.value = "";
+
+      setAllImgs((prev) =>
+        prev.map((imgItem) =>
+          imgItem._id === img._id
+            ? { ...imgItem, replacementImg: undefined }
+            : imgItem
+        )
+      );
+    };
+
+    useEffect(() => {
+      if ("replacementImg" in img && !img.replacementImg && replacementImg)
+        setReplacementImg(undefined);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [img]);
+
     if (!showImg) return;
 
     return (
       <SortableItem id={img._id}>
         <div className="img-preview-cell">
           <img
-            src={serverImg ? img.secure_url : URL.createObjectURL(img.img)}
+            src={
+              replacementImg && serverImg
+                ? URL.createObjectURL(replacementImg)
+                : imgSrc
+            }
             alt="product image"
             width="100%"
             height="100%"
           />
 
-          <button
-            title="remove image from list btn"
-            className="red-btn delete-product-img-btn"
-            onClick={(e) => handleRemoveImg(e, serverImg, img)}
-            disabled={removeImgLoading}
-            type="button"
-            data-no-dnd="true"
-          >
-            remove
-          </button>
+          <div className="img-preview-cell-btns-holder">
+            {replacementImg && serverImg ? (
+              <button
+                title="reset image btn"
+                className="red-btn"
+                onClick={handleResetImg}
+                disabled={removeImgLoading || isFormLoading}
+                type="button"
+                style={{ flex: 1 }}
+              >
+                <BiReset />
+              </button>
+            ) : (
+              <button
+                title="remove image from list btn"
+                className="red-btn"
+                onClick={(e) => handleRemoveImg(e, serverImg, img)}
+                disabled={removeImgLoading || isFormLoading}
+                type="button"
+                style={{ flex: 1 }}
+              >
+                <IconAndSpinnerSwitcher
+                  icon={<MdDelete />}
+                  toggleIcon={removeImgLoading}
+                />
+              </button>
+            )}
+
+            <InputComponent
+              ref={replaceImgInputRef}
+              onChange={handleReplaceImg}
+              disabled={removeImgLoading || isFormLoading}
+              type="file"
+              accept="image/*"
+              title={`replace-img-${img._id}`}
+              id={`replace-img-${img._id}`}
+              label={<MdOutlineFindReplace />}
+              labelAttr={{
+                className: "btn",
+                style: { flex: 1, display: "grid", placeContent: "center" },
+              }}
+            />
+          </div>
         </div>
       </SortableItem>
     );

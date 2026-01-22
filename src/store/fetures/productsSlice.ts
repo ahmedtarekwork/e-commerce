@@ -34,20 +34,10 @@ const productsSlice = createSlice({
         (product) => product._id !== payload
       );
     },
-    editProduct: (state, { payload }: PayloadAction<ProductType>) => {
-      state.products = state.products.map((product) =>
-        product._id === payload._id ? payload : product
-      );
-    },
   },
 });
 
 export default productsSlice.reducer;
 
-export const {
-  setProducts,
-  resetProducts,
-  addProducts,
-  removeProduct,
-  editProduct,
-} = productsSlice.actions;
+export const { setProducts, resetProducts, addProducts, removeProduct } =
+  productsSlice.actions;

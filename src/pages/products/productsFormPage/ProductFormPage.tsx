@@ -71,7 +71,7 @@ const getSingleProductQueryFn = async ({
   return (await axios.get(`products/${productId}`)).data;
 };
 
-const NewProductPage = () => {
+const ProductFormPage = () => {
   // react-router-dom
   const { pathname } = useLocation();
   const { id } = useParams();
@@ -295,6 +295,7 @@ const NewProductPage = () => {
           imgErr={imgErr}
           product={product}
           setProduct={setProduct}
+          isFormLoading={isLoading}
         />
 
         <button
@@ -319,4 +320,4 @@ const NewProductPage = () => {
     </AnimatedLayout>
   );
 };
-export default NewProductPage;
+export default ProductFormPage;

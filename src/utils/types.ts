@@ -22,6 +22,8 @@ export type ImageType = { order?: number } & Record<
   string
 >;
 
+export type ReplacementImage = ImageType & { replacementImg?: File };
+
 export type CategoryAndBrandType = {
   name: string;
   image: ImageType;

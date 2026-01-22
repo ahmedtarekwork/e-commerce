@@ -1,18 +1,28 @@
-import { type ComponentProps, forwardRef } from "react";
+import { forwardRef, type ComponentProps, type ReactNode } from "react";
 
-export type InputPropsType = ComponentProps<"input"> & {
-  label?: string;
-  error?: boolean;
-};
+type LabelProps =
+  | {
+      label: ReactNode;
+      labelAttr?: ComponentProps<"label">;
+    }
+  | {
+      label?: never;
+      labelAttr?: never;
+    };
+
+export type InputPropsType = ComponentProps<"input"> &
+  LabelProps & {
+    error?: boolean;
+  };
 
 const InputComponent = forwardRef<HTMLInputElement, InputPropsType>(
-  ({ label, error, ...attr }, ref) => {
+  ({ label, error, labelAttr, ...attr }, ref) => {
     const { className, id, disabled } = attr;
 
     return (
       <>
         {label && (
-          <label data-disabled={disabled} htmlFor={id}>
+          <label data-disabled={disabled} htmlFor={id} {...(labelAttr || {})}>
             {label}
           </label>
         )}
