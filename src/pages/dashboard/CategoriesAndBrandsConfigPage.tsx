@@ -13,9 +13,9 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 // components
-import Spinner from "../../components/spinners/Spinner";
 import BtnWithSpinner from "../../components/animatedBtns/BtnWithSpinner";
 import InputComponent from "../../components/appForm/Input/InputComponent";
+import Spinner from "../../components/spinners/Spinner";
 
 // react query
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -221,6 +221,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
 
   useEffect(() => {
     if (id && !initialEditableModel) getSingleModel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -229,6 +230,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
       setName(singleModel.name);
     }
     if (singleModelErr) handleError(singleModelErrData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleModel, singleModelErr, singleModelErrData]);
 
   if (singleModelLoading && fetchStatus === "fetching") {
@@ -326,9 +328,8 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
             toggleSpinner={modelLoading || editModelLoading}
             className="btn"
             disabled={
-              (!!id && name === editableModel?.name) ||
-              (!image && !name && !!id) ||
-              (!name && !id) ||
+              (id && name === editableModel?.name && !image) || // in edit mode
+              (!id && !image && !name) || // in normal mode
               modelLoading ||
               editModelLoading
             }

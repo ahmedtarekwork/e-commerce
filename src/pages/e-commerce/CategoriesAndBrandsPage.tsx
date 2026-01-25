@@ -82,53 +82,47 @@ const CategoriesAndBrandsPage = ({ type }: Props) => {
     );
   }
 
-  return (
-    <div
-      style={
-        !modelArr.length
-          ? { display: "grid", placeContent: "center", height: "100%" }
-          : {}
-      }
-    >
-      {!!modelArr.length && (
-        <>
-          {isDashboard && (
-            <Link
-              className="btn"
-              to={`/dashboard/${type}Form`}
-              relative="path"
-              style={{ marginBottom: 30 }}
-            >
-              + Add New {type}
-            </Link>
-          )}
-
-          <Heading>Available {type}</Heading>
-
-          <ul className="categories-or-brands-list">
-            <AnimatePresence>
-              {modelArr.map((modelData) => (
-                <CategoryAndBrandCard
-                  key={modelData._id}
-                  isDashboard={isDashboard}
-                  modelData={modelData}
-                  type={type}
-                  refetchModels={refetch}
-                />
-              ))}
-            </AnimatePresence>
-          </ul>
-        </>
-      )}
-
-      {!modelArr.length && (
+  if (!modelArr.length) {
+    return (
+      <div style={{ display: "grid", placeContent: "center", height: "100%" }}>
         <div className="category-or-brand-no-data-holder">
           <strong>there aren't any {type} to display</strong>
           <Link className="btn" to={`/dashboard/${type}Form`} relative="path">
             + Add Some {type}
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {isDashboard && (
+        <Link
+          className="btn"
+          to={`/dashboard/${type}Form`}
+          relative="path"
+          style={{ marginBottom: 30 }}
+        >
+          + Add New {type}
+        </Link>
       )}
+
+      <Heading>Available {type}</Heading>
+
+      <ul className="categories-or-brands-list">
+        <AnimatePresence>
+          {modelArr.map((modelData) => (
+            <CategoryAndBrandCard
+              key={modelData._id}
+              isDashboard={isDashboard}
+              modelData={modelData}
+              type={type}
+              refetchModels={refetch}
+            />
+          ))}
+        </AnimatePresence>
+      </ul>
     </div>
   );
 };
