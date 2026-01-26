@@ -227,6 +227,8 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
     return <Spinner fullWidth>Loading {modelName} Data...</Spinner>;
   }
 
+  console.log(id, name, image);
+
   return (
     <>
       <Link
@@ -319,7 +321,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
             className="btn"
             disabled={
               (id && name === editableModel?.name && !image) || // in edit mode
-              (!id && !image && !name) || // in normal mode
+              (!id && (!name || !image)) || // in normal mode
               modelLoading ||
               editModelLoading
             }
