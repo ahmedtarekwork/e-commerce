@@ -1,19 +1,11 @@
-// react
-import { useEffect } from "react";
-
 // react router
 import { Link, useLocation } from "react-router-dom";
 
 // react query
 import { useQuery } from "@tanstack/react-query";
 
-// redux
-import useDispatch from "../../hooks/redux/useDispatch";
-// redux actions
-import { setCategoriesOrBrand } from "../../store/fetures/categoriesAndBrandsSlice";
-
 // components
-import CategoryAndBrandCard from "../../components/CategoryAndBrandCard";
+import CategoryAndBrandCard from "../../components/categoryAndBrandCard/CategoryAndBrandCard";
 import Heading from "../../components/Heading";
 import DisplayError from "../../components/layout/DisplayError";
 import Spinner from "../../components/spinners/Spinner";
@@ -42,9 +34,6 @@ const getCategoriesOrBrandsQueryFn = async ({
 };
 
 const CategoriesAndBrandsPage = ({ type }: Props) => {
-  // redux
-  const dispatch = useDispatch();
-
   // react router
   const { pathname } = useLocation();
 
@@ -61,13 +50,6 @@ const CategoriesAndBrandsPage = ({ type }: Props) => {
     queryKey: [`get ${type}`, type],
     queryFn: getCategoriesOrBrandsQueryFn,
   });
-
-  useEffect(() => {
-    if (modelArr) {
-      dispatch(setCategoriesOrBrand({ type, categoriesOrBrands: modelArr }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelArr]);
 
   if (isPending) {
     return <Spinner fullWidth>Loading {type}...</Spinner>;

@@ -210,6 +210,8 @@ const SingleProductPage = () => {
     // ratings,
     // totalRating,
   } = product;
+  console.log("sold", sold);
+  console.log("quantity", quantity);
 
   const soldedUnitsData = (): ChartDataType<"doughnut"> => {
     return {
@@ -336,6 +338,7 @@ const SingleProductPage = () => {
         </div>
       </div>
 
+      {/* TODO: HIDE INSIGHTS IF QUANTITY = 0 */}
       {isDashboard && (
         <ul className="single-product-page-insights-list">
           <InsightWrapper title="Solded Units Count" diminsion="900px">

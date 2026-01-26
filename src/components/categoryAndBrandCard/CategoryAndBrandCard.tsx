@@ -6,28 +6,20 @@ import { Link, useNavigate } from "react-router-dom";
 
 // react query
 import {
-  useMutation,
-
-  // types
   type QueryObserverResult,
   type RefetchOptions,
 } from "@tanstack/react-query";
 
 // components
-import AreYouSureModal, { type SureModalRef } from "./modals/AreYouSureModal";
+import RemoveCatOrBrandSureModel from "./RemoveCatOrBrandSureModel";
+// import DeleteCatOrBrandCardBtn, { RemoveCatOrBrandSureModel } from "./DeleteCatOrBrandCardBtn";
 
 // framer motion
-import { type HTMLMotionProps, motion } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 
 // types
-import type { CategoryAndBrandType } from "../utils/types";
-
-// hooks
-import useHandleErrorMsg from "../hooks/useHandleErrorMsg";
-import useShowMsg from "../hooks/useShowMsg";
-
-// utils
-import axios from "../utils/axios";
+import type { CategoryAndBrandType } from "../../utils/types";
+import type { SureModalRef } from "../modals/AreYouSureModal";
 
 type Props = {
   isDashboard: boolean;
@@ -38,30 +30,15 @@ type Props = {
   ) => Promise<QueryObserverResult<CategoryAndBrandType[]>>;
 };
 
-const deleteCategoryOrBrandMutationFn = async ({
-  type,
-  id,
-}: {
-  type: Props["type"];
-  id: string;
-}) => {
-  return (await axios.delete(`${type}/${id}`)).data;
-};
-
 const CategoryAndBrandCard = ({
   isDashboard,
   type,
   modelData,
   refetchModels,
 }: Props) => {
-  const navigate = useNavigate();
-
-  // hooks
-  const handleError = useHandleErrorMsg();
-  const showMsg = useShowMsg();
-
-  // refs
   const sureModelRef = useRef<SureModalRef>(null);
+
+  const navigate = useNavigate();
 
   const singleType = type === "brands" ? "brand" : "category";
 
@@ -82,54 +59,20 @@ const CategoryAndBrandCard = ({
         data: {},
       };
 
-  const { isPending: removeLoading, mutate: removeModelMutate } = useMutation({
-    mutationKey: [`remove ${singleType}`],
-    mutationFn: deleteCategoryOrBrandMutationFn,
-    onSuccess: (data) => {
-      showMsg?.({
-        content: data.message || `${singleType} deleted successfully`,
-        clr: "green",
-        time: 4000,
-      });
-      sureModelRef.current?.setOpenModal(false);
-      sureModelRef.current?.setShowYesSpinner(false);
-
-      refetchModels();
-    },
-    onError: (data) => {
-      handleError(data);
-
-      sureModelRef.current?.setShowYesSpinner(false);
-      sureModelRef.current?.appModalEl
-        ?.querySelectorAll("button")
-        .forEach((btn) => (btn.disabled = false));
-    },
-  });
-
   return (
     <>
-      <AreYouSureModal
+      <RemoveCatOrBrandSureModel
+        _id={_id}
+        name={name}
+        singleType={singleType}
+        type={type}
+        refetchModels={refetchModels}
         ref={sureModelRef}
-        functionToMake={(e) => {
-          sureModelRef.current?.appModalEl
-            ?.querySelectorAll("button")
-            .forEach((btn) => (btn.disabled = true));
-
-          e.currentTarget.disabled = true;
-          sureModelRef.current?.setShowYesSpinner(true);
-          removeModelMutate({ type, id: _id });
-        }}
-        toggleClosingFunctions={!removeLoading}
-      >
-        Are you sure you want to delete{" "}
-        <span style={{ color: "var(--danger)", fontWeight: "bold" }}>
-          {name}
-        </span>{" "}
-        {singleType}
-      </AreYouSureModal>
+      />
 
       <ComponentData.tagName {...ComponentData.data} key={_id}>
         <button
+          data-testid={`main-btn-for-${singleType}-${_id}`}
           className="category-or-brand-card"
           title={`go to ${name} category`}
           onClick={(e) => {
@@ -138,9 +81,14 @@ const CategoryAndBrandCard = ({
                 (name) => !(e.target as HTMLElement).classList.contains(name)
               )
             ) {
-              navigate(`/products?${singleType}=${name}`, {
-                relative: "path",
-              });
+              navigate(
+                `${
+                  isDashboard ? "/dashboard" : ""
+                }/products?${singleType}=${name}`,
+                {
+                  relative: "path",
+                }
+              );
             }
           }}
         >
@@ -149,6 +97,7 @@ const CategoryAndBrandCard = ({
             alt={`${name} ${singleType} image`}
             width={150}
             height={120}
+            data-testid={`img-for-${singleType}-${_id}`}
           />
 
           <div style={{ width: "100%" }}>
@@ -164,6 +113,15 @@ const CategoryAndBrandCard = ({
                 >
                   delete
                 </span>
+
+                {/* <DeleteCatOrBrandCardBtn
+                  refetchModels={refetchModels}
+                  singleType={singleType}
+                  type={type}
+                  _id={_id}
+                  name={name}
+                /> */}
+
                 <Link className="btn" to={`/dashboard/${type}Form?id=${_id}`}>
                   edit
                 </Link>

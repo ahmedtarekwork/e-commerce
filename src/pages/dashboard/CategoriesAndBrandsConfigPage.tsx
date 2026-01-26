@@ -20,12 +20,6 @@ import Spinner from "../../components/spinners/Spinner";
 // react query
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// redux
-import useDispatch from "../../hooks/redux/useDispatch";
-import useSelector from "../../hooks/redux/useSelector";
-// redux actions
-import { addCategoryOrBrand } from "../../store/fetures/categoriesAndBrandsSlice";
-
 // utils
 import axios from "axios";
 
@@ -112,12 +106,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
   // hooks
   const handleError = useHandleErrorMsg();
 
-  // redux
-  const dispatch = useDispatch();
   const showMsg = useShowMsg();
-  const initialEditableModel = useSelector(
-    (state) => state.categoriesAndBrands[type]
-  ).find((model) => model._id === id);
 
   // constants
   const modelName = type === "brands" ? "brand" : "category";
@@ -129,7 +118,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
   // states
   const [editableModel, setEditableModel] = useState<
     CategoryAndBrandType | undefined
-  >(initialEditableModel);
+  >();
 
   const [image, setImage] = useState<File | null>(null);
   const [name, setName] = useState(id ? editableModel?.name || "" : "");
@@ -139,13 +128,14 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
   const { mutate: submitModel, isPending: modelLoading } = useMutation({
     mutationKey: [`add new ${modelName}`],
     mutationFn: submitModelMutationFn,
-    onSuccess(data) {
+    onSuccess() {
       showMsg?.({
         content: `${modelName} created successfully`,
         clr: "green",
         time: 4000,
       });
-      dispatch(addCategoryOrBrand({ type, newCategoryOrBrand: data }));
+
+      queryClient.prefetchQuery({ queryKey: [`get ${type}`] });
 
       formRef.current?.reset();
       if (imgInputRef.current) imgInputRef.current.value = "";
@@ -220,7 +210,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
   };
 
   useEffect(() => {
-    if (id && !initialEditableModel) getSingleModel();
+    if (id) getSingleModel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
