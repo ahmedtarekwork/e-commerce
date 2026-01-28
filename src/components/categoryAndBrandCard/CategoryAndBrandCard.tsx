@@ -12,7 +12,6 @@ import {
 
 // components
 import RemoveCatOrBrandSureModel from "./RemoveCatOrBrandSureModel";
-// import DeleteCatOrBrandCardBtn, { RemoveCatOrBrandSureModel } from "./DeleteCatOrBrandCardBtn";
 
 // framer motion
 import { motion, type HTMLMotionProps } from "framer-motion";
@@ -113,14 +112,6 @@ const CategoryAndBrandCard = ({
                 >
                   delete
                 </span>
-
-                {/* <DeleteCatOrBrandCardBtn
-                  refetchModels={refetchModels}
-                  singleType={singleType}
-                  type={type}
-                  _id={_id}
-                  name={name}
-                /> */}
 
                 <Link className="btn" to={`/dashboard/${type}Form?id=${_id}`}>
                   edit

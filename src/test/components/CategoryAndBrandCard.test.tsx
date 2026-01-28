@@ -133,14 +133,16 @@ describe("test CategoryAndBrandCard component", () => {
         );
 
         const editBtn = screen.getByText("edit");
+        const location = screen.getByTestId("location");
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        expect(new URL(location.textContent).pathname).toBe(
           "/dashboard/categories"
         );
 
         await userEvent.click(editBtn);
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        const newLocation = new URL(location.textContent);
+        expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
           "/dashboard/categoriesForm?id=1"
         );
       });
@@ -160,14 +162,16 @@ describe("test CategoryAndBrandCard component", () => {
         );
 
         const mainBtn = screen.getByTestId("main-btn-for-category-1");
+        const location = screen.getByTestId("location");
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        expect(new URL(location.textContent).pathname).toBe(
           "/dashboard/categories"
         );
 
         await userEvent.click(mainBtn);
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        const newLocation = new URL(location.textContent);
+        expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
           "/dashboard/products?category=Electronics"
         );
       });
@@ -300,14 +304,16 @@ describe("test CategoryAndBrandCard component", () => {
         );
 
         const editBtn = screen.getByText("edit");
+        const location = screen.getByTestId("location");
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        expect(new URL(location.textContent).pathname).toBe(
           "/dashboard/brands"
         );
 
         await userEvent.click(editBtn);
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        const newLocation = new URL(location.textContent);
+        expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
           "/dashboard/brandsForm?id=1"
         );
       });
@@ -327,14 +333,16 @@ describe("test CategoryAndBrandCard component", () => {
         );
 
         const mainBtn = screen.getByTestId("main-btn-for-brand-1");
+        const location = screen.getByTestId("location");
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        expect(new URL(location.textContent).pathname).toBe(
           "/dashboard/brands"
         );
 
         await userEvent.click(mainBtn);
 
-        expect(screen.getByTestId("location")).toHaveTextContent(
+        const newLocation = new URL(location.textContent);
+        expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
           "/dashboard/products?brand=HP"
         );
       });

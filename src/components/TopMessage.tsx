@@ -60,6 +60,7 @@ const TopMessage = () => {
         // if i want to remove messsage element after some time
         if (time) setTimeout(() => closeMsg(msgEl), time);
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageData]);
 
   return createPortal(

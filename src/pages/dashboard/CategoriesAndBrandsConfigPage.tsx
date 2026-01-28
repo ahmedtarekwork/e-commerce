@@ -309,6 +309,7 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
             type="button"
             onClick={() => {
               setImage(null);
+              imgInputRef.current!.value = "";
 
               setName(id ? editableModel?.name || "" : "");
             }}
@@ -320,8 +321,9 @@ const CategoriesAndBrandsConfigPage = ({ type }: Props) => {
             toggleSpinner={modelLoading || editModelLoading}
             className="btn"
             disabled={
-              (id && name === editableModel?.name && !image) || // in edit mode
-              (!id && (!name || !image)) || // in normal mode
+              !name.trim() ||
+              (id && name.trim() === editableModel?.name.trim() && !image) || // in edit mode
+              (!id && !image) || // in normal mode
               modelLoading ||
               editModelLoading
             }

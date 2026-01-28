@@ -18,7 +18,9 @@ describe("test categories page", () => {
       }
     );
 
-    expect(screen.getByTestId("location")).toHaveTextContent("/categories");
+    const location = screen.getByTestId("location");
+
+    expect(new URL(location.textContent).pathname).toBe("/categories");
     expect(screen.getByText("Loading categories...")).toBeInTheDocument();
 
     expect(await screen.findAllByRole("listitem")).toHaveLength(2);
@@ -42,7 +44,8 @@ describe("test categories page", () => {
     );
     await userEvent.click(secindCategoryBtn);
 
-    expect(await screen.findByTestId("location")).toHaveTextContent(
+    const newLocation = new URL(location.textContent);
+    expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
       "/products?category=Clothes"
     );
   });
@@ -63,7 +66,7 @@ describe("test categories page", () => {
 
     await userEvent.click(addNewCategoryBtn);
 
-    expect(await screen.findByTestId("location")).toHaveTextContent(
+    expect(new URL(screen.getByTestId("location").textContent).pathname).toBe(
       "/dashboard/categoriesForm"
     );
   });
@@ -81,7 +84,9 @@ describe("test brands page", () => {
       }
     );
 
-    expect(screen.getByTestId("location")).toHaveTextContent("/brands");
+    const location = screen.getByTestId("location");
+
+    expect(new URL(location.textContent).pathname).toBe("/brands");
     expect(screen.getByText("Loading brands...")).toBeInTheDocument();
 
     expect(await screen.findAllByRole("listitem")).toHaveLength(2);
@@ -103,7 +108,8 @@ describe("test brands page", () => {
     const secindCategoryBtn = await screen.findByTestId("main-btn-for-brand-2");
     await userEvent.click(secindCategoryBtn);
 
-    expect(await screen.findByTestId("location")).toHaveTextContent(
+    const newLocation = new URL(location.textContent);
+    expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
       "/products?brand=HP"
     );
   });
@@ -119,12 +125,13 @@ describe("test brands page", () => {
       }
     );
 
+    const location = screen.getByTestId("location");
     const addNewCategoryBtn = await screen.findByText("+ Add New brands");
     expect(addNewCategoryBtn).toBeInTheDocument();
 
     await userEvent.click(addNewCategoryBtn);
 
-    expect(await screen.findByTestId("location")).toHaveTextContent(
+    expect(new URL(location.textContent).pathname).toBe(
       "/dashboard/brandsForm"
     );
   });
