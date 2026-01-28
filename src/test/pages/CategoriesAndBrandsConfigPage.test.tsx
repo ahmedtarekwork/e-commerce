@@ -3,7 +3,7 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // components
-import CategoriesAndBrandsConfigPage from "../../pages/dashboard/CategoriesAndBrandsConfigPage";
+import CategoriesAndBrandsConfigPage from "../../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
 
 // statics
 import {

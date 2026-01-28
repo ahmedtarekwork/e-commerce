@@ -1,29 +1,29 @@
 // Router
 import {
-  createRoutesFromElements,
   createBrowserRouter,
+  createRoutesFromElements,
   Route,
 } from "react-router-dom";
 
 // Pages \\
 import LoginOrSignupPage from "../pages/LoginOrSignupPage";
 // home
-import EcommerceHomePage from "../pages/e-commerce/homePage/EcommerceHomePage";
 import DashboardHomePage from "../pages/dashboard/dashboardHomePage/DashboardHomePage";
 import HomePageSettingsPage from "../pages/dashboard/homePageSettings/HomePageSettingsPage";
+import EcommerceHomePage from "../pages/e-commerce/homePage/EcommerceHomePage";
 // users
-import ProfilePage from "../pages/profilePage/ProfilePage";
 import UsersPage from "../pages/dashboard/usersPage/UsersPage";
+import ProfilePage from "../pages/profilePage/ProfilePage";
 // products
-import ProductsPage from "../pages/products/productsPage/ProductsPage";
 import ProductFormPage from "../pages/products/productsFormPage/ProductFormPage";
+import ProductsPage from "../pages/products/productsPage/ProductsPage";
 import SingleProductPage from "../pages/products/SingleProductPage";
 // orders
-import SingleOrderPage from "../pages/orders/SingleOrderPage";
 import OrdersPage from "../pages/orders/OrdersPage";
+import SingleOrderPage from "../pages/orders/SingleOrderPage";
 // payment
-import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
 import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
+import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
 // cart or wishlist
 import CartOrWishlistPage from "../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
 // more pages
@@ -32,14 +32,14 @@ import EmptyPage from "../components/layout/EmptyPage";
 // layouts \\
 import MainLayout from "../layouts/MainLayout";
 // auth layouts
-import NotAuthLayout from "../layouts/NotAuthLayout";
 import AlreadyLogedInLayout from "../layouts/AlreadyLogedInLayout";
 import NeedLoginLayout from "../layouts/NeedLoginLayout";
+import NotAuthLayout from "../layouts/NotAuthLayout";
 
 // SVGs
 import ErrSvg from "../../imgs/404.svg";
+import CategoriesAndBrandsConfigPage from "../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
 import CategoriesAndBrandsPage from "../pages/e-commerce/CategoriesAndBrandsPage";
-import CategoriesAndBrandsConfigPage from "../pages/dashboard/CategoriesAndBrandsConfigPage";
 
 const useAppRouter = (checkUserLoading: boolean) => {
   return createBrowserRouter(
