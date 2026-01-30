@@ -1,10 +1,18 @@
+// react query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// react router dom
 import { MemoryRouter } from "react-router-dom";
 
-import { configureStore } from "@reduxjs/toolkit";
+// RTL
 import { render } from "@testing-library/react";
+
+// types
 import type { ReactElement, ReactNode } from "react";
+import type { RootStateType, UserType } from "../../utils/types";
+
+// redux
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 
 // reducers
@@ -14,22 +22,27 @@ import productsReducer from "../../store/fetures/productsSlice";
 import topMessageReducer from "../../store/fetures/topMessageSlice";
 import userReducer from "../../store/fetures/userSlice";
 
+export const rootReducer = combineReducers({
+  user: userReducer,
+  orders: ordersReducer,
+  products: productsReducer,
+  homePageSliderImgs: homePageSliderImgsReducer,
+  topMessage: topMessageReducer,
+});
+
 type RenderOptions = {
   route?: string;
+  user?: UserType;
+  preloadedState?: Partial<RootStateType>;
 };
 
 export function renderWithProviders(
   ui: ReactElement,
-  { route = "/" }: RenderOptions = {}
+  { route = "/", preloadedState }: RenderOptions = {}
 ) {
   const store = configureStore({
-    reducer: {
-      user: userReducer,
-      orders: ordersReducer,
-      products: productsReducer,
-      homePageSliderImgs: homePageSliderImgsReducer,
-      topMessage: topMessageReducer,
-    },
+    reducer: rootReducer,
+    preloadedState,
   });
 
   const queryClient = new QueryClient({

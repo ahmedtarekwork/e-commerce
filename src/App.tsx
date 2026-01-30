@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 
 // redux
-import useSelector from "./hooks/redux/useSelector";
 import useDispatch from "./hooks/redux/useDispatch";
+import useSelector from "./hooks/redux/useSelector";
 // redux actions
 import { setUser } from "./store/fetures/userSlice";
 
@@ -56,6 +56,7 @@ const App = () => {
   // if there is a token in cookies => try to login user automatically
   useEffect(() => {
     if (!user) checkUserQuery();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

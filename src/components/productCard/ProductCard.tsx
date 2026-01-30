@@ -150,7 +150,7 @@ const ProductCard = ({
 
           let propValue = product[prop as keyof typeof product];
 
-          if (prop === "price") propValue += "$";
+          if (prop === "price") propValue = "$" + propValue;
 
           const isCategoryOrBrandProp = ["brand", "category"].includes(prop);
 
@@ -188,6 +188,7 @@ const ProductCard = ({
             relative="path"
             to={`${isDashboard ? "/dashboard" : ""}/product/${_id}`}
             className="product-card-more-info btn"
+            data-testid={`go-to-${product._id}`}
           >
             more info
           </Link>

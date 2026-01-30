@@ -3,7 +3,7 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 // types
 import type { CartType, UserType } from "../../utils/types";
 
-type InitStateType = {
+export type InitStateType = {
   user: null | UserType;
   userCart: CartType | null;
   allUsers: UserType[];

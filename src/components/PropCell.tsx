@@ -44,7 +44,7 @@ const PropCell = ({
       <ValueHolderTagName.tagName {...ValueHolderTagName.props}>
         <div
           {...propNameProps}
-          className={`prop-cell-value ${propNameProps?.className}`.trim()}
+          className={`prop-cell-value ${propNameProps?.className || ""}`.trim()}
         >
           {val}
         </div>

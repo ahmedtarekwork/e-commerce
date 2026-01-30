@@ -102,6 +102,7 @@ const DeleteProductBtn = ({
 
   return (
     <button
+      data-testid={`delete-product-${productId}`}
       title="remove product from cart btn"
       disabled={wishlistLoading || removeFromCartLoading}
       className="red-btn delete-product-btn"

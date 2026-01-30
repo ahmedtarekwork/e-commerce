@@ -210,9 +210,6 @@ const SingleProductPage = () => {
     // ratings,
     // totalRating,
   } = product;
-  console.log("sold", sold);
-  console.log("quantity", quantity);
-
   const soldedUnitsData = (): ChartDataType<"doughnut"> => {
     return {
       labels: ["Solded", "Not Solded"],

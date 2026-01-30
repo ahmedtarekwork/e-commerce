@@ -1,7 +1,7 @@
-import CategoriesAndBrandsPage from "../../pages/e-commerce/CategoriesAndBrandsPage";
+import CategoriesAndBrandsPage from "../../../pages/e-commerce/CategoriesAndBrandsPage";
 
-import { LocationDisplay } from "../utils/location";
-import { renderWithProviders } from "../utils/renderWithProviders";
+import { LocationDisplay } from "../../utils/location";
+import { renderWithProviders } from "../../utils/renderWithProviders";
 
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

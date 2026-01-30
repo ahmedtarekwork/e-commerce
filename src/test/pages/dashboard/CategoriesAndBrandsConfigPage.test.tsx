@@ -3,17 +3,17 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // components
-import CategoriesAndBrandsConfigPage from "../../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
+import CategoriesAndBrandsConfigPage from "../../../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
 
 // statics
 import {
   brands,
   categories,
-} from "../mocks/handlers/categoriesAndBrandsHandlers/static";
+} from "../../mocks/handlers/categoriesAndBrandsHandlers/static";
 
 // utils
-import { LocationDisplay } from "../utils/location";
-import { renderWithProviders } from "../utils/renderWithProviders";
+import { LocationDisplay } from "../../utils/location";
+import { renderWithProviders } from "../../utils/renderWithProviders";
 
 describe("CategoriesAndBrandsConfigPage", () => {
   describe("test categories", () => {
