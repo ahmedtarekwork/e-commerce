@@ -92,7 +92,7 @@ const MainLayout = () => {
         <div
           className="container"
           style={{
-            ...(makePageFullHeight
+            ...(makePageFullHeight || pathname.includes("/wishlist")
               ? {
                   display: "flex",
                   flexDirection: "column",

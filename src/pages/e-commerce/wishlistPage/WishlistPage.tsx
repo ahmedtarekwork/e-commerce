@@ -219,54 +219,51 @@ const WishlistPage = ({ userId, withDeleteBtn }: Props) => {
             />
           </motion.div>
         ) : (
-          <>
+          <motion.div
+            key="two"
+            variants={slideOutVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            id="wishlist-page-holder"
+          >
             {isCurrentUserProfile && <Heading>Your Wishlist</Heading>}
-
-            <motion.div
-              key="two"
-              variants={slideOutVariant}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              id="wishlist-page-holder"
+            <GridList
+              withMargin={!!withDeleteBtn}
+              cells={listCell}
+              initType="row"
+              isChanging={false}
             >
-              <GridList
-                withMargin={!!withDeleteBtn}
-                cells={listCell}
-                initType="row"
-                isChanging={false}
-              >
-                <AnimatePresence>
-                  {currentWishlist?.map((prd) => (
-                    <motion.li
-                      className="no-grid"
-                      variants={slideOutVariant}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      layout
-                      title={"product-" + prd._id}
-                      key={prd._id}
-                      data-testid="wishlist-item"
-                    >
-                      <ProductCard
-                        TagName="div"
-                        className="rows-list-cell"
-                        withDeleteBtn={{
-                          type: "wishlist",
-                          setCurrentWishlist,
-                        }}
-                        product={prd}
-                        cells={productCardCells}
-                      />
-                    </motion.li>
-                  ))}
-                </AnimatePresence>
-              </GridList>
+              <AnimatePresence>
+                {currentWishlist?.map((prd) => (
+                  <motion.li
+                    className="no-grid"
+                    variants={slideOutVariant}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    layout
+                    title={"product-" + prd._id}
+                    key={prd._id}
+                    data-testid="wishlist-item"
+                  >
+                    <ProductCard
+                      TagName="div"
+                      className="rows-list-cell"
+                      withDeleteBtn={{
+                        type: "wishlist",
+                        setCurrentWishlist,
+                      }}
+                      product={prd}
+                      cells={productCardCells}
+                    />
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </GridList>
 
-              <ClearWishlistBtn setCurrentWishlist={setCurrentWishlist} />
-            </motion.div>
-          </>
+            <ClearWishlistBtn setCurrentWishlist={setCurrentWishlist} />
+          </motion.div>
         )}
       </AnimatePresence>
     );

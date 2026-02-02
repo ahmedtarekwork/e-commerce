@@ -54,7 +54,7 @@ const ClearWishlistBtn = ({ setCurrentWishlist }: Props) => {
           clr: "green",
         });
 
-        setCurrentWishlist([]);
+        setCurrentWishlist((prev) => prev.filter(() => false));
         dispatch(resetUserWishlist());
       },
       onError(error) {
