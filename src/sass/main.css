@@ -1431,24 +1431,7 @@ form#auth-form {
   text-align: center;
 }
 
-.cart-or-wishlist-down-holder {
-  display: flex;
-  flex-direction: column;
-  margin-top: auto;
-  padding-top: 30px;
-  position: relative;
-  background: white;
-}
-.cart-or-wishlist-down-holder::after {
-  content: "";
-  position: absolute;
-  top: 20px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: var(--main);
-}
-.cart-or-wishlist-down-holder .cart-or-wishlist-btns {
+.cart-or-wishlist-btns {
   display: flex;
   flex: 1;
   align-items: flex-end;
@@ -1457,7 +1440,7 @@ form#auth-form {
   min-width: fit-content;
   flex-wrap: wrap;
 }
-.cart-or-wishlist-down-holder .cart-or-wishlist-btns > * {
+.cart-or-wishlist-btns > * {
   flex: 1;
   min-width: -moz-fit-content;
   min-width: fit-content;
@@ -1466,17 +1449,34 @@ form#auth-form {
   align-items: center;
   gap: 10px;
 }
-.cart-or-wishlist-down-holder .cart-or-wishlist-btns > * svg {
+.cart-or-wishlist-btns > * svg {
   font-size: 20px;
 }
 @media (max-width: 275px) {
-  .cart-or-wishlist-down-holder .cart-or-wishlist-btns {
+  .cart-or-wishlist-btns {
     justify-content: flex-end;
   }
-  .cart-or-wishlist-down-holder .cart-or-wishlist-btns > * {
+  .cart-or-wishlist-btns > * {
     width: 100%;
     flex: unset;
   }
+}
+
+#wishlist-page-holder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#wishlist-btn-holder button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+#wishlist-btn-holder button svg {
+  font-size: 20px;
 }
 
 .success-or-fail-icon {
@@ -1894,6 +1894,24 @@ form#auth-form {
 .app-footer-white-logo {
   width: 40px;
   display: grid;
+}
+
+.cart-and-wishlist-down-holder {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  padding-top: 30px;
+  position: relative;
+  background: white;
+}
+.cart-and-wishlist-down-holder::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--main);
 }
 
 .category-or-brand-card {

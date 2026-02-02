@@ -44,7 +44,7 @@ import useInitProductsCells from "../hooks/useInitProductsCells";
 import { FaHeartBroken } from "react-icons/fa";
 
 // SVGs
-import wishlistSvg from "../../imgs/wishe-list.svg";
+import wishlistSvg from "../../imgs/wish-list.svg";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
@@ -150,6 +150,33 @@ const WishlistArea = forwardRef<WishlistAreaRefType, Props>(
       );
     }
 
+    if (!isCurrentUserProfile && currentWishlist.length) {
+      return (
+        <GridList
+          withMargin={!!withDeleteBtn}
+          cells={listCell}
+          initType="row"
+          isChanging={false}
+        >
+          {currentWishlist?.map((prd) => (
+            <li
+              className="no-grid"
+              title={"product-" + prd._id}
+              key={prd._id}
+              data-testid="wishlist-item"
+            >
+              <ProductCard
+                TagName="div"
+                className="rows-list-cell"
+                product={prd}
+                cells={productCardCells}
+              />
+            </li>
+          ))}
+        </GridList>
+      );
+    }
+
     if (isCurrentUserProfile) {
       return (
         <AnimatePresence mode="wait">
@@ -212,14 +239,10 @@ const WishlistArea = forwardRef<WishlistAreaRefType, Props>(
                       <ProductCard
                         TagName="div"
                         className="rows-list-cell"
-                        withDeleteBtn={
-                          isCurrentUserProfile
-                            ? {
-                                type: "wishlist",
-                                setCurrentWishlist,
-                              }
-                            : undefined
-                        }
+                        withDeleteBtn={{
+                          type: "wishlist",
+                          setCurrentWishlist,
+                        }}
                         product={prd}
                         cells={productCardCells}
                       />

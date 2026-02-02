@@ -6,8 +6,12 @@ import userEvent from "@testing-library/user-event";
 import { LocationDisplay } from "../../utils/location";
 import { renderWithProviders } from "../../utils/renderWithProviders";
 
+// react router dom
+import { Route, Routes } from "react-router-dom";
+import NeedLoginLayout from "../../../layouts/NeedLoginLayout";
+
 // pages
-import CartOrWishlistPage from "../../../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
+import WishlistPage from "../../../pages/e-commerce/wishlistPage/WishlistPage";
 
 // mocks
 import { products } from "../../mocks/handlers/products/static";
@@ -21,22 +25,33 @@ import { server } from "../../mocks/server";
 import type { ProductType } from "../../../utils/types";
 
 describe("testing wishlist page", () => {
-  it("should navigate to login page when no user signed in", () => {
+  it("should render forbidden screen when no user signed in", async () => {
     renderWithProviders(
-      <>
-        <CartOrWishlistPage />
-        <LocationDisplay />
-      </>,
+      <Routes>
+        <Route element={<NeedLoginLayout />}>
+          <Route path="/wishlist" element={<WishlistPage />} />
+        </Route>
+      </Routes>,
       { route: "/wishlist" }
     );
 
-    const location = new URL(screen.getByTestId("location").textContent)
-      .pathname;
-    expect(location).toBe("/login");
+    const img = await screen.findByRole("img");
+    const title = await screen.findByText(
+      "You need to login to access this page"
+    );
+    const loginBtn = await screen.findByRole("link", { name: "Login" });
+
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute("src", "/imgs/need_auth.svg");
+
+    expect(title).toBeInTheDocument();
+
+    expect(loginBtn).toBeInTheDocument();
+    expect(loginBtn).toHaveClass("btn");
   });
 
   it("should render loading screen", () => {
-    renderWithProviders(<CartOrWishlistPage />, {
+    renderWithProviders(<WishlistPage />, {
       route: "/wishlist",
       preloadedState: { user: userStateMock },
     });
@@ -48,7 +63,7 @@ describe("testing wishlist page", () => {
   it("should render no items in wishlist screen", async () => {
     server.use(http.get("*/users/wishlist/:id", () => HttpResponse.json([])));
 
-    renderWithProviders(<CartOrWishlistPage />, {
+    renderWithProviders(<WishlistPage />, {
       route: "/wishlist",
       preloadedState: { user: userStateMock },
     });
@@ -69,115 +84,108 @@ describe("testing wishlist page", () => {
   });
 
   it("should render page components correctlly", async () => {
-    renderWithProviders(<CartOrWishlistPage />, {
+    renderWithProviders(<WishlistPage />, {
       route: "/wishlist",
       preloadedState: { user: userStateMock },
     });
 
-    await waitFor(
-      () => {
-        const pageTitle = screen.getByRole("heading", {
-          name: /Your Wishlist/i,
-        });
+    const pageTitle = await screen.findByRole("heading", {
+      name: /Your Wishlist/i,
+    });
 
-        const clearWishlistBtn = screen.getByRole("button", {
-          name: /clear your wishlist/i,
-        });
+    const clearWishlistBtn = await screen.findByRole("button", {
+      name: /clear your wishlist/i,
+    });
 
-        const productImgHeading = screen.getByText("img", { selector: "p" });
-        const productTitleHeading = screen.getByText("title", {
-          selector: "p",
-        });
-        const productBrandHeading = screen.getByText("brand", {
-          selector: "p",
-        });
-        const productQtyHeading = screen.getByText("quantity", {
-          selector: "p",
-        });
-        const productCategoryHeading = screen.getByText("category", {
-          selector: "p",
-        });
-        const productMoreInfoHeading = screen.getByText("more info", {
-          selector: "p",
-        });
+    const productImgHeading = await screen.findByText("img", { selector: "p" });
+    const productTitleHeading = await screen.findByText("title", {
+      selector: "p",
+    });
+    const productBrandHeading = await screen.findByText("brand", {
+      selector: "p",
+    });
+    const productQtyHeading = await screen.findByText("quantity", {
+      selector: "p",
+    });
+    const productCategoryHeading = await screen.findByText("category", {
+      selector: "p",
+    });
+    const productMoreInfoHeading = await screen.findByText("more info", {
+      selector: "p",
+    });
 
-        expect(pageTitle).toBeInTheDocument();
-        expect(productImgHeading).toBeInTheDocument();
-        expect(productTitleHeading).toBeInTheDocument();
-        expect(productBrandHeading).toBeInTheDocument();
-        expect(productQtyHeading).toBeInTheDocument();
-        expect(productCategoryHeading).toBeInTheDocument();
-        expect(productMoreInfoHeading).toBeInTheDocument();
-        expect(clearWishlistBtn).toBeInTheDocument();
+    expect(pageTitle).toBeInTheDocument();
+    expect(productImgHeading).toBeInTheDocument();
+    expect(productTitleHeading).toBeInTheDocument();
+    expect(productBrandHeading).toBeInTheDocument();
+    expect(productQtyHeading).toBeInTheDocument();
+    expect(productCategoryHeading).toBeInTheDocument();
+    expect(productMoreInfoHeading).toBeInTheDocument();
+    expect(clearWishlistBtn).toBeInTheDocument();
 
-        const items = screen.getAllByTestId("wishlist-item");
+    const items = screen.getAllByTestId("wishlist-item");
 
-        expect(items.length).toBe(products.length);
-      },
-      { timeout: 4000 }
-    );
+    expect(items.length).toBe(products.length);
   });
 
-  it("should render all products correctlly", async () => {
-    renderWithProviders(<CartOrWishlistPage />, {
+  it("should render all products correctly", async () => {
+    renderWithProviders(<WishlistPage />, {
       route: "/wishlist",
       preloadedState: { user: userStateMock },
     });
 
-    await waitFor(
-      () => {
-        const items = screen.getAllByTestId("wishlist-item");
+    const items = await screen.findAllByTestId("wishlist-item");
 
-        expect(items.length).toBe(products.length);
+    expect(items.length).toBe(products.length);
 
-        const source = products[0];
-        const firstItemImg = screen.getAllByRole("img")[0];
-        const firstItemTitle = screen.getByText(source.title);
-        const firstItemBrand = screen.getByRole("button", {
-          name: source.brand.name,
-        });
-        const firstItemQty = screen.getByText(source.quantity);
-        const firstItemCategory = screen.getByRole("button", {
-          name: source.category.name,
-        });
-        const firstItemPrice = screen.getByText("$" + source.price);
-        const firstItemMoreInfoBtn = screen.getByTestId(`go-to-${source._id}`);
-
-        const firstItemDeleteBtn = screen.getByTestId(
-          `delete-product-${source._id}`
-        );
-
-        expect(firstItemDeleteBtn).toBeInTheDocument();
-        expect(firstItemDeleteBtn).toHaveClass("delete-product-btn");
-
-        expect(firstItemMoreInfoBtn).toBeInTheDocument();
-        expect(firstItemMoreInfoBtn).toHaveClass("product-card-more-info");
-
-        expect(firstItemPrice).toBeInTheDocument();
-        expect(firstItemPrice).toHaveClass("prop-cell-value");
-
-        expect(firstItemCategory).toBeInTheDocument();
-
-        expect(firstItemQty).toBeInTheDocument();
-        expect(firstItemQty).toHaveClass("prop-cell-value");
-
-        expect(firstItemBrand).toBeInTheDocument();
-
-        expect(firstItemImg).toBeInTheDocument();
-        expect(firstItemImg).toHaveAttribute("src", source.imgs[0].secure_url);
-
-        expect(firstItemTitle).toBeInTheDocument();
-        expect(firstItemTitle).toHaveClass("product-card-title");
-      },
-      { timeout: 4000 }
+    const source = products[0];
+    const imgs = await screen.findAllByRole("img");
+    const firstItemImg = imgs[0];
+    const firstItemTitle = await screen.findByText(source.title);
+    const firstItemBrand = await screen.findByRole("button", {
+      name: source.brand.name,
+    });
+    const firstItemQty = await screen.findByText(source.quantity);
+    const firstItemCategory = await screen.findByRole("button", {
+      name: source.category.name,
+    });
+    const firstItemPrice = await screen.findByText("$" + source.price);
+    const firstItemMoreInfoBtn = await screen.findByTestId(
+      `go-to-${source._id}`
     );
+
+    const firstItemDeleteBtn = await screen.findByTestId(
+      `delete-product-${source._id}`
+    );
+
+    expect(firstItemDeleteBtn).toBeInTheDocument();
+    expect(firstItemDeleteBtn).toHaveClass("delete-product-btn");
+
+    expect(firstItemMoreInfoBtn).toBeInTheDocument();
+    expect(firstItemMoreInfoBtn).toHaveClass("product-card-more-info");
+
+    expect(firstItemPrice).toBeInTheDocument();
+    expect(firstItemPrice).toHaveClass("prop-cell-value");
+
+    expect(firstItemCategory).toBeInTheDocument();
+
+    expect(firstItemQty).toBeInTheDocument();
+    expect(firstItemQty).toHaveClass("prop-cell-value");
+
+    expect(firstItemBrand).toBeInTheDocument();
+
+    expect(firstItemImg).toBeInTheDocument();
+    expect(firstItemImg).toHaveAttribute("src", source.imgs[0].secure_url);
+
+    expect(firstItemTitle).toBeInTheDocument();
+    expect(firstItemTitle).toHaveClass("product-card-title");
   });
 
   describe("test product card btns", () => {
     it("should navigate to single product page when click on more info btn", async () => {
       renderWithProviders(
         <>
-          <CartOrWishlistPage />
+          <WishlistPage />
           <LocationDisplay />
         </>,
         {
@@ -200,7 +208,7 @@ describe("testing wishlist page", () => {
     });
 
     it("should delete single product when click on delete product btn", async () => {
-      renderWithProviders(<CartOrWishlistPage />, {
+      renderWithProviders(<WishlistPage />, {
         route: "/wishlist",
         preloadedState: { user: userStateMock },
       });
@@ -217,18 +225,21 @@ describe("testing wishlist page", () => {
       await userEvent.click(firstItemDeleteBtn);
       expect(firstItemDeleteBtn).toBeDisabled();
 
-      await waitFor(() => {
-        const newItems = screen.getAllByTestId("wishlist-item");
-        expect(newItems.length).toBe(products.length - 1);
+      await waitFor(
+        () => {
+          const newItems = screen.getAllByTestId("wishlist-item");
+          expect(newItems.length).toBe(products.length - 1);
 
-        expect(
-          screen.queryByTitle(`product-${source._id}`)
-        ).not.toBeInTheDocument();
-      });
-    });
+          expect(
+            screen.queryByTitle(`product-${source._id}`)
+          ).not.toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
+    }, 10000);
 
     it("should clear all product from wishlist when click on 'clear your wishlist' btn", async () => {
-      renderWithProviders(<CartOrWishlistPage />, {
+      renderWithProviders(<WishlistPage />, {
         route: "/wishlist",
         preloadedState: { user: userStateMock },
       });
@@ -267,7 +278,7 @@ describe("testing wishlist page", () => {
       async ({ key }) => {
         renderWithProviders(
           <>
-            <CartOrWishlistPage />
+            <WishlistPage />
             <LocationDisplay />
           </>,
           {

@@ -205,7 +205,7 @@ const CartOrWishlistPageBtns = ({
         initial="initial"
         animate="animate"
         exit="exit"
-        className="cart-or-wishlist-down-holder"
+        className="cart-and-wishlist-down-holder"
       >
         {showCartComponents && (
           <>

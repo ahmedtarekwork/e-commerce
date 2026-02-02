@@ -26,6 +26,7 @@ import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
 import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
 // cart or wishlist
 import CartOrWishlistPage from "../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
+import WishlistPage from "../pages/e-commerce/wishlistPage/WishlistPage";
 // more pages
 import EmptyPage from "../components/layout/EmptyPage";
 
@@ -91,7 +92,7 @@ const useAppRouter = (checkUserLoading: boolean) => {
         {/* login necessery for access these routes */}
         <Route element={<NeedLoginLayout />}>
           <Route element={<CartOrWishlistPage />} path="cart" />
-          <Route element={<CartOrWishlistPage />} path="wishlist" />
+          <Route element={<WishlistPage />} path="wishlist" />
 
           <Route element={<OrdersPage />} path="orders" />
           <Route path="profile" element={<ProfilePage />} />

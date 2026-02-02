@@ -1,0 +1,16 @@
+#wishlist-page-holder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#wishlist-btn-holder {
+  button {
+    @include flex(center, center, 10px);
+
+    svg {
+      font-size: 20px;
+    }
+  }
+}

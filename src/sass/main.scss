@@ -40,6 +40,8 @@
 
 // cart or wishlist page
 @import "pages/cart-or-wishlist-page";
+// wishlist page
+@import "pages/wishlist-page";
 
 // payments
 // success of failed payment page
@@ -64,6 +66,9 @@
 @import "components/layout/app-footer";
 
 // components \\
+// cart and wishlist down btns holder
+@import "components/cart-and-wishlist-down-btns-holder";
+
 // category and card card
 @import "components/category-or-brand-card";
 
