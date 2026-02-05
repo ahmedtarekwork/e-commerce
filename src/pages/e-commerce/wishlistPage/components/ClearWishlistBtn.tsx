@@ -68,7 +68,8 @@ const ClearWishlistBtn = ({ setCurrentWishlist }: Props) => {
   return (
     <div className="cart-and-wishlist-down-holder" id="wishlist-btn-holder">
       <button
-        title="clear your cart or wishlist"
+        id="clear-wishlist-btn"
+        title="clear your wishlist"
         className="red-btn"
         onClick={() => {
           if (user) deleteWishlist();

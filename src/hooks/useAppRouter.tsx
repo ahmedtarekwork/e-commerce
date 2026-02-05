@@ -24,8 +24,12 @@ import SingleOrderPage from "../pages/orders/SingleOrderPage";
 // payment
 import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
 import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
-// cart or wishlist
-import CartOrWishlistPage from "../pages/e-commerce/cartAndWishlist/CartOrWishlistPage";
+// categories and brands
+import CategoriesAndBrandsConfigPage from "../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
+import CategoriesAndBrandsPage from "../pages/e-commerce/CategoriesAndBrandsPage";
+// cart
+import CartPage from "../pages/e-commerce/cartPage/CartPage";
+// wishlist
 import WishlistPage from "../pages/e-commerce/wishlistPage/WishlistPage";
 // more pages
 import EmptyPage from "../components/layout/EmptyPage";
@@ -39,8 +43,6 @@ import NotAuthLayout from "../layouts/NotAuthLayout";
 
 // SVGs
 import ErrSvg from "../../imgs/404.svg";
-import CategoriesAndBrandsConfigPage from "../pages/dashboard/categoriesAndBrandsConfigPage/CategoriesAndBrandsConfigPage";
-import CategoriesAndBrandsPage from "../pages/e-commerce/CategoriesAndBrandsPage";
 
 const useAppRouter = (checkUserLoading: boolean) => {
   return createBrowserRouter(
@@ -91,7 +93,7 @@ const useAppRouter = (checkUserLoading: boolean) => {
 
         {/* login necessery for access these routes */}
         <Route element={<NeedLoginLayout />}>
-          <Route element={<CartOrWishlistPage />} path="cart" />
+          <Route element={<CartPage />} path="cart" />
           <Route element={<WishlistPage />} path="wishlist" />
 
           <Route element={<OrdersPage />} path="orders" />

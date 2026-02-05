@@ -21,7 +21,7 @@ const ProductCardQtyList = ({ propName, product }: Props) => {
   const { mutate: addToCart, isPending: cartLoading } = useAddToCart();
 
   const list = Array.from({
-    length: product.quantity,
+    length: product.count,
   }).map((_, i) => ({
     selected: product.wantedQty === i + 1,
     text: i + 1,

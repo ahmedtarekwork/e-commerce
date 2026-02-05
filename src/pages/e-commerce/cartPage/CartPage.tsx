@@ -5,63 +5,56 @@ import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 // redux
-import useDispatch from "../../hooks/redux/useDispatch";
-import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../../hooks/redux/useDispatch";
+import useSelector from "../../../hooks/redux/useSelector";
 // redux actions
-import { resetCart, setCart } from "../../store/fetures/userSlice";
+import { resetCart, setCart } from "../../../store/fetures/userSlice";
 
 // hooks
-import useGetUserCart from "../../hooks/ReactQuery/CartRequest/useGetUserCart";
-import useInitProductsCells from "../../hooks/useInitProductsCells";
+import useGetUserCart from "../../../hooks/ReactQuery/CartRequest/useGetUserCart";
+import useInitProductsCells from "../../../hooks/useInitProductsCells";
 
 // components
-import GridList from "../gridList/GridList";
-import DisplayError from "../layout/DisplayError";
-import EmptyPage, { type WithBtnType } from "../layout/EmptyPage";
-import ProductCard from "../productCard/ProductCard";
-import ProfilePageTabsError from "../ProfilePageTabsError";
-import UserAreaLoading from "../UserAreaLoading";
-import CartAreaDownInfo from "./CartAreaDownInfo";
+import GridList from "../../../components/gridList/GridList";
+import Heading from "../../../components/Heading";
+import DisplayError from "../../../components/layout/DisplayError";
+import EmptyPage, {
+  type WithBtnType,
+} from "../../../components/layout/EmptyPage";
+import ProductCard from "../../../components/productCard/ProductCard";
+import ProfilePageTabsError from "../../../components/ProfilePageTabsError";
+import UserAreaLoading from "../../../components/UserAreaLoading";
+import CartDownInfo from "./components/CartDownInfo";
+import CartPageBtns from "./components/CartPageBtns";
 
 // icons
 import { BsFillCartXFill } from "react-icons/bs";
 
 // SVGs
-import cartSvg from "../../../imgs/cart.svg";
+import cartSvg from "../../../../imgs/cart.svg";
 
 // types
-import type { CartType } from "../../utils/types";
+import type { CartType } from "../../../utils/types";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
-import { slideOutVariant } from "../../utils/variants";
+import { slideOutVariant } from "../../../utils/variants";
 
 type Props = {
-  userId: string;
-  withAddMore?: boolean;
-  showTotal?: boolean;
-  withDeleteBtn?: boolean;
+  userId?: string;
 };
 
-const replaceQty = (arr: string[]) =>
-  arr.map((cell) => (cell === "quantity" ? "count" : cell));
-
-const CartArea = ({
-  userId,
-  withDeleteBtn,
-  withAddMore,
-  showTotal = true,
-}: Props) => {
+const CartPage = ({ userId }: Props) => {
   const { pathname } = useLocation();
   const isCurrentUserCart = !pathname.includes("singleUser");
 
   // redux
   const dispatch = useDispatch();
-  const { userCart } = useSelector((state) => state.user);
+  const { user, userCart } = useSelector((state) => state.user);
 
   // hooks
-  const { listCell, productCardCells } = useInitProductsCells();
+  const { listCell, productCardCells } = useInitProductsCells("count");
 
   // react query => get cart data
   const {
@@ -70,11 +63,10 @@ const CartArea = ({
     error: cartErrData,
     isError: cartErr,
     isLoading: cartLoading,
-  } = useGetUserCart(userId);
-
-  const choosedCart = (isCurrentUserCart ? userCart : cart) as
-    | CartType
-    | undefined;
+  } = useGetUserCart(
+    (isCurrentUserCart ? user?._id : userId) || "",
+    !!(isCurrentUserCart ? user?._id : userId)
+  );
 
   useEffect(() => {
     if (isCurrentUserCart) getCart();
@@ -191,26 +183,20 @@ const CartArea = ({
   if (!isCurrentUserCart) {
     return (
       <>
-        <GridList
-          withMargin={!!withDeleteBtn}
-          initType="row"
-          isChanging={false}
-          cells={replaceQty(listCell)}
-        >
+        <GridList initType="row" isChanging={false} cells={listCell}>
           {(cart as CartType)?.products?.map((prd) => {
             return (
               <ProductCard
                 className="rows-list-cell"
-                withAddMore={withAddMore}
-                withDeleteBtn={{ type: "cart" }}
                 product={prd}
-                cells={replaceQty(productCardCells)}
+                cells={productCardCells}
+                key={prd._id}
               />
             );
           })}
         </GridList>
 
-        {showTotal && <CartAreaDownInfo userCart={cart as CartType} />}
+        <CartDownInfo userCart={cart as CartType} />
       </>
     );
   }
@@ -218,7 +204,7 @@ const CartArea = ({
   if (isCurrentUserCart) {
     return (
       <AnimatePresence mode="wait" initial={false}>
-        {!(choosedCart as CartType)?.products?.length && (
+        {!(userCart as CartType)?.products?.length && (
           <motion.div
             key="one"
             variants={slideOutVariant}
@@ -236,7 +222,7 @@ const CartArea = ({
           </motion.div>
         )}
 
-        {(choosedCart as CartType)?.products?.length && (
+        {(userCart as CartType)?.products?.length && (
           <motion.div
             key="two"
             variants={slideOutVariant}
@@ -247,50 +233,46 @@ const CartArea = ({
               zIndex: "calc(var(--header-index) - 2)",
             }}
             layout
+            className="cart-and-wishlist-pages-holder"
           >
-            <GridList
-              withMargin={!!withDeleteBtn}
-              initType="row"
-              isChanging={false}
-              cells={replaceQty(listCell)}
-            >
+            <Heading>Your Cart</Heading>
+
+            <GridList initType="row" isChanging={false} cells={listCell}>
               <AnimatePresence>
-                {(choosedCart as CartType)?.products?.map(
-                  (prd, i, { length }) => {
-                    return (
-                      <motion.li
-                        className="no-grid"
-                        key={prd._id}
-                        variants={slideOutVariant}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        layout
-                        style={{
-                          position: "relative",
-                          zIndex: length - i,
-                        }}
-                      >
-                        <ProductCard
-                          TagName="div"
-                          className="rows-list-cell"
-                          withAddMore={withAddMore}
-                          withDeleteBtn={{ type: "cart" }}
-                          product={prd}
-                          cells={replaceQty(productCardCells)}
-                        />
-                      </motion.li>
-                    );
-                  }
-                )}
+                {(userCart as CartType)?.products?.map((prd, i, { length }) => {
+                  return (
+                    <motion.li
+                      className="no-grid"
+                      key={prd._id}
+                      variants={slideOutVariant}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      layout
+                      style={{
+                        position: "relative",
+                        zIndex: length - i,
+                      }}
+                    >
+                      <ProductCard
+                        TagName="div"
+                        className="rows-list-cell"
+                        withAddMore
+                        withDeleteBtn={{ type: "cart" }}
+                        product={prd}
+                        cells={productCardCells}
+                      />
+                    </motion.li>
+                  );
+                })}
               </AnimatePresence>
             </GridList>
 
-            {showTotal && <CartAreaDownInfo userCart={cart as CartType} />}
+            <CartPageBtns />
           </motion.div>
         )}
       </AnimatePresence>
     );
   }
 };
-export default CartArea;
+export default CartPage;

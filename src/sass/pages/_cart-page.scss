@@ -1,4 +1,4 @@
-.cart-or-wishlist-btns {
+.cart-btns {
   display: flex;
   flex: 1;
   align-items: flex-end;
@@ -9,11 +9,7 @@
   > * {
     flex: 1;
     min-width: fit-content;
-    @include flex(center, center, 10px);
-
-    svg {
-      font-size: 20px;
-    }
+    @extend %cart-and-wishlist-pages-down-btns-common-styles;
   }
 
   @media (max-width: 275px) {

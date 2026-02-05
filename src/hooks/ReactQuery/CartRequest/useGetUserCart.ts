@@ -40,6 +40,7 @@ const useGetUserCart = (userId: string, enabled: boolean = false) => {
 
   useEffect(() => {
     dispatch(setCartLoading(isPending));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending]);
 
   return cartQuery;

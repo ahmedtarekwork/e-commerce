@@ -11,16 +11,15 @@ import { useQuery } from "@tanstack/react-query";
 import useSelector from "../../hooks/redux/useSelector";
 
 // components
+import DangerZone from "../../components/dangerZone/DangerZone";
 import DeleteUserBtn from "../../components/DeleteUserBtn";
-import ProfilePageCell from "./ProfilePageCell";
-import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
-import CartArea from "../../components/cartArea/CartArea";
 import Heading from "../../components/Heading";
+import PropCell from "../../components/PropCell";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import TabsList from "../../components/TabsList";
-import WishlistArea from "../../components/WishlistArea";
-import PropCell from "../../components/PropCell";
-import DangerZone from "../../components/dangerZone/DangerZone";
+import CartPage from "../e-commerce/cartPage/CartPage";
+import ProfilePageCell from "./ProfilePageCell";
+import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
 
 // icons
 import { FaDonate } from "react-icons/fa";
@@ -34,6 +33,7 @@ import type { UserType } from "../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
+import WishlistPage from "../e-commerce/wishlistPage/WishlistPage";
 
 // fetchers
 const getUserQueryFn = async ({
@@ -173,7 +173,7 @@ const ProfilePage = () => {
             lists={[
               {
                 tabName: "User Cart",
-                tabContent: <CartArea userId={user._id} />,
+                tabContent: <CartPage userId={user._id} />,
               },
               {
                 tabName: "User Orders",
@@ -186,12 +186,7 @@ const ProfilePage = () => {
               },
               {
                 tabName: "User wishlist",
-                tabContent: (
-                  <WishlistArea
-                    userId={user._id}
-                    isCurrentUserProfile={isCurrentUserProfile}
-                  />
-                ),
+                tabContent: <WishlistPage userId={user._id} />,
               },
             ]}
           />

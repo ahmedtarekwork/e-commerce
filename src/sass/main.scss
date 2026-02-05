@@ -38,8 +38,10 @@
 // profile page
 @import "pages/profile-page";
 
-// cart or wishlist page
-@import "pages/cart-or-wishlist-page";
+// cart and wishlist page
+@import "pages/cart-and-wishlist-pages";
+// cart page
+@import "pages/cart-page";
 // wishlist page
 @import "pages/wishlist-page";
 
@@ -66,8 +68,6 @@
 @import "components/layout/app-footer";
 
 // components \\
-// cart and wishlist down btns holder
-@import "components/cart-and-wishlist-down-btns-holder";
 
 // category and card card
 @import "components/category-or-brand-card";

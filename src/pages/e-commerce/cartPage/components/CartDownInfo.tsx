@@ -1,12 +1,12 @@
-import PropCell from "../PropCell";
+import PropCell from "../../../../components/PropCell";
 
-import type { CartType } from "../../utils/types";
+import type { CartType } from "../../../../utils/types";
 
 type Props = {
   userCart: CartType | undefined;
 };
 
-const CartAreaDownInfo = ({ userCart }: Props) => {
+const CartDownInfo = ({ userCart }: Props) => {
   const total = userCart?.products
     .map((prd) => prd.price * prd.wantedQty)
     .reduce((a, b) => a + b, 0);
@@ -41,4 +41,4 @@ const CartAreaDownInfo = ({ userCart }: Props) => {
     </>
   );
 };
-export default CartAreaDownInfo;
+export default CartDownInfo;

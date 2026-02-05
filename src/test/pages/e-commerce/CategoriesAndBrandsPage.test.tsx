@@ -20,7 +20,7 @@ describe("test categories page", () => {
 
     const location = screen.getByTestId("location");
 
-    expect(new URL(location.textContent).pathname).toBe("/categories");
+    expect(new URL(location.textContent || "").pathname).toBe("/categories");
     expect(screen.getByText("Loading categories...")).toBeInTheDocument();
 
     expect(await screen.findAllByRole("listitem")).toHaveLength(2);
@@ -44,7 +44,7 @@ describe("test categories page", () => {
     );
     await userEvent.click(secindCategoryBtn);
 
-    const newLocation = new URL(location.textContent);
+    const newLocation = new URL(location.textContent || "");
     expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
       "/products?category=Clothes"
     );
@@ -66,9 +66,9 @@ describe("test categories page", () => {
 
     await userEvent.click(addNewCategoryBtn);
 
-    expect(new URL(screen.getByTestId("location").textContent).pathname).toBe(
-      "/dashboard/categoriesForm"
-    );
+    expect(
+      new URL(screen.getByTestId("location").textContent || "").pathname
+    ).toBe("/dashboard/categoriesForm");
   });
 });
 
@@ -86,7 +86,7 @@ describe("test brands page", () => {
 
     const location = screen.getByTestId("location");
 
-    expect(new URL(location.textContent).pathname).toBe("/brands");
+    expect(new URL(location.textContent || "").pathname).toBe("/brands");
     expect(screen.getByText("Loading brands...")).toBeInTheDocument();
 
     expect(await screen.findAllByRole("listitem")).toHaveLength(2);
@@ -108,7 +108,7 @@ describe("test brands page", () => {
     const secindCategoryBtn = await screen.findByTestId("main-btn-for-brand-2");
     await userEvent.click(secindCategoryBtn);
 
-    const newLocation = new URL(location.textContent);
+    const newLocation = new URL(location.textContent || "");
     expect(newLocation.pathname + "?" + newLocation.searchParams).toBe(
       "/products?brand=HP"
     );
@@ -131,7 +131,7 @@ describe("test brands page", () => {
 
     await userEvent.click(addNewCategoryBtn);
 
-    expect(new URL(location.textContent).pathname).toBe(
+    expect(new URL(location.textContent || "").pathname).toBe(
       "/dashboard/brandsForm"
     );
   });

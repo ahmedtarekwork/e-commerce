@@ -1,3 +1,11 @@
+%cart-and-wishlist-pages-down-btns-common-styles {
+  @include flex(center, center, 10px);
+
+  svg {
+    font-size: 20px;
+  }
+}
+
 .cart-and-wishlist-down-holder {
   display: flex;
   flex-direction: column;
@@ -15,4 +23,11 @@
     height: 1px;
     background: var(--main);
   }
+}
+
+.cart-and-wishlist-pages-holder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }

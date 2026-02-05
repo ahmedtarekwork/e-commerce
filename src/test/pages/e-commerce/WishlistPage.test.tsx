@@ -201,7 +201,7 @@ describe("testing wishlist page", () => {
 
       await userEvent.click(firstItemMoreInfoBtn);
 
-      const location = new URL(screen.getByTestId("location").textContent)
+      const location = new URL(screen.getByTestId("location").textContent || "")
         .pathname;
 
       expect(location).toBe(`/product/${source._id}`);
@@ -297,7 +297,9 @@ describe("testing wishlist page", () => {
 
         await userEvent.click(firstItemModel);
 
-        const location = new URL(screen.getByTestId("location").textContent);
+        const location = new URL(
+          screen.getByTestId("location").textContent || ""
+        );
 
         expect(location.pathname + "?" + location.searchParams).toBe(
           `/products?${key}=${modelName.replaceAll(" ", "+")}`

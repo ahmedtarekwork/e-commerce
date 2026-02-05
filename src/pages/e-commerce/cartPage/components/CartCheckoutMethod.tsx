@@ -27,6 +27,7 @@ const CartCheckoutMethod = ({ setPayMethod, payMethod, cartBtnRef }: Props) => {
 
   useEffect(() => {
     if (cartBtnRef.current) cartBtnRef.current.disabled = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payMethod]);
 
   return (

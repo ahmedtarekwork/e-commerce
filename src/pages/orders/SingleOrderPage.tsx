@@ -11,13 +11,13 @@ import useSelector from "../../hooks/redux/useSelector";
 import { useQuery } from "@tanstack/react-query";
 
 // components
-import DisplayError from "../../components/layout/DisplayError";
-import SplashScreen from "../../components/spinners/SplashScreen";
 import Heading from "../../components/Heading";
 import PropCell from "../../components/PropCell";
 import GridList from "../../components/gridList/GridList";
-import ProductCard from "../../components/productCard/ProductCard";
+import DisplayError from "../../components/layout/DisplayError";
 import EmptyPage from "../../components/layout/EmptyPage";
+import ProductCard from "../../components/productCard/ProductCard";
+import SplashScreen from "../../components/spinners/SplashScreen";
 
 // utils
 import axios from "../../utils/axios";
@@ -31,6 +31,8 @@ import useInitProductsCells from "../../hooks/useInitProductsCells";
 // SVGs
 import IdRequired from "../../../imgs/ID_required.svg";
 import DeletedSvg from "../../../imgs/deleted.svg";
+
+// layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 // fetchers
@@ -57,7 +59,7 @@ const SingleOrderPage = () => {
   const [order, setOrder] = useState<OrderType | undefined>(appStateOrder);
 
   // hooks
-  const { listCell, productCardCells } = useInitProductsCells();
+  const { listCell, productCardCells } = useInitProductsCells("count");
 
   // react query
   const {
@@ -76,6 +78,7 @@ const SingleOrderPage = () => {
   // useEffects
   useEffect(() => {
     if (id && !appStateOrder) getOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -181,19 +184,9 @@ const SingleOrderPage = () => {
       </ul>
 
       {products.length ? (
-        <GridList
-          initType="row"
-          isChanging={false}
-          cells={listCell.map((cell) => (cell === "quantity" ? "count" : cell))}
-        >
+        <GridList initType="row" isChanging={false} cells={listCell}>
           {products.map((prd) => (
-            <ProductCard
-              key={prd._id}
-              cells={productCardCells.map((cell) =>
-                cell === "wantedQty" ? "count" : cell
-              )}
-              product={prd}
-            />
+            <ProductCard key={prd._id} cells={productCardCells} product={prd} />
           ))}
         </GridList>
       ) : (

@@ -30,7 +30,7 @@ import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import useInitProductsCells from "../../hooks/useInitProductsCells";
 
 type Props = {
-  product: ProductType;
+  product: ProductType | OrderProductType;
   cells?: (keyof Partial<ProductType> | string)[];
   withAddToCart?: boolean;
   withAddToWishList?: boolean;
@@ -134,7 +134,6 @@ const ProductCard = ({
 
       <div className="product-data-big-holder">
         <strong className="product-card-title">{title}</strong>
-
         {(cells || productCardCells).map((prop) => {
           if (!withQty && prop === "quantity") return;
 
@@ -181,7 +180,6 @@ const ProductCard = ({
             />
           );
         })}
-
         <div className="product-card-btns-holder">
           <Link
             title="go to single product page btn"

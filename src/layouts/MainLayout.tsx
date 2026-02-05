@@ -29,6 +29,10 @@ const MainLayout = () => {
     pathname.includes(path)
   );
 
+  const makeContainerFlexColumn = ["/wishlist", "/cart"].some((path) =>
+    pathname.includes(path)
+  );
+
   const makePageFullHeight = [
     "profile",
     "singleUser",
@@ -92,7 +96,7 @@ const MainLayout = () => {
         <div
           className="container"
           style={{
-            ...(makePageFullHeight || pathname.includes("/wishlist")
+            ...(makePageFullHeight || makeContainerFlexColumn
               ? {
                   display: "flex",
                   flexDirection: "column",

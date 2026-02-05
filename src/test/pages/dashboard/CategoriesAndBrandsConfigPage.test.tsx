@@ -36,13 +36,13 @@ describe("CategoriesAndBrandsConfigPage", () => {
       const location = screen.getByTestId("location");
       const backBtn = screen.getByText("back to categories");
 
-      expect(new URL(location.textContent).pathname).toBe(
+      expect(new URL(location.textContent || "").pathname).toBe(
         "/dashboard/categoriesForm"
       );
 
       await userEvent.click(backBtn);
 
-      expect(new URL(location.textContent).pathname).toBe(
+      expect(new URL(location.textContent || "").pathname).toBe(
         "/dashboard/categories"
       );
     });
@@ -407,7 +407,7 @@ describe("CategoriesAndBrandsConfigPage", () => {
         expect(submitBtn).toBeDisabled();
 
         await waitFor(() => {
-          expect(new URL(location.textContent).pathname).toBe(
+          expect(new URL(location.textContent || "").pathname).toBe(
             `/dashboard/categories`
           );
         });
@@ -435,13 +435,15 @@ describe("CategoriesAndBrandsConfigPage", () => {
       const location = screen.getByTestId("location");
       const backBtn = screen.getByText("back to brands");
 
-      expect(new URL(location.textContent).pathname).toBe(
+      expect(new URL(location.textContent || "").pathname).toBe(
         "/dashboard/brandsForm"
       );
 
       await userEvent.click(backBtn);
 
-      expect(new URL(location.textContent).pathname).toBe("/dashboard/brands");
+      expect(new URL(location.textContent || "").pathname).toBe(
+        "/dashboard/brands"
+      );
     });
 
     describe("add mode", () => {
@@ -787,7 +789,7 @@ describe("CategoriesAndBrandsConfigPage", () => {
         expect(submitBtn).toBeDisabled();
 
         await waitFor(() => {
-          expect(new URL(location.textContent).pathname).toBe(
+          expect(new URL(location.textContent || "").pathname).toBe(
             `/dashboard/brands`
           );
         });

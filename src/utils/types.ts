@@ -42,8 +42,9 @@ export type UserType = {
   donationPlan?: "pro" | "premium pro" | "standard";
 };
 
-export type OrderProductType = ProductType & {
+export type OrderProductType = Omit<ProductType, "quantity"> & {
   wantedQty: number;
+  count: number;
 };
 
 export type LineItemType = {
