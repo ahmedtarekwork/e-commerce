@@ -121,7 +121,6 @@ const SingleOrderPage = () => {
     removedProductsCount,
   } = order;
 
-  console.log(products);
   return (
     <AnimatedLayout>
       <Heading>Order Preview</Heading>

@@ -24,6 +24,7 @@ const CartAreaDownInfo = ({ userCart }: Props) => {
               style={{
                 color: "var(--dark)",
               }}
+              data-testid="cart-products-count"
             >
               {userCart?.products?.length || 0}{" "}
             </strong>

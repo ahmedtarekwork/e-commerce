@@ -23,6 +23,7 @@ import EmptyPage, {
 } from "../../../components/layout/EmptyPage";
 import ProductCard from "../../../components/productCard/ProductCard";
 import ProfilePageTabsError from "../../../components/ProfilePageTabsError";
+import Spinner from "../../../components/spinners/Spinner";
 import UserAreaLoading from "../../../components/UserAreaLoading";
 import CartDownInfo from "./components/CartDownInfo";
 import CartPageBtns from "./components/CartPageBtns";
@@ -39,7 +40,7 @@ import type { CartType } from "../../../utils/types";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
-import { slideOutVariant } from "../../../utils/variants";
+import { scaleUpDownVariant, slideOutVariant } from "../../../utils/variants";
 
 type Props = {
   userId?: string;
@@ -63,6 +64,7 @@ const CartPage = ({ userId }: Props) => {
     error: cartErrData,
     isError: cartErr,
     isLoading: cartLoading,
+    fetchStatus,
   } = useGetUserCart(
     (isCurrentUserCart ? user?._id : userId) || "",
     !!(isCurrentUserCart ? user?._id : userId)
@@ -78,18 +80,7 @@ const CartPage = ({ userId }: Props) => {
 
   useEffect(() => {
     if (cart && isCurrentUserCart) {
-      const isSame = () => {
-        const sameLength =
-          userCart?.products?.length === cart?.products?.length;
-
-        if (!sameLength) return false;
-
-        return userCart?.products?.every((prd) => {
-          return cart?.products?.some((p) => p._id === prd._id);
-        });
-      };
-
-      if (!isSame()) dispatch(setCart(cart));
+      dispatch(setCart(cart));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, dispatch]);
@@ -248,6 +239,7 @@ const CartPage = ({ userId }: Props) => {
                       initial="initial"
                       animate="animate"
                       exit="exit"
+                      data-testid="cart-item"
                       layout
                       style={{
                         position: "relative",
@@ -267,6 +259,19 @@ const CartPage = ({ userId }: Props) => {
                 })}
               </AnimatePresence>
             </GridList>
+
+            {fetchStatus === "fetching" && (
+              <motion.strong
+                variants={scaleUpDownVariant}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="update-cart-loading-holder"
+              >
+                <Spinner />
+                Updating Cart Info...
+              </motion.strong>
+            )}
 
             <CartPageBtns />
           </motion.div>
