@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import useSelector from "../../../../hooks/redux/useSelector";
 
 // components
-import CartAreaDownInfo from "../../../../components/cartArea/CartAreaDownInfo";
+import CartAreaDownInfo from "./CartAreaDownInfo";
 import CartCheckoutMethod from "./CartCheckoutMethod";
 import ClearCartBtn from "./ClearCartBtn";
 import SubmitOrderBtn from "./SubmitOrderBtn";
