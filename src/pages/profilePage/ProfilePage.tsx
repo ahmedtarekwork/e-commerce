@@ -19,7 +19,6 @@ import SplashScreen from "../../components/spinners/SplashScreen";
 import TabsList from "../../components/TabsList";
 import CartPage from "../e-commerce/cartPage/CartPage";
 import ProfilePageCell from "./ProfilePageCell";
-import ProfilePageOrdersArea from "./ProfilePageOrdersArea";
 
 // icons
 import { FaDonate } from "react-icons/fa";
@@ -174,15 +173,6 @@ const ProfilePage = () => {
               {
                 tabName: "User Cart",
                 tabContent: <CartPage userId={user._id} />,
-              },
-              {
-                tabName: "User Orders",
-                tabContent: (
-                  <ProfilePageOrdersArea
-                    user={user}
-                    isCurrentUserProfile={isCurrentUserProfile}
-                  />
-                ),
               },
               {
                 tabName: "User wishlist",

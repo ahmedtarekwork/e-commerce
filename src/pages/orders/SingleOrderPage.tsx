@@ -31,8 +31,6 @@ import useInitProductsCells from "../../hooks/useInitProductsCells";
 // SVGs
 import IdRequired from "../../../imgs/ID_required.svg";
 import DeletedSvg from "../../../imgs/deleted.svg";
-
-// layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
 
 // fetchers
@@ -78,7 +76,6 @@ const SingleOrderPage = () => {
   // useEffects
   useEffect(() => {
     if (id && !appStateOrder) getOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -124,6 +121,7 @@ const SingleOrderPage = () => {
     removedProductsCount,
   } = order;
 
+  console.log(products);
   return (
     <AnimatedLayout>
       <Heading>Order Preview</Heading>
@@ -186,7 +184,11 @@ const SingleOrderPage = () => {
       {products.length ? (
         <GridList initType="row" isChanging={false} cells={listCell}>
           {products.map((prd) => (
-            <ProductCard key={prd._id} cells={productCardCells} product={prd} />
+            <ProductCard
+              key={prd._id}
+              cells={productCardCells}
+              product={{ ...prd, count: prd.wantedQty }}
+            />
           ))}
         </GridList>
       ) : (
