@@ -1,31 +1,19 @@
 // react
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 // react-router-dom
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
-// redux
-import useDispatch from "../hooks/redux/useDispatch";
-// redux actions
-import { setUser } from "../store/fetures/userSlice";
+import { Link, useLocation } from "react-router-dom";
 
 // components
-import FormInput from "../components/appForm/Input/FormInput";
-import FormList from "../components/appForm/FormList";
 import BtnWithSpinner from "../components/animatedBtns/BtnWithSpinner";
+import FormList from "../components/appForm/FormList";
+import FormInput from "../components/appForm/Input/FormInput";
 
 // react-hook-form
-import { SubmitHandler, useForm } from "react-hook-form";
-
-// react query
-import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 
 // hooks
-import useHandleErrorMsg from "../hooks/useHandleErrorMsg";
-import useShowMsg from "../hooks/useShowMsg";
-
-// utils
-import axios from "../utils/axios";
+import useSubmitLoginAndSignupForm from "../hooks/useSubmitLoginAndSignupForm";
 
 // types
 import type { UserType } from "../utils/types";
@@ -33,45 +21,20 @@ import type { UserType } from "../utils/types";
 // layouts
 import AnimatedLayout from "../layouts/AnimatedLayout";
 
-type FormValues = Omit<UserType, "_id"> & { password: string };
-
-// fetchers
-const loginMutationFn = async (userData: {
-  username: string;
+export type LoginAndSugnupFormValues = Omit<UserType, "_id"> & {
   password: string;
-}): Promise<UserType & { accessToken?: string }> => {
-  return (
-    await axios.post("auth/login/credentials", userData, {
-      timeout: 30 * 1000,
-    })
-  ).data;
-};
-const registerMutationFn = async (
-  userData: Omit<UserType, "_id"> & { password: string }
-) => {
-  return (await axios.post("auth/register", userData)).data;
 };
 
 // component \\
-const LoginPage = ({ type }: { type: "login" | "signup" }) => {
-  const dispatch = useDispatch();
-  const showMsg = useShowMsg();
-
-  // hooks
-  const handleError = useHandleErrorMsg();
-
+const LoginOrSignupPage = ({ type }: { type: "login" | "signup" }) => {
   // react-router-dom
   const { pathname } = useLocation();
-  const navigate = useNavigate();
 
   // refs
   const renders = useRef(0);
 
-  // states
-  const [disableSubmit, setDisableSubmit] = useState(false);
-
   // react-hook-form
-  const form = useForm<FormValues>({
+  const form = useForm<LoginAndSugnupFormValues>({
     defaultValues: {
       username: "",
       email: "",
@@ -86,63 +49,9 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
     errors: { email: emailErr, password: passwordErr, username: usernameErr },
   } = formState;
 
-  // react query
-  // login
-  const { isPending: loginLoading, mutate: loginMutate } = useMutation({
-    mutationKey: ["login"],
-    mutationFn: loginMutationFn,
-    onSuccess(data) {
-      dispatch(setUser({ ...data }));
-    },
-    onError(error) {
-      handleError(error, {
-        forAllStates: "something went wrong while login",
-      });
-    },
+  const { disableSubmit, loading, onSubmit } = useSubmitLoginAndSignupForm({
+    type,
   });
-  // register
-  const {
-    isPending: registerLoading,
-    mutate: registerMutate,
-    reset: resetRegister,
-  } = useMutation({
-    mutationKey: ["register"],
-    mutationFn: registerMutationFn,
-    onSuccess() {
-      setDisableSubmit(true);
-      showMsg?.({
-        clr: "green",
-        content: "user registerd successfully",
-        time: 1500,
-      });
-      setTimeout(() => {
-        navigate("/login", { relative: "path" });
-        resetRegister();
-        setDisableSubmit(false);
-      }, 1500);
-    },
-    onError(error) {
-      handleError(error, {
-        forAllStates: "something went wrong while register a new user",
-      });
-    },
-  });
-
-  // handlers
-  const onSubmit: SubmitHandler<FormValues> = (data, e) => {
-    e?.preventDefault();
-
-    if (type === "login") {
-      const userData = { username: data.username, password: data.password };
-
-      loginMutate(userData);
-    } else {
-      const userData = data;
-      if (!userData.address) delete userData.address;
-
-      registerMutate(userData);
-    }
-  };
 
   // useEffects
 
@@ -153,6 +62,7 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
     if (renders.current !== 0) {
       reset();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   return (
@@ -227,19 +137,17 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
         )}
 
         <BtnWithSpinner
-          toggleSpinner={loginLoading || registerLoading}
+          toggleSpinner={loading}
           title="submit"
           className="btn"
           type="submit"
-          disabled={
-            !isDirty || loginLoading || registerLoading || disableSubmit
-          }
+          disabled={!isDirty || loading || disableSubmit}
         >
           {disableSubmit ? "redirecting..." : type}
         </BtnWithSpinner>
       </form>
 
-      <p className="auth-msg">
+      <p data-testid="auth-msg" className="auth-msg">
         {type === "login"
           ? "you don't have an account?"
           : "you have an account already?"}
@@ -257,4 +165,4 @@ const LoginPage = ({ type }: { type: "login" | "signup" }) => {
   );
 };
 
-export default LoginPage;
+export default LoginOrSignupPage;

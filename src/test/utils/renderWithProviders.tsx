@@ -38,7 +38,7 @@ type RenderOptions = {
 
 export function renderWithProviders(
   ui: ReactElement,
-  { route = "/", preloadedState }: RenderOptions = {}
+  { route = "/", preloadedState }: RenderOptions = {},
 ) {
   const store = configureStore({
     reducer: rootReducer,
