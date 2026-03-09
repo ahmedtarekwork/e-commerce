@@ -38,6 +38,7 @@ const OrderCard = ({
       to={`${pathname.includes("dashboard") ? "/dashboard" : ""}/orders/${_id}`}
       relative="path"
       className={`order-card${loading ? " loading" : ""}`}
+      data-testid="order-card"
     >
       <ul>
         {withId && (

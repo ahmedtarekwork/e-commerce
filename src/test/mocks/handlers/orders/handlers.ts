@@ -1,8 +1,14 @@
 import { http, HttpResponse } from "msw";
 
 import { orderProducts as products } from "../products/static";
+import { orders } from "./statics";
 
 const handlers = [
+  http.get("*/orders", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return HttpResponse.json(orders);
+  }),
+
   http.post("*/orders", async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return HttpResponse.json({ products });

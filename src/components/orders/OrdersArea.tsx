@@ -73,7 +73,7 @@ const OrdersArea = ({
 
   return (
     <AnimatedLayout>
-      <ul className="orders-list">
+      <ul className="orders-list" data-testid="orders-list">
         {orders.map((order) => (
           <li key={order._id} className="orders-page-order-cell">
             {withEditStatus ? (

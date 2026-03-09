@@ -64,6 +64,27 @@ export const orderProducts: OrderProductType[] = [
     ratings: [],
     totalRating: "",
   },
+  {
+    _id: "4",
+    brand: { _id: "4", name: "Brand 4" },
+    category: { _id: "4", name: "Category 4" },
+    color: "#0f0",
+    description: "lorem ipusm 4",
+    imgs: [
+      {
+        _id: "4",
+        secure_url: "https://picsum.photos/200/300",
+        public_id: "4",
+      },
+    ],
+    price: 4000,
+    count: 44,
+    wantedQty: 4,
+    sold: 4,
+    title: "Product Title 4",
+    ratings: [],
+    totalRating: "",
+  },
 ];
 
 export const products: ProductType[] = [
