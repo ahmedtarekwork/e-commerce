@@ -81,15 +81,16 @@ const ProductCard = ({
             forAllStates:
               "something went wrong while adding the product to wishlist",
           },
-          4000
+          4000,
         );
-      }
+      },
     );
 
   return (
     <TagName
       key={_id}
       className={`product-card${className ? ` ${className}` : ""}`}
+      data-testid="product-card"
     >
       {withAddToWishList &&
         !isDashboard &&

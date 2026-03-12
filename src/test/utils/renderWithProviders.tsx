@@ -17,14 +17,12 @@ import { Provider } from "react-redux";
 
 // reducers
 import homePageSliderImgsReducer from "../../store/fetures/homePageSliderImgsSlice";
-import ordersReducer from "../../store/fetures/ordersSlice";
 import productsReducer from "../../store/fetures/productsSlice";
 import topMessageReducer from "../../store/fetures/topMessageSlice";
 import userReducer from "../../store/fetures/userSlice";
 
 export const rootReducer = combineReducers({
   user: userReducer,
-  orders: ordersReducer,
   products: productsReducer,
   homePageSliderImgs: homePageSliderImgsReducer,
   topMessage: topMessageReducer,

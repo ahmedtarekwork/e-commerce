@@ -1,16 +1,8 @@
-// react
-import { useEffect } from "react";
-
 // react-router-dom
 import { useLocation } from "react-router-dom";
 
 // react query
 import { useQuery } from "@tanstack/react-query";
-
-// redux
-import useDispatch from "../../hooks/redux/useDispatch";
-// redux actions
-import { setOrders } from "../../store/fetures/ordersSlice";
 
 // components
 import Heading from "../../components/Heading";
@@ -42,9 +34,6 @@ const OrdersPage = () => {
   const { pathname } = useLocation();
   const isDashboard = pathname.includes("dashboard");
 
-  // redux
-  const dispatch = useDispatch();
-
   // get orders
   const {
     data: orders,
@@ -55,10 +44,6 @@ const OrdersPage = () => {
     queryKey: ["getOrders", isDashboard],
     queryFn: getOrdersQueryFn,
   });
-
-  useEffect(() => {
-    if (orders?.length) dispatch(setOrders(orders));
-  }, [orders, dispatch]);
 
   if (error) {
     return (

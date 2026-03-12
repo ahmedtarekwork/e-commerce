@@ -20,7 +20,7 @@ import ProductsPage from "../pages/products/productsPage/ProductsPage";
 import SingleProductPage from "../pages/products/SingleProductPage";
 // orders
 import OrdersPage from "../pages/orders/OrdersPage";
-import SingleOrderPage from "../pages/orders/SingleOrderPage";
+import SingleOrderPage from "../pages/orders/SingleOrderPage/SingleOrderPage";
 // payment
 import DonationPage from "../pages/e-commerce/payment/DonatePage/DonationPage";
 import PaymentSuccessOrFailPage from "../pages/e-commerce/payment/successOrFailedPage/PaymentSuccessOrFailedPage";
@@ -147,8 +147,8 @@ const useAppRouter = (checkUserLoading: boolean) => {
             />
           }
         />
-      </Route>
-    )
+      </Route>,
+    ),
   );
 };
 
