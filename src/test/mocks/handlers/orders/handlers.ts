@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 
+// mock data
 import { orderProducts as products } from "../products/static";
 import { orders } from "./statics";
 

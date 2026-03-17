@@ -71,7 +71,9 @@ const OrderCard = ({
           <PropCell
             name="Orderd By"
             val={
-              user?.username === orderby?.username ? "You" : orderby?.username
+              user?.username === orderby?.username
+                ? "You"
+                : orderby?.username || "_DELETED_USER_"
             }
           />
         </li>

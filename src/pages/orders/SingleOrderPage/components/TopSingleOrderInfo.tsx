@@ -63,8 +63,8 @@ const TopSingleOrderInfo = ({ order }: Props) => {
         />
       </li>
 
-      {orderby && (
-        <li>
+      <li>
+        {orderby ? (
           <PropCell
             name="ordered by"
             val={orderby.username === user?.username ? "You" : orderby.username}
@@ -75,8 +75,10 @@ const TopSingleOrderInfo = ({ order }: Props) => {
                   : "/dashboard/singleUser/" + orderby._id,
             }}
           />
-        </li>
-      )}
+        ) : (
+          <PropCell name="ordered by" val="_DELETED_USER_" />
+        )}
+      </li>
     </ul>
   );
 };

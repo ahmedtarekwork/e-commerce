@@ -1,6 +1,6 @@
 // components
 import OrderCard from "./OrderCard";
-import OrderCellWithChangeStatus from "./OrderCellWithChangeStatus";
+import ChangeOrderStatus from "./ChangeOrderStatus";
 import DisplayError from "../layout/DisplayError";
 import EmptyPage from "../layout/EmptyPage";
 import Spinner from "../spinners/Spinner";
@@ -76,11 +76,9 @@ const OrdersArea = ({
       <ul className="orders-list" data-testid="orders-list">
         {orders.map((order) => (
           <li key={order._id} className="orders-page-order-cell">
-            {withEditStatus ? (
-              <OrderCellWithChangeStatus order={order} withId={withId} /> // render in dashboard for admins only
-            ) : (
-              <OrderCard order={order} withId={withId} /> // render for each user outside the dashboard
-            )}
+            <OrderCard order={order} withId={withId} />
+
+            {withEditStatus && <ChangeOrderStatus order={order} />}
           </li>
         ))}
       </ul>

@@ -11,7 +11,6 @@ import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import SelectList, {
   type selectListOptionType,
 } from "../selectList/SelectList";
-import OrderCard from "./OrderCard";
 
 // types
 import type { OrderType } from "../../utils/types";
@@ -21,7 +20,6 @@ import axios from "../../utils/axios";
 
 type Props = {
   order: OrderType;
-  withId?: boolean;
 };
 
 const changeOrderStatusMutationFn = async ({
@@ -53,7 +51,7 @@ const statusList: selectListOptionType<OrderType["orderStatus"]>[] = [
   },
 ];
 
-const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
+const ChangeOrderStatus = ({ order }: Props) => {
   const handleError = useHandleErrorMsg();
 
   const { pathname } = useLocation();
@@ -75,33 +73,29 @@ const OrderCellWithChangeStatus = ({ order, withId = false }: Props) => {
           {
             forAllStates: "something went wrong while change order status",
           },
-          5000
+          5000,
         );
       },
-    }
+    },
   );
 
   return (
-    <>
-      <OrderCard order={order} withId={withId} loading={newOrderLoading} />
-
-      <SelectList
-        disabled={{
-          value: newOrderLoading,
-          text: "loading...",
-        }}
-        label="change status"
-        listOptsArr={statusList.map((o) =>
-          o.text === order.orderStatus ? { ...o, selected: true } : o
-        )}
-        optClickFunc={(e) => {
-          changeOrderStatus({
-            orderId: order._id,
-            newStatus: e.currentTarget.dataset.opt as OrderType["orderStatus"],
-          });
-        }}
-      />
-    </>
+    <SelectList
+      disabled={{
+        value: newOrderLoading,
+        text: "loading...",
+      }}
+      label="change status"
+      listOptsArr={statusList.map((o) =>
+        o.text === order.orderStatus ? { ...o, selected: true } : o,
+      )}
+      optClickFunc={(e) => {
+        changeOrderStatus({
+          orderId: order._id,
+          newStatus: e.currentTarget.dataset.opt as OrderType["orderStatus"],
+        });
+      }}
+    />
   );
 };
-export default OrderCellWithChangeStatus;
+export default ChangeOrderStatus;
