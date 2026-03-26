@@ -1,11 +1,15 @@
 // react query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+// react router dom
+import { useNavigate } from "react-router-dom";
+
 // redux
 import useSelector from "../redux/useSelector";
+import useDispatch from "../redux/useDispatch";
+import { logoutUser } from "../../store/fetures/userSlice";
 
 // hooks
-import useLogoutUser from "../useLogoutUser";
 import useHandleErrorMsg from "../useHandleErrorMsg";
 import useShowMsg from "../useShowMsg";
 
@@ -19,15 +23,16 @@ const deleteUserMutationFn = async (userId: string) => {
 
 const useDeleteUser = (
   onSuccess?: (data: { message: string }) => void,
-  onError?: (error: unknown) => void
+  onError?: (error: unknown) => void,
 ) => {
   // hooks
-  const { logoutUser } = useLogoutUser();
+  const navigate = useNavigate();
   const handleError = useHandleErrorMsg();
+  const showMsg = useShowMsg();
 
   // redux
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const showMsg = useShowMsg();
 
   const currentUser = (userId: string) => userId === user?._id;
 
@@ -45,7 +50,8 @@ const useDeleteUser = (
           clr: "green",
         });
       } else {
-        await logoutUser();
+        dispatch(logoutUser());
+        navigate("/login", { relative: "path" });
       }
 
       deleteUserMutateHook.reset();

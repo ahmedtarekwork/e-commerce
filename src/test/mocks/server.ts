@@ -7,14 +7,14 @@ import ordersHandlers from "./handlers/orders/handlers";
 import wishlistHandlers from "./handlers/wishlist/handlers";
 import loginHandlers from "./handlers/auth/login/handlers";
 import registerHandlers from "./handlers/auth/signup/handlers";
+import userHandlers from "./handlers/users/handlers";
 
 export const server = setupServer(
-  ...[
-    ...categoriesAndBrandsHandlers,
-    ...wishlistHandlers,
-    ...cartHandlers,
-    ...ordersHandlers,
-    ...loginHandlers,
-    ...registerHandlers,
-  ],
+  ...categoriesAndBrandsHandlers,
+  ...wishlistHandlers,
+  ...cartHandlers,
+  ...ordersHandlers,
+  ...loginHandlers,
+  ...registerHandlers,
+  ...userHandlers,
 );

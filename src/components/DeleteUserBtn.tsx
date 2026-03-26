@@ -68,18 +68,25 @@ const DeleteUserBtn = ({
       >
         Are you sure you want to{" "}
         {user?._id === userId ? (
-          <span style={{ fontWeight: "bold", color: "var(--danger)" }}>
+          <span
+            data-testid="typeof-user"
+            style={{ fontWeight: "bold", color: "var(--danger)" }}
+          >
             delete your account
           </span>
         ) : (
           <>
             delete "
-            <span style={{ color: "var(--danger)", fontWeight: "bold" }}>
+            <span
+              data-testid="typeof-user"
+              style={{ color: "var(--danger)", fontWeight: "bold" }}
+            >
               {username}
             </span>
             " user
           </>
-        )}
+        )}{" "}
+        ?
       </AreYouSureModal>
     </>
   );

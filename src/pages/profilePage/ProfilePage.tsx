@@ -58,7 +58,7 @@ const ProfilePage = () => {
   const singleUser = allUsers.find(({ _id }) => _id === id) || null;
 
   const [user, setUser] = useState<UserType | null>(
-    isCurrentUserProfile ? appUser : singleUser
+    isCurrentUserProfile ? appUser : singleUser,
   );
 
   const {
@@ -122,26 +122,42 @@ const ProfilePage = () => {
       <ProfilePageCell
         user={user}
         propName="address"
-        content={user?.address || "no address found!"}
+        content={user?.address || "NO_ADDRESS_FOUND!"}
         isCurrentUserProfile={isCurrentUserProfile}
       />
       <PropCell
         name="donationPlan"
         val={
-          <p className="profile-page-donation-cell">
-            {user?.donationPlan ? (
-              <>
-                {isCurrentUserProfile ? "you are" : "this user"} subscriped to
-                <strong className="plan-name">{user.donationPlan}</strong>
-              </>
-            ) : (
-              `${
-                isCurrentUserProfile ? "you aren't" : "this user doesn't"
-              } subscriped to any donation plan`
-            )}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 30,
+              justifyContent: "space-between",
+            }}
+          >
+            <p className="profile-page-donation-cell">
+              {user?.donationPlan ? (
+                <>
+                  {isCurrentUserProfile ? "you are" : "this user"} subscriped to
+                  <strong className="plan-name">{user.donationPlan}</strong>
+                </>
+              ) : (
+                `${
+                  isCurrentUserProfile ? "you aren't" : "this user doesn't"
+                } subscriped to any donation plan`
+              )}
+            </p>
 
             {isCurrentUserProfile && (
               <Link
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  flexWrap: "wrap",
+                }}
                 title="go to donate page btn"
                 className="btn"
                 to="/donate"
@@ -160,7 +176,7 @@ const ProfilePage = () => {
                 )}
               </Link>
             )}
-          </p>
+          </div>
         }
       />
 
@@ -186,7 +202,11 @@ const ProfilePage = () => {
       )}
 
       <DangerZone
-        content="delete your account, you can't restore your account after delete it."
+        content={
+          isCurrentUserProfile
+            ? "delete your account, you can't restore your account after delete it."
+            : "delete this user's account, you can't restore it after delete it."
+        }
         title="Danger Zone"
         deleteBtn={{
           type: "custom",
@@ -196,7 +216,7 @@ const ProfilePage = () => {
               userId={_id}
               username={username}
             >
-              Delete your account
+              Delete {isCurrentUserProfile ? "your" : "this user's"} account
             </DeleteUserBtn>
           ),
         }}

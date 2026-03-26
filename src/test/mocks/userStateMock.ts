@@ -1,13 +1,8 @@
 import { InitStateType } from "../../store/fetures/userSlice";
+import { users } from "./handlers/auth/statics";
 
 const userStateMock: InitStateType = {
-  user: {
-    _id: "1",
-    email: "test@test.com",
-    username: "test",
-    wishlist: [],
-    isAdmin: false,
-  },
+  user: users[0],
 
   userCart: null,
   allUsers: [],

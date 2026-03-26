@@ -38,12 +38,12 @@ type reqParamType = {
 // fetchers
 const updateUserMutationFn = async (
   userId: reqParamType["userId"],
-  userData: reqParamType["userData"]
+  userData: reqParamType["userData"],
 ) => {
   if (!Object.keys(userData).length) {
     throw new axios.AxiosError(
       "__APP_ERROR__ you need to send some data to update it",
-      "400"
+      "400",
     );
   }
 
@@ -60,9 +60,11 @@ const ProfilePageCell = ({
 
   const dispatch = useDispatch();
   const showMsg = useShowMsg();
+  const initValue =
+    content === "NO_ADDRESS_FOUND!" && propName === "address" ? "" : content;
 
   // states
-  const [inputValue, setInputValue] = useState(content);
+  const [inputValue, setInputValue] = useState(initValue);
   const [editMode, setEditMode] = useState(false);
 
   const { mutate: updateUser, isPending: isLoading } = useMutation({
@@ -71,7 +73,7 @@ const ProfilePageCell = ({
       updateUserMutationFn(userId, userData),
 
     onSuccess(data) {
-      dispatch(setUser(data));
+      dispatch(setUser({ ...user, ...data }));
 
       setEditMode(false);
 
@@ -89,7 +91,7 @@ const ProfilePageCell = ({
           duplicatedMsg: propName + " is already taken",
         },
 
-        5000
+        5000,
       );
     },
   });
@@ -101,9 +103,11 @@ const ProfilePageCell = ({
         <div className="profile-cell-content">
           {editMode ? (
             <FormInput
+              autoFocus
               className="profile-cell-input"
               onChange={(e) => setInputValue(e.target.value)}
               value={inputValue}
+              name={`edit-${propName}-input`}
             />
           ) : (
             `${propName === "username" ? "#" : ""}${content}`
@@ -118,7 +122,7 @@ const ProfilePageCell = ({
             className={`${editMode ? "red-" : ""}btn`}
             disabled={isLoading}
             onClick={() => {
-              if (editMode) setInputValue(content);
+              if (editMode) setInputValue(initValue);
               setEditMode(!editMode);
             }}
           >

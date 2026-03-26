@@ -42,7 +42,7 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
     useImperativeHandle(
       ref,
       () => ({ ...modalRef.current, setShowYesSpinner }),
-      []
+      [],
     );
 
     return createPortal(
@@ -78,7 +78,7 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
           </button>
 
           <button
-            title="cencel"
+            title="cancel"
             className="red-btn"
             data-modal-status="cancel"
             onClick={() => modalRef.current?.setOpenModal(false)}
@@ -87,9 +87,9 @@ const AreYouSureModal = forwardRef<SureModalRef, SureModalProps>(
           </button>
         </div>
       </AppModal>,
-      document.body
+      document.body,
     );
-  }
+  },
 );
 
 export default AreYouSureModal;

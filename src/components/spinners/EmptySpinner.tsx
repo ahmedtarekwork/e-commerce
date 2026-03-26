@@ -13,11 +13,12 @@ export type EmptySpinnerComponentProps = {
 const EmptySpinner = forwardRef(
   ({ settings, holderAttr, ...attr }: EmptySpinnerComponentProps, ref) => {
     const mainStyles = Object.fromEntries(
-      Object.entries(settings || {}).map(([key, value]) => ["--" + key, value])
+      Object.entries(settings || {}).map(([key, value]) => ["--" + key, value]),
     ) as CSSProperties;
 
     return (
       <motion.div
+        data-testid="empty-spinner-holder"
         ref={ref}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -53,6 +54,6 @@ const EmptySpinner = forwardRef(
         />
       </motion.div>
     );
-  }
+  },
 );
 export default EmptySpinner;

@@ -75,7 +75,7 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
         // if press key in keyboard is Escape => we will close modal => by taking the value of condition and reverse it
         const keyDownFunc = (e: KeyboardEvent) =>
           setOpenModal(
-            !(e.key.toLowerCase() === "escape" && toggleClosingFunctions)
+            !(e.key.toLowerCase() === "escape" && toggleClosingFunctions),
           );
 
         overlay.addEventListener("keydown", keyDownFunc);
@@ -91,7 +91,7 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
     useImperativeHandle(
       ref,
       () => ({ setOpenModal, appModalEl: appModalEl.current }),
-      []
+      [],
     );
 
     return createPortal(
@@ -108,6 +108,7 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
               ref={overlayEl}
               className="overlay no-animation"
               id="app-modal-overlay"
+              data-testid="app-modal-overlay"
             />
             <motion.div
               initial={{ scale: 0 }}
@@ -115,6 +116,7 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
               exit={{ scale: 0, opacity: 0 }}
               {...(attr as HTMLMotionProps<"div">)}
               ref={appModalEl}
+              data-testid="app-modal"
               className={`app-modal modal${
                 attr.className ? ` ${attr.className}` : ""
               }`}
@@ -135,9 +137,9 @@ const AppModal = forwardRef<AppModalRefType, AppModalProps>(
           </>
         )}
       </AnimatePresence>,
-      document.body
+      document.body,
     );
-  }
+  },
 );
 
 export default AppModal;
