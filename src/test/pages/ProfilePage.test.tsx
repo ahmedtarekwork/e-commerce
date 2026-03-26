@@ -78,11 +78,11 @@ describe("test profile page", () => {
       const location = screen.getByTestId("location");
       const donateBtn = screen.getByTitle("go to donate page btn");
 
-      expect(location.textContent.includes("/profile")).toBeTruthy();
+      expect((location.textContent || "").includes("/profile")).toBeTruthy();
 
       await userEvent.click(donateBtn);
 
-      expect(location.textContent.includes("/donate")).toBeTruthy();
+      expect((location.textContent || "").includes("/donate")).toBeTruthy();
     });
 
     it("should create text field instead of read-only field when edit username button is clicked", async () => {
@@ -406,7 +406,7 @@ describe("test profile page", () => {
       const closeModalBtn = await screen.findByTitle("close app modal btn");
       const noBtn = screen.getByRole("button", { name: /no/i });
 
-      expect(location.textContent.includes("/profile")).toBeTruthy();
+      expect((location.textContent || "").includes("/profile")).toBeTruthy();
       await userEvent.click(yesBtn);
 
       expect(deleteAccountBtn).toBeDisabled();
@@ -419,7 +419,7 @@ describe("test profile page", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByTestId("location").textContent.includes("/login"),
+          (screen.getByTestId("location").textContent || "").includes("/login"),
         ).toBeTruthy();
       });
 
