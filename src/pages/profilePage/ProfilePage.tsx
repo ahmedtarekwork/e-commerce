@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 // react router
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 // react query
 import { useQuery } from "@tanstack/react-query";
@@ -14,15 +14,11 @@ import useSelector from "../../hooks/redux/useSelector";
 import DangerZone from "../../components/dangerZone/DangerZone";
 import DeleteUserBtn from "../../components/DeleteUserBtn";
 import Heading from "../../components/Heading";
-import PropCell from "../../components/PropCell";
 import SplashScreen from "../../components/spinners/SplashScreen";
 import TabsList from "../../components/TabsList";
 import CartPage from "../e-commerce/cartPage/CartPage";
-import ProfilePageCell from "./ProfilePageCell";
-
-// icons
-import { FaDonate } from "react-icons/fa";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
+import WishlistPage from "../e-commerce/wishlistPage/WishlistPage";
+import ProfilePageUserInfo from "./components/ProfilePageUserInfo";
 
 // utils
 import axios from "../../utils/axios";
@@ -32,7 +28,6 @@ import type { UserType } from "../../utils/types";
 
 // layouts
 import AnimatedLayout from "../../layouts/AnimatedLayout";
-import WishlistPage from "../e-commerce/wishlistPage/WishlistPage";
 
 // fetchers
 const getUserQueryFn = async ({
@@ -98,7 +93,7 @@ const ProfilePage = () => {
   if (userLoading && fetchStatus !== "idle") return <SplashScreen />;
   if (!user) return <h1>No user has been founded</h1>;
 
-  const { username, email, _id } = user;
+  const { username, _id } = user;
 
   return (
     <AnimatedLayout>
@@ -106,78 +101,9 @@ const ProfilePage = () => {
         {isCurrentUserProfile ? "Your Profile" : "Profile Page"}
       </Heading>
 
-      <ProfilePageCell
-        user={user}
-        propName="username"
-        content={username}
+      <ProfilePageUserInfo
         isCurrentUserProfile={isCurrentUserProfile}
-      />
-      <ProfilePageCell
         user={user}
-        propName="email"
-        content={email}
-        isCurrentUserProfile={isCurrentUserProfile}
-      />
-
-      <ProfilePageCell
-        user={user}
-        propName="address"
-        content={user?.address || "NO_ADDRESS_FOUND!"}
-        isCurrentUserProfile={isCurrentUserProfile}
-      />
-      <PropCell
-        name="donationPlan"
-        val={
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 30,
-              justifyContent: "space-between",
-            }}
-          >
-            <p className="profile-page-donation-cell">
-              {user?.donationPlan ? (
-                <>
-                  {isCurrentUserProfile ? "you are" : "this user"} subscriped to
-                  <strong className="plan-name">{user.donationPlan}</strong>
-                </>
-              ) : (
-                `${
-                  isCurrentUserProfile ? "you aren't" : "this user doesn't"
-                } subscriped to any donation plan`
-              )}
-            </p>
-
-            {isCurrentUserProfile && (
-              <Link
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 10,
-                  flexWrap: "wrap",
-                }}
-                title="go to donate page btn"
-                className="btn"
-                to="/donate"
-                relative="path"
-              >
-                {user.donationPlan ? (
-                  <>
-                    <FaMoneyBillTransfer />
-                    change plan
-                  </>
-                ) : (
-                  <>
-                    <FaDonate />
-                    Go to Donate
-                  </>
-                )}
-              </Link>
-            )}
-          </div>
-        }
       />
 
       <hr style={{ marginBlock: 15 }} />
