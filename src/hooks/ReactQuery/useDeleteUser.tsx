@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 // redux
 import useSelector from "../redux/useSelector";
 import useDispatch from "../redux/useDispatch";
+
+// redux actions
 import { logoutUser } from "../../store/fetures/userSlice";
 
 // hooks
@@ -49,6 +51,7 @@ const useDeleteUser = (
           time: 3500,
           clr: "green",
         });
+        navigate("/dashboard/users", { relative: "path" });
       } else {
         dispatch(logoutUser());
         navigate("/login", { relative: "path" });
