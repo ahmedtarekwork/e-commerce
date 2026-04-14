@@ -132,7 +132,13 @@ const HomePageProductsSlider = memo(
               {data.map((product) => (
                 <SwiperSlide key={product._id}>
                   <ProductCard
-                    product={{ ...product, imgs: [product.imgs[0]] }}
+                    product={{
+                      ...product,
+                      imgs: [
+                        product.imgs.find((img) => img.order === 0) ||
+                          product.imgs[0],
+                      ],
+                    }}
                     className="card-mode"
                     TagName="div"
                     imgWidth="130px"
@@ -159,7 +165,7 @@ const HomePageProductsSlider = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default HomePageProductsSlider;
