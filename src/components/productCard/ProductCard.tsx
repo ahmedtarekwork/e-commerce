@@ -4,13 +4,9 @@ import { Link, useLocation } from "react-router-dom";
 // redux
 import useDispatch from "../../hooks/redux/useDispatch";
 import useSelector from "../../hooks/redux/useSelector";
-// redux actions
-import { setUserWishlist } from "../../store/fetures/userSlice";
 
 // components
 import ProductCardAddToCartBtn from "../AddProductToCartBtn";
-import IconAndSpinnerSwitcher from "../animatedBtns/IconAndSpinnerSwitcher";
-import FillIcon from "../FillIcon";
 import ImgsSlider from "../ImgsSlider";
 import PropCell from "../PropCell";
 import DeleteProductBtn, {
@@ -18,16 +14,13 @@ import DeleteProductBtn, {
 } from "./DeleteProductBtn";
 import ProductCardQtyList from "./ProductCardQtyList";
 
-// icons
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-
 // types
 import type { OrderProductType, ProductType } from "../../utils/types";
 
 // hooks
-import useToggleFromWishlist from "../../hooks/ReactQuery/useToggleFromWishlist";
 import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 import useInitProductsCells from "../../hooks/useInitProductsCells";
+import ToggleProductFromWishlistBtn from "./ToggleProductFromWishlistBtn";
 
 type Props = {
   product: ProductType | OrderProductType;
@@ -67,65 +60,21 @@ const ProductCard = ({
   const { productCardCells } = useInitProductsCells();
   const handleError = useHandleErrorMsg();
 
-  // add to wishlist
-  const { toggleFromWishlist, isPending: wishlistLoading } =
-    useToggleFromWishlist(
-      _id,
-      (data: string[]) => {
-        dispatch(setUserWishlist(data));
-      },
-      (error: unknown) => {
-        handleError(
-          error,
-          {
-            forAllStates:
-              "something went wrong while adding the product to wishlist",
-          },
-          4000,
-        );
-      },
-    );
-
   return (
     <TagName
       key={_id}
       className={`product-card${className ? ` ${className}` : ""}`}
       data-testid="product-card"
     >
-      {withAddToWishList &&
-        !isDashboard &&
-        (user ? (
-          <button
-            title="add to wishlist btn"
-            disabled={wishlistLoading}
-            className="add-to-wishlist"
-            onClick={toggleFromWishlist}
-          >
-            <IconAndSpinnerSwitcher
-              toggleIcon={wishlistLoading}
-              icon={
-                <FillIcon
-                  className={
-                    user?.wishlist?.some((prdId) => prdId === _id)
-                      ? " active"
-                      : ""
-                  }
-                  fill={<FaHeart />}
-                  stroke={<FaRegHeart />}
-                />
-              }
-            />
-          </button>
-        ) : (
-          <Link
-            title="add product to wishlist btn"
-            className="add-to-wishlist"
-            to="/login"
-            relative="path"
-          >
-            <FillIcon fill={<FaHeart />} stroke={<FaRegHeart />} />
-          </Link>
-        ))}
+      {withAddToWishList && (
+        <ToggleProductFromWishlistBtn
+          isDashboard={isDashboard}
+          user={user}
+          handleError={handleError}
+          dispatch={dispatch}
+          productId={_id}
+        />
+      )}
 
       <ImgsSlider
         imgWidth={imgWidth || "150px"}
