@@ -1,0 +1,35 @@
+.users-page-cell-text {
+  color: red;
+  background: rgba(255, 0, 0, 0.185);
+  font-weight: bold;
+  padding: 7px;
+  border-radius: 5px;
+  text-align: center;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.prop-cell-value:is(
+  :has(.users-page-cell-email),
+  :has(.users-page-username-btn)
+) {
+  min-width: unset !important;
+}
+
+.users-page-username-btn,
+.users-page-cell-email {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.user-page-cell-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}

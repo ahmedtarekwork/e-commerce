@@ -10,7 +10,7 @@ import { setAllUsers } from "../../../store/fetures/userSlice";
 import { useQuery } from "@tanstack/react-query";
 
 // components
-import UsersPageCell from "./UsersPageCell";
+import UsersPageCell from "./components/UsersPageCell";
 import Heading from "../../../components/Heading";
 import SplashScreen from "../../../components/spinners/SplashScreen";
 import DisplayError from "../../../components/layout/DisplayError";
