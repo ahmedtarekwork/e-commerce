@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 
 // pages
 import ProfilePage from "../../pages/profilePage/ProfilePage";
+
+// components
 import TopMessage from "../../components/TopMessage";
 
 // mocks

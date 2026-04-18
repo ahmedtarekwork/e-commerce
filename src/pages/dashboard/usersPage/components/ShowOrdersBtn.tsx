@@ -25,7 +25,7 @@ const ShowOrdersBtn = ({
 }: Props) => {
   if (!orders?.length) {
     return (
-      <p className="users-page-cell-text">
+      <p className="users-page-cell-text" data-testid="no-orders-msg">
         <GiBoxUnpacking size={20} />
         NO_ORDERS !
       </p>
@@ -34,6 +34,7 @@ const ShowOrdersBtn = ({
 
   return (
     <button
+      data-testid="show-orders-btn"
       title="show user orders btn"
       className="btn user-page-cell-btn"
       onClick={() => {

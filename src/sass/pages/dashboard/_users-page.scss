@@ -26,6 +26,20 @@
   overflow: hidden;
 }
 
+.users-page-username-btn {
+  svg {
+    flex: 1;
+    flex-shrink: 0.2;
+    max-width: fit-content;
+  }
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+}
+
 .user-page-cell-btn {
   display: flex;
   align-items: center;

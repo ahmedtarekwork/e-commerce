@@ -1,14 +1,12 @@
 // react
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
-// react-router-dom
-import { Link } from "react-router-dom";
-
 // components
 import GridListItem from "../../../../components/gridList/GridListItem";
 import DeleteUserBtn from "../../../../components/DeleteUserBtn";
 import IsUserAdmin from "./IsUserAdmin";
 import ShowOrdersBtn from "./ShowOrdersBtn";
+import GoToUserProfileBtn from "./GoToUserProfileBtn";
 
 // types
 import type { AppModalRefType } from "../../../../components/modals/appModal/AppModal";
@@ -17,7 +15,6 @@ import type { OrderType, UserType } from "../../../../utils/types";
 // icons
 import { FcHome } from "react-icons/fc";
 import { MdDelete } from "react-icons/md";
-import { FaUserTag } from "react-icons/fa";
 
 export type UsersPageCellProps = {
   user: UserType & { orders: OrderType[] };
@@ -36,23 +33,19 @@ const UsersPageCell = ({
 }: UsersPageCellProps) => {
   return (
     <GridListItem
+      data-testid="users-page-cell"
       cells={cells}
       itemData={{
         isAdmin: <IsUserAdmin val={isAdmin} />,
         email: <p className="users-page-cell-email">{email}</p>,
-        username: (
-          <Link
-            title="go to single user page btn"
-            className="btn users-page-username-btn user-page-cell-btn"
-            to={"/dashboard/singleUser/" + _id}
-            relative="path"
+        username: <GoToUserProfileBtn _id={_id} username={username} />,
+        address: address ? (
+          <span data-testid="users-page-cell-address">{address}</span>
+        ) : (
+          <p
+            className="users-page-cell-text"
+            data-testid="users-page-cell-address"
           >
-            <FaUserTag size={20} />
-            {username}
-          </Link>
-        ),
-        address: address || (
-          <p className="users-page-cell-text">
             <FcHome size={20} />
             NO_ADDRESS !
           </p>

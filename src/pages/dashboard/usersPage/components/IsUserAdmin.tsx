@@ -11,6 +11,7 @@ const IsUserAdmin = ({ val }: { val: boolean }) => {
       }}
     >
       <Icon
+        data-testid={val ? "true-icon" : "false-icon"}
         style={{
           color: val ? "rgb(4 131 4)" : "red",
           background: "white",

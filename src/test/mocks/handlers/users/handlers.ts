@@ -1,10 +1,16 @@
 import { http, HttpResponse } from "msw";
 
 import { users } from "../auth/statics";
+import { allUsersEndpointData } from "./statics";
 
 import type { UserType } from "../../../../utils/types";
 
 const handlers = [
+  http.get("*users", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return HttpResponse.json(allUsersEndpointData);
+  }),
+
   http.patch("*users/:id", async ({ params, request }) => {
     const { id } = params as { id: string };
 

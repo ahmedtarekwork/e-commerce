@@ -901,6 +901,19 @@ form#auth-form {
   overflow: hidden;
 }
 
+.users-page-username-btn svg {
+  flex: 1;
+  flex-shrink: 0.2;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
+}
+.users-page-username-btn p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
 .user-page-cell-btn {
   display: flex;
   align-items: center;

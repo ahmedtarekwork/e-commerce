@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // react router dom
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // redux
 import useSelector from "../redux/useSelector";
@@ -29,6 +29,7 @@ const useDeleteUser = (
 ) => {
   // hooks
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const handleError = useHandleErrorMsg();
   const showMsg = useShowMsg();
 
@@ -51,7 +52,8 @@ const useDeleteUser = (
           time: 3500,
           clr: "green",
         });
-        navigate("/dashboard/users", { relative: "path" });
+        if (pathname !== "/dashboard/users")
+          navigate("/dashboard/users", { relative: "path" });
       } else {
         dispatch(logoutUser());
         navigate("/login", { relative: "path" });

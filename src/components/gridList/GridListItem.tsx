@@ -1,5 +1,5 @@
 // react
-import { type ReactNode } from "react";
+import { ComponentProps, type ReactNode } from "react";
 
 // components
 import PropCell from "../PropCell";
@@ -7,11 +7,11 @@ import PropCell from "../PropCell";
 type Props = {
   cells: (keyof Props["itemData"] | string)[];
   itemData: Record<string, ReactNode>;
-};
+} & ComponentProps<"li">;
 
-const GridListItem = ({ cells, itemData }: Props) => {
+const GridListItem = ({ cells, itemData, ...attr }: Props) => {
   return (
-    <li>
+    <li {...attr}>
       {cells.map((cell) => {
         return (
           <PropCell
