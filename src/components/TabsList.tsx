@@ -1,5 +1,4 @@
 import { createRef, useState } from "react";
-import { nanoid } from "@reduxjs/toolkit";
 
 type Props = {
   lists: {
@@ -17,20 +16,13 @@ const TabsList = ({ lists }: Props) => {
       <div className="tabs-list-left-side">
         <ul>
           {lists.map(({ tabName }, i) => (
-            <li key={nanoid()}>
+            <li key={tabName}>
               <button
                 title="tabs list btn"
                 ref={btnsListRef[i]}
-                onClick={(e) => {
-                  btnsListRef.forEach((btn) =>
-                    btn.current?.classList.toggle(
-                      "active",
-                      btn.current === e.currentTarget
-                    )
-                  );
-
+                onClick={() => {
                   setSelected(
-                    lists.find((list) => list.tabName === tabName) || selected
+                    lists.find((list) => list.tabName === tabName) || selected,
                   );
                 }}
                 className={

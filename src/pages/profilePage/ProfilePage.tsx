@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import useSelector from "../../hooks/redux/useSelector";
 
 // components
+import EmptyPage from "../../components/layout/EmptyPage";
 import DangerZone from "../../components/dangerZone/DangerZone";
 import DeleteUserBtn from "../../components/DeleteUserBtn";
 import Heading from "../../components/Heading";
@@ -19,6 +20,9 @@ import TabsList from "../../components/TabsList";
 import CartPage from "../e-commerce/cartPage/CartPage";
 import WishlistPage from "../e-commerce/wishlistPage/WishlistPage";
 import ProfilePageUserInfo from "./components/ProfilePageUserInfo";
+
+// SVGs
+import notFoundSvg from "../../../imgs/404.svg";
 
 // utils
 import axios from "../../utils/axios";
@@ -49,11 +53,8 @@ const ProfilePage = () => {
   // states
   const { user: appUser } = useSelector((state) => state.user);
 
-  const allUsers = useSelector((state) => state.user.allUsers);
-  const singleUser = allUsers.find(({ _id }) => _id === id) || null;
-
   const [user, setUser] = useState<UserType | null>(
-    isCurrentUserProfile ? appUser : singleUser,
+    isCurrentUserProfile ? appUser : null,
   );
 
   const {
@@ -91,7 +92,15 @@ const ProfilePage = () => {
   }, [appUser, isCurrentUserProfile]);
 
   if (userLoading && fetchStatus !== "idle") return <SplashScreen />;
-  if (!user) return <h1>No user has been founded</h1>;
+  if (!user) {
+    return (
+      <EmptyPage
+        content="User with given ID not founded !"
+        svg={notFoundSvg}
+        withBtn={{ type: "GoToHome" }}
+      />
+    );
+  }
 
   const { username, _id } = user;
 

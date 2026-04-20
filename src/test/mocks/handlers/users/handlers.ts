@@ -6,6 +6,17 @@ import { allUsersEndpointData } from "./statics";
 import type { UserType } from "../../../../utils/types";
 
 const handlers = [
+  http.get("*users/:id", async ({ params }) => {
+    const { id } = params as { id: string };
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const selectedUser = JSON.parse(
+      JSON.stringify(users.find(({ _id }) => _id === id)!),
+    );
+
+    return HttpResponse.json(selectedUser);
+  }),
+
   http.get("*users", async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return HttpResponse.json(allUsersEndpointData);

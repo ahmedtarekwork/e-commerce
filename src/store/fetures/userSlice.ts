@@ -31,11 +31,6 @@ const userSlice = createSlice({
       state.user = null;
     },
 
-    // all users
-    setAllUsers: (state, { payload }: PayloadAction<UserType[]>) => {
-      state.allUsers = payload;
-    },
-
     // current user wishlist
     resetUserWishlist: (state) => {
       if (state.user?.wishlist) state.user.wishlist = [];
@@ -71,9 +66,6 @@ export const {
   resetUserWishlist,
   setUserWishlist,
   toggleWishlistLoading,
-
-  // all users
-  setAllUsers,
 
   // current user cart
   setCart,

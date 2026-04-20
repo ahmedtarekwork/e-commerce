@@ -1,5 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+// react router dom
+import { Route, Routes } from "react-router-dom";
 
 // pages
 import ProfilePage from "../../pages/profilePage/ProfilePage";
@@ -9,10 +11,16 @@ import TopMessage from "../../components/TopMessage";
 
 // mocks
 import userStateMock from "../mocks/userStateMock";
+import { users } from "../mocks/handlers/auth/statics";
+import { orderProducts, products } from "../mocks/handlers/products/static";
 
 // utils
 import { renderWithProviders } from "../utils/renderWithProviders";
 import { LocationDisplay } from "../utils/location";
+
+// msw
+import { http, HttpResponse } from "msw";
+import { server } from "../mocks/server";
 
 describe("test profile page", () => {
   it("should render profile page normally", () => {
@@ -429,6 +437,233 @@ describe("test profile page", () => {
       expect(closeModalBtn).not.toBeInTheDocument();
       expect(noBtn).not.toBeInTheDocument();
       expect(yesBtn).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe("test singleUser page", () => {
+  it("should render singleUser page normally", async () => {
+    const { donationPlan, _id } = users[1];
+
+    renderWithProviders(
+      <Routes>
+        <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+      </Routes>,
+      {
+        preloadedState: { user: userStateMock },
+        route: `/dashboard/singleUser/${_id}`,
+      },
+    );
+
+    const title = await screen.findByRole("heading", { name: /Profile Page/i });
+
+    const donationPlanCellValue = await screen.findByText(
+      donationPlan || "this user doesn't subscriped to any donation plan",
+    );
+
+    const dangerZoneDescribtion = await screen.findByText(
+      "delete this user's account, you can't restore it after delete it.",
+    );
+    const deleteAccountBtn = await screen.findByRole("button", {
+      name: /Delete this user's account/i,
+    });
+
+    expect(title).toBeInTheDocument();
+    expect(donationPlanCellValue).toBeInTheDocument();
+    expect(dangerZoneDescribtion).toBeInTheDocument();
+    expect(deleteAccountBtn).toBeInTheDocument();
+    expect(deleteAccountBtn).toHaveClass("btn-with-spinner red-btn");
+
+    await waitFor(() => {
+      const donateBtn = screen.queryByTitle("go to donate page btn");
+      const editBtns = screen.queryAllByRole("button", { name: /edit/i });
+
+      expect(donateBtn).not.toBeInTheDocument();
+      expect(editBtns).toHaveLength(0);
+    });
+  });
+
+  it("should render right username inside are you sure to delete this user modal", async () => {
+    const { username, _id } = users[1];
+
+    renderWithProviders(
+      <Routes>
+        <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+      </Routes>,
+      {
+        preloadedState: { user: userStateMock },
+        route: `/dashboard/singleUser/${_id}`,
+      },
+    );
+
+    const deleteAccountBtn = await screen.findByRole("button", {
+      name: /Delete this user's account/i,
+    });
+
+    await userEvent.click(deleteAccountBtn);
+
+    const typeofUser = await screen.findByTestId("typeof-user");
+    expect(typeofUser).toBeInTheDocument();
+    expect(typeofUser).toHaveTextContent(username);
+  });
+
+  it("should remove user when click on 'yes' btn and navigate to the user page in dashboard", async () => {
+    const { _id } = users[1];
+
+    renderWithProviders(
+      <>
+        <Routes>
+          <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+        </Routes>
+
+        <LocationDisplay />
+        <TopMessage />
+      </>,
+      {
+        preloadedState: { user: userStateMock },
+        route: `/dashboard/singleUser/${_id}`,
+      },
+    );
+    const location = screen.getByTestId("location");
+    const deleteAccountBtn = await screen.findByRole("button", {
+      name: /Delete this user's account/i,
+    });
+
+    expect(location).toHaveTextContent(
+      "http://localhost/dashboard/singleUser/" + _id,
+    );
+
+    await userEvent.click(deleteAccountBtn);
+
+    const yesBtn = await screen.findByRole("button", {
+      name: /Yes/i,
+    });
+    await userEvent.click(yesBtn);
+
+    const topMsg = await screen.findByText(/user deleted successfully/i);
+
+    expect(topMsg).toBeInTheDocument();
+    expect(topMsg).toHaveClass("green");
+
+    expect(location).toHaveTextContent("http://localhost/dashboard/users");
+  });
+
+  describe("test singleUser Page cart tab", () => {
+    it("should render user cart click on 'usre cart' btn", async () => {
+      const { _id } = users[1];
+
+      renderWithProviders(
+        <Routes>
+          <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+        </Routes>,
+        {
+          preloadedState: { user: userStateMock },
+          route: `/dashboard/singleUser/${_id}`,
+        },
+      );
+      const cartBtn = await screen.findByRole("button", {
+        name: /User Cart/i,
+      });
+
+      await userEvent.click(cartBtn);
+
+      const productsList = await screen.findAllByTestId("product-card");
+      expect(productsList).toHaveLength(orderProducts.length);
+    });
+
+    it("should render 'this user dosen't have any products in his cart' msg when cart is empty", async () => {
+      server.use(http.get("*carts/:userId", () => HttpResponse.json([])));
+
+      const { _id } = users[1];
+
+      renderWithProviders(
+        <Routes>
+          <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+        </Routes>,
+        {
+          preloadedState: { user: userStateMock },
+          route: `/dashboard/singleUser/${_id}`,
+        },
+      );
+      const cartBtn = await screen.findByRole("button", {
+        name: /User Cart/i,
+      });
+
+      await userEvent.click(cartBtn);
+
+      const emptyCartMsg = await screen.findByText(
+        /this user dosen't have any products in his cart/i,
+      );
+
+      expect(emptyCartMsg).toBeInTheDocument();
+
+      await waitFor(() => {
+        const productsList = screen.queryAllByTestId("product-card");
+        expect(productsList).toHaveLength(0);
+      });
+    });
+  });
+
+  describe("test singleUser Page wishlist tab", () => {
+    it("should render user wishlist click on 'user wishlist' btn", async () => {
+      const { _id } = users[1];
+
+      renderWithProviders(
+        <Routes>
+          <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+        </Routes>,
+        {
+          preloadedState: { user: userStateMock },
+          route: `/dashboard/singleUser/${_id}`,
+        },
+      );
+      const wishlistBtn = await screen.findByRole("button", {
+        name: /User Wishlist/i,
+      });
+
+      await userEvent.click(wishlistBtn);
+      expect(wishlistBtn).toHaveClass("active");
+
+      screen.debug(wishlistBtn);
+
+      const productsList = await screen.findAllByTestId("product-card");
+      expect(productsList).toHaveLength(products.length);
+    });
+
+    it("should render 'this user dosen't have any products in his wishlist' msg when wishlist is empty", async () => {
+      server.use(
+        http.get("*/users/wishlist/:id", () => {
+          return HttpResponse.json([]);
+        }),
+      );
+
+      const { _id } = users[1];
+
+      renderWithProviders(
+        <Routes>
+          <Route path="/dashboard/singleUser/:id" element={<ProfilePage />} />
+        </Routes>,
+        {
+          preloadedState: { user: userStateMock },
+          route: `/dashboard/singleUser/${_id}`,
+        },
+      );
+      const wishlistBtn = await screen.findByRole("button", {
+        name: /User Wishlist/i,
+      });
+
+      await userEvent.click(wishlistBtn);
+
+      const emptyWishlistMsg = await screen.findByText(
+        /this user doesn't have any products in his wishlist/i,
+      );
+
+      expect(emptyWishlistMsg).toBeInTheDocument();
+
+      await waitFor(() => {
+        const productsList = screen.queryAllByTestId("product-card");
+        expect(productsList).toHaveLength(0);
+      });
     });
   });
 });

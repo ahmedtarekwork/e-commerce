@@ -1,10 +1,5 @@
 // react
-import { useEffect, useRef, useState } from "react";
-
-// redux
-import useDispatch from "../../../hooks/redux/useDispatch";
-// redux actions
-import { setAllUsers } from "../../../store/fetures/userSlice";
+import { useRef, useState } from "react";
 
 // react-query
 import { useQuery } from "@tanstack/react-query";
@@ -43,8 +38,6 @@ const getAllUsers = async (): Promise<
 };
 
 const UsersPage = () => {
-  const dispatch = useDispatch();
-
   // refs
   const modalRef = useRef<AppModalRefType>(null);
 
@@ -62,10 +55,6 @@ const UsersPage = () => {
     queryKey: ["getAllUsers"],
     queryFn: getAllUsers,
   });
-
-  useEffect(() => {
-    if (usersList) dispatch(setAllUsers(usersList));
-  }, [usersList, dispatch]);
 
   if (usersListLoading)
     return <SplashScreen notMain>Loading Users...</SplashScreen>;

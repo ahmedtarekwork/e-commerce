@@ -16,7 +16,7 @@ const handlers = [
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     return HttpResponse.json(
-      products.filter(({ _id }) => _id.toString() !== productId?.toString())
+      products.filter(({ _id }) => _id.toString() !== productId?.toString()),
     );
   }),
 

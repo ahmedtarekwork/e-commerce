@@ -23,11 +23,12 @@ const MainBtnsList = ({ type }: { type: "header" | "sidebar" }) => {
     [
       listRef.current,
       ...((listRef.current?.querySelectorAll(
-        "*"
+        "*",
       ) as unknown as HTMLElement[]) || []),
     ].forEach((el) => {
       if (el) el.dataset.type = type;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
