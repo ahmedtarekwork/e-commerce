@@ -67,6 +67,7 @@ export type LineItemType = {
 export type CartType = {
   products: OrderProductType[];
   orderdby: string;
+  totalItemsLength: number;
 };
 
 export type OrderType = {
@@ -97,6 +98,7 @@ export type ProductType = Record<
   sold: number;
   totalRating: string;
   description: string;
+  existsInCart: boolean;
 
   ratings: {
     star: number;

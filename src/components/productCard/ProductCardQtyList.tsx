@@ -1,24 +1,70 @@
+// react query
+import { useMutation } from "@tanstack/react-query";
+
 // components
 import PropCell from "../PropCell";
 import SelectList, {
   type selectListOptionType,
 } from "../selectList/SelectList";
 
-// hooks
-import useAddToCart from "../../hooks/ReactQuery/CartRequest/useAddToCart";
-
 // types
 import type { OrderProductType } from "../../utils/types";
+
+// redux
+import useSelector from "../../hooks/redux/useSelector";
+import useDispatch from "../../hooks/redux/useDispatch";
+// redux actions
+import { setCart } from "../../store/fetures/userSlice";
+
+// utils
+import axios from "../../utils/axios";
+import useHandleErrorMsg from "../../hooks/useHandleErrorMsg";
 
 type Props = {
   propName: string;
   product: OrderProductType;
 };
+const changeProductQTYMutationFn = async (
+  product: {
+    productId: string;
+    newWantedQTY: number;
+    oldQTY: number;
+  },
+  userId: string,
+) => {
+  if (!userId)
+    throw new axios.AxiosError(
+      "__APP_ERROR__ you need to login before modify your cart",
+      "403",
+    );
+
+  return (await axios.patch(`carts/${userId}/changeProductQTY`, product)).data;
+};
 
 const ProductCardQtyList = ({ propName, product }: Props) => {
   const { _id } = product;
+  const { user } = useSelector((state) => state.user);
 
-  const { mutate: addToCart, isPending: cartLoading } = useAddToCart();
+  const dispatch = useDispatch();
+  const handleError = useHandleErrorMsg();
+
+  const { isPending, mutate: changeProductQTY } = useMutation({
+    mutationKey: ["changeProductQTY", _id],
+    mutationFn: (product: { newWantedQTY: number; oldQTY: number }) =>
+      changeProductQTYMutationFn(
+        { ...product, productId: _id },
+        user?._id || "",
+      ),
+
+    onSuccess: (data) => {
+      dispatch(setCart(data));
+    },
+    onError(error) {
+      handleError(error, {
+        forAllStates: "something went wrong while modifying your cart",
+      });
+    },
+  });
 
   const list = Array.from({
     length: product.count,
@@ -34,7 +80,7 @@ const ProductCardQtyList = ({ propName, product }: Props) => {
       val={
         <SelectList
           disabled={{
-            value: cartLoading,
+            value: isPending,
             text: "loading...",
           }}
           outOfFlow={{
@@ -42,12 +88,13 @@ const ProductCardQtyList = ({ propName, product }: Props) => {
             fullWidth: true,
           }}
           optClickFunc={(e) => {
-            const value = e.currentTarget.dataset.opt;
+            const newWantedQTY = e.currentTarget.dataset.opt;
+            const oldQTY = product.wantedQty;
 
-            if (value) {
-              addToCart({
-                productId: _id,
-                wantedQty: +value - +product.wantedQty,
+            if (newWantedQTY && +newWantedQTY !== oldQTY) {
+              changeProductQTY({
+                newWantedQTY: +newWantedQTY,
+                oldQTY,
               });
             }
           }}

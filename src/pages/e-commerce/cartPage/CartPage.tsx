@@ -67,7 +67,7 @@ const CartPage = ({ userId }: Props) => {
     fetchStatus,
   } = useGetUserCart(
     (isCurrentUserCart ? user?._id : userId) || "",
-    !!(isCurrentUserCart ? user?._id : userId)
+    !!(isCurrentUserCart ? user?._id : userId),
   );
 
   useEffect(() => {

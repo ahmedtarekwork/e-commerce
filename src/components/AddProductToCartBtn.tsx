@@ -23,6 +23,7 @@ import { AnimatePresence, motion } from "framer-motion";
 type Props = {
   productId: string;
   productQty: number;
+  existsInCart: boolean;
 } & ComponentProps<"button">;
 
 // variants
@@ -47,7 +48,12 @@ const addToCartBtnContentVariant = {
   },
 };
 
-const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
+const AddProductToCartBtn = ({
+  existsInCart,
+  productQty,
+  productId,
+  ...attr
+}: Props) => {
   // react router dom
   const navigate = useNavigate();
 
@@ -56,6 +62,8 @@ const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
 
   const isProductInCart =
     (userCart?.products || []).some((prd) => prd._id === productId) || false;
+
+  const activeExistsInCart = existsInCart || isProductInCart;
 
   const isInStock = +(productQty || 0) > 0;
 
@@ -84,7 +92,7 @@ const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
       className="btn add-product-to-cart-btn"
       disabled={isPending || !isInStock || attr.disabled}
       onClick={(e) => {
-        if (isProductInCart) return navigate("/cart", { relative: "path" });
+        if (activeExistsInCart) return navigate("/cart", { relative: "path" });
         else {
           if (!isInStock) return;
 
@@ -98,7 +106,7 @@ const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
       }}
     >
       <AnimatePresence mode="wait" initial={false}>
-        {isProductInCart && (
+        {activeExistsInCart && (
           <motion.div
             key="one"
             className="add-product-to-cart-btn-content-holder"
@@ -111,7 +119,7 @@ const AddProductToCartBtn = ({ productQty, productId, ...attr }: Props) => {
           </motion.div>
         )}
 
-        {!isProductInCart &&
+        {!activeExistsInCart &&
           (isInStock ? (
             <motion.div
               key="two"

@@ -94,14 +94,14 @@ const SingleProductPage = () => {
   const { user } = useSelector((state) => state.user);
 
   const isInWishlist = useSelector((state) =>
-    state.user.user?.wishlist?.some((prdId: string) => prdId === id)
+    state.user.user?.wishlist?.some((prdId: string) => prdId === id),
   );
 
   // states
   const [product, setProduct] = useState<ProductType | undefined>(
     useSelector((state) =>
-      state.products.products.find((prd) => prd._id === id)
-    )
+      state.products.products.find((prd) => prd._id === id),
+    ),
   );
 
   // get product
@@ -135,7 +135,7 @@ const SingleProductPage = () => {
         {
           forAllStates: "something went wrong while deleting the product",
         },
-        5000
+        5000,
       );
     },
   });
@@ -153,7 +153,7 @@ const SingleProductPage = () => {
         handleError(error, {
           forAllStates: "something went wrong while doing this proccess",
         });
-      }
+      },
     );
 
   // get product if it's not found in app state
@@ -207,9 +207,11 @@ const SingleProductPage = () => {
     title,
     sold,
     description,
+    existsInCart,
     // ratings,
     // totalRating,
   } = product;
+
   const soldedUnitsData = (): ChartDataType<"doughnut"> => {
     return {
       labels: ["Solded", "Not Solded"],
@@ -397,7 +399,11 @@ const SingleProductPage = () => {
           </>
         ) : (
           <>
-            <AddProductToCartBtn productId={id} productQty={quantity} />
+            <AddProductToCartBtn
+              existsInCart={existsInCart}
+              productId={id}
+              productQty={quantity}
+            />
 
             {/* toggle from wishlist btn */}
             {user && (

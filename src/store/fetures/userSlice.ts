@@ -1,20 +1,20 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 // types
-import type { CartType, UserType } from "../../utils/types";
+import type { CartType, OrderProductType, UserType } from "../../utils/types";
 
 export type InitStateType = {
   user: null | UserType;
-  userCart: CartType | null;
-  allUsers: UserType[];
+  userCart:
+    | CartType
+    | { totalItemsLength: 0; products: OrderProductType[]; orderdby: string };
   cartLoading: boolean;
   wishlistLoading: boolean;
 };
 
 const initialState: InitStateType = {
   user: null,
-  userCart: null,
-  allUsers: [],
+  userCart: { totalItemsLength: 0, products: [], orderdby: "" },
   cartLoading: false,
   wishlistLoading: false,
 };
@@ -43,12 +43,21 @@ const userSlice = createSlice({
     },
 
     // current user cart
+    setCartLength: (state, { payload }: PayloadAction<number>) => {
+      state.userCart.totalItemsLength = payload;
+
+      state.cartLoading = false;
+    },
     setCart: (state, { payload }: PayloadAction<CartType>) => {
       state.userCart = payload;
       state.cartLoading = false;
     },
     resetCart: (state) => {
-      state.userCart = { products: [], orderdby: state.user?._id || "" };
+      state.userCart = {
+        products: [],
+        orderdby: state.user?._id || "",
+        totalItemsLength: 0,
+      };
       state.cartLoading = false;
     },
     setCartLoading: (state, { payload }: PayloadAction<boolean>) => {
@@ -69,6 +78,7 @@ export const {
 
   // current user cart
   setCart,
+  setCartLength,
   resetCart,
   setCartLoading,
 } = userSlice.actions;

@@ -14,7 +14,7 @@ import useShowMsg from "../../../../hooks/useShowMsg";
 // redux
 import useDispatch from "../../../../hooks/redux/useDispatch";
 // redux actions
-import { setCart } from "../../../../store/fetures/userSlice";
+import { resetCart } from "../../../../store/fetures/userSlice";
 
 // components
 import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
@@ -34,7 +34,7 @@ const clearCartMutationFn = async (userId: string) => {
   if (!userId)
     throw new axios.AxiosError(
       "__APP_ERROR__ you need to login before modify your cart",
-      "403"
+      "403",
     );
 
   return (await axios.delete(`carts/${userId}/resetCart`)).data;
@@ -62,7 +62,7 @@ const ClearCartBtn = ({
         clr: "green",
       });
 
-      if (user) dispatch(setCart({ orderdby: user?._id, products: [] }));
+      if (user) dispatch(resetCart());
     },
 
     onError(error) {

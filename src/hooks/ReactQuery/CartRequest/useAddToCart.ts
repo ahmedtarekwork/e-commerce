@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 // react query
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 // redux
 import useDispatch from "../../redux/useDispatch";
@@ -21,20 +21,18 @@ const AddToCartMutationFn = async (
     productId: string;
     wantedQty?: number;
   },
-  userId: string
+  userId: string,
 ) => {
   if (!userId)
     throw new axios.AxiosError(
       "__APP_ERROR__ you need to login before modify your cart",
-      "403"
+      "403",
     );
 
   return (await axios.post(`carts/${userId}`, product)).data;
 };
 
 const useAddToCart = () => {
-  const queryClient = useQueryClient();
-
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
@@ -47,9 +45,6 @@ const useAddToCart = () => {
 
     onSuccess: (data) => {
       dispatch(setCart(data));
-
-      queryClient.prefetchQuery({ queryKey: ["getCart", ""] });
-      queryClient.prefetchQuery({ queryKey: ["getProducts"] });
     },
     onError(error) {
       handleError(error, {

@@ -6,7 +6,7 @@ import useDispatch from "../../hooks/redux/useDispatch";
 import useSelector from "../../hooks/redux/useSelector";
 
 // components
-import ProductCardAddToCartBtn from "../AddProductToCartBtn";
+import AddProductToCartBtn from "../AddProductToCartBtn";
 import ImgsSlider from "../ImgsSlider";
 import PropCell from "../PropCell";
 import DeleteProductBtn, {
@@ -47,7 +47,7 @@ const ProductCard = ({
   TagName = "li",
   className,
 }: Props) => {
-  const { _id, imgs, title } = product;
+  const { _id, imgs, title, existsInCart } = product;
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
@@ -55,6 +55,7 @@ const ProductCard = ({
   // react router dom
   const { pathname } = useLocation();
   const isDashboard = pathname.includes("dashboard");
+  const isDashboardProfile = pathname.includes("dashboard/singleUser");
 
   // hooks
   const { productCardCells } = useInitProductsCells();
@@ -99,6 +100,10 @@ const ProductCard = ({
 
           let propValue = product[prop as keyof typeof product];
 
+          if (isDashboardProfile && prop === "count") {
+            propValue = (product as OrderProductType)["wantedQty"];
+          }
+
           if (prop === "price") propValue = "$" + propValue;
 
           const isCategoryOrBrandProp = ["brand", "category"].includes(prop);
@@ -142,7 +147,8 @@ const ProductCard = ({
           </Link>
 
           {withAddToCart && (
-            <ProductCardAddToCartBtn
+            <AddProductToCartBtn
+              existsInCart={existsInCart}
               productId={product._id}
               productQty={(product as ProductType).quantity}
             />

@@ -1,8 +1,11 @@
 // react
 import { useEffect } from "react";
 
+// react query
+import { useQuery } from "@tanstack/react-query";
+
 // react router
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 // components
 import EmptySpinner from "../../../../spinners/EmptySpinner";
@@ -14,45 +17,53 @@ import { FaShoppingCart } from "react-icons/fa";
 import useSelector from "../../../../../hooks/redux/useSelector";
 import useDispatch from "../../../../../hooks/redux/useDispatch";
 // redux actions
-import { setCart } from "../../../../../store/fetures/userSlice";
-
-// hooks
-import useGetUserCart from "../../../../../hooks/ReactQuery/CartRequest/useGetUserCart";
+import { setCartLength } from "../../../../../store/fetures/userSlice";
 
 // types
-import type { OrderProductType } from "../../../../../utils/types";
+import type { CartType } from "../../../../../utils/types";
 
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 // variants
 import { scaleUpDownVariant } from "../../../../../utils/variants";
 
+// utils
+import axios from "../../../../../utils/axios";
+
+// fetchers
+const getCartItemsLengthQueryFn = async ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  queryKey: [_key, userId],
+}: {
+  queryKey: string[];
+}): Promise<CartType> => {
+  if (!userId)
+    throw new axios.AxiosError("__APP_ERROR__ user id is required", "400");
+
+  return (await axios(`carts/currentUserCartItemsCount`)).data;
+};
+
 const CartBtn = () => {
   const dispatch = useDispatch();
-  const { user, userCart, cartLoading } = useSelector((state) => state.user);
-
   const {
-    refetch: getCart,
-    data: cart,
-    isPending: initCartLoading,
-  } = useGetUserCart(user?._id || "");
+    user,
+    cartLoading,
+    userCart: { totalItemsLength },
+  } = useSelector((state) => state.user);
 
-  const userCartCount = (userCart?.products || []).map(
-    (prd: OrderProductType) => prd?.wantedQty || 0
-  );
+  const isCartPage = useLocation().pathname === "/cart";
 
-  let productsLength = 0;
-
-  if (userCartCount?.length)
-    productsLength = userCartCount.reduce((a: number, b: number) => a + b);
-
-  useEffect(() => {
-    if (user) getCart();
-  }, [user]);
+  const { data: cartLength, isPending: CartLengthLoading } = useQuery({
+    queryKey: ["getCurrentUserCartLength", user?._id || ""],
+    queryFn: getCartItemsLengthQueryFn,
+    enabled: !!user && !isCartPage,
+  });
 
   useEffect(() => {
-    if (cart) dispatch(setCart(cart));
-  }, [cart, dispatch]);
+    if (cartLength) {
+      dispatch(setCartLength(cartLength.totalItemsLength));
+    }
+  }, [cartLength, dispatch]);
 
   return (
     <li>
@@ -64,7 +75,7 @@ const CartBtn = () => {
       >
         <span id="cart-products-length">
           <AnimatePresence mode="popLayout">
-            {initCartLoading || cartLoading ? (
+            {(CartLengthLoading && !isCartPage) || cartLoading ? (
               <EmptySpinner
                 settings={{
                   clr: "white",
@@ -78,7 +89,7 @@ const CartBtn = () => {
                 animate="animate"
                 exit="exit"
               >
-                {productsLength > 9 ? "9+" : productsLength}
+                {totalItemsLength > 9 ? "9+" : totalItemsLength}
               </motion.span>
             )}
           </AnimatePresence>
