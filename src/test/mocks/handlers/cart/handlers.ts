@@ -5,7 +5,12 @@ import { orderProducts as products } from "../products/static";
 const handlers = [
   http.get("*/carts/:userId", async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    return HttpResponse.json({ products });
+    return HttpResponse.json({
+      products,
+      totalItemsLength: products
+        .map((prd) => prd.wantedQty)
+        .reduce((a, b) => a + b, 0),
+    });
   }),
 
   http.delete("*/carts/:userId/removeProduct", async ({ request }) => {
@@ -15,8 +20,13 @@ const handlers = [
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    const filteredProducts = products.filter((prd) => prd._id !== productId);
+
     return HttpResponse.json({
-      products: products.filter((prd) => prd._id !== productId),
+      products: filteredProducts,
+      totalItemsLength: filteredProducts
+        .map((prd) => prd.wantedQty)
+        .reduce((a, b) => a + b, 0),
     });
   }),
 

@@ -624,8 +624,6 @@ describe("test singleUser page", () => {
       await userEvent.click(wishlistBtn);
       expect(wishlistBtn).toHaveClass("active");
 
-      screen.debug(wishlistBtn);
-
       const productsList = await screen.findAllByTestId("product-card");
       expect(productsList).toHaveLength(products.length);
     });

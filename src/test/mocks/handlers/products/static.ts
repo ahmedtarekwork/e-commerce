@@ -21,6 +21,7 @@ export const orderProducts: OrderProductType[] = [
     title: "Product Title 1",
     ratings: [],
     totalRating: "",
+    existsInCart: true,
   },
   {
     _id: "2",
@@ -42,6 +43,7 @@ export const orderProducts: OrderProductType[] = [
     title: "Product Title 2",
     ratings: [],
     totalRating: "",
+    existsInCart: true,
   },
   {
     _id: "3",
@@ -63,6 +65,7 @@ export const orderProducts: OrderProductType[] = [
     title: "Product Title 3",
     ratings: [],
     totalRating: "",
+    existsInCart: true,
   },
   {
     _id: "4",
@@ -84,6 +87,7 @@ export const orderProducts: OrderProductType[] = [
     title: "Product Title 4",
     ratings: [],
     totalRating: "",
+    existsInCart: true,
   },
 ];
 
@@ -107,6 +111,7 @@ export const products: ProductType[] = [
     title: "Product Title 1",
     ratings: [],
     totalRating: "",
+    existsInCart: false,
   },
   {
     _id: "2",
@@ -127,6 +132,7 @@ export const products: ProductType[] = [
     title: "Product Title 2",
     ratings: [],
     totalRating: "",
+    existsInCart: false,
   },
   {
     _id: "3",
@@ -147,5 +153,6 @@ export const products: ProductType[] = [
     title: "Product Title 3",
     ratings: [],
     totalRating: "",
+    existsInCart: false,
   },
 ];

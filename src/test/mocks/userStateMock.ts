@@ -4,8 +4,7 @@ import { users } from "./handlers/auth/statics";
 const userStateMock: InitStateType = {
   user: users[0],
 
-  userCart: null,
-  allUsers: [],
+  userCart: { orderdby: "", products: [], totalItemsLength: 0 },
   cartLoading: false,
   wishlistLoading: false,
 };

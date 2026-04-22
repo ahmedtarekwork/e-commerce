@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 // redux
 import useDispatch from "../../../../hooks/redux/useDispatch";
 // redux actions
-import { setCart } from "../../../../store/fetures/userSlice";
+import { resetCart } from "../../../../store/fetures/userSlice";
 
 // components
 import IconAndSpinnerSwitcher from "../../../../components/animatedBtns/IconAndSpinnerSwitcher";
@@ -62,7 +62,7 @@ const SubmitOrderBtn = forwardRef<HTMLButtonElement, Props>(
           handleError(error, {
             forAllStates: "something went wrong while trying to handle payment",
           });
-        }
+        },
       );
 
     // make order
@@ -71,7 +71,7 @@ const SubmitOrderBtn = forwardRef<HTMLButtonElement, Props>(
       mutationFn: makeOrderMutationFn,
       onSuccess: () => {
         queryClient.prefetchQuery({ queryKey: ["getProducts"] });
-        if (user) dispatch(setCart({ orderdby: user?._id, products: [] }));
+        if (user) dispatch(resetCart());
 
         showMsg?.({
           clr: "green",
@@ -90,7 +90,7 @@ const SubmitOrderBtn = forwardRef<HTMLButtonElement, Props>(
           {
             forAllStates: "something went wrong while making the order for you",
           },
-          4000
+          4000,
         );
       },
     });
@@ -129,6 +129,6 @@ const SubmitOrderBtn = forwardRef<HTMLButtonElement, Props>(
         {payMethod === "Cash on Delivery" ? "Submit Order" : "Checkout"}
       </button>
     );
-  }
+  },
 );
 export default SubmitOrderBtn;

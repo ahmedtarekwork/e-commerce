@@ -1,5 +1,5 @@
 // RTL
-import { screen, waitFor } from "@testing-library/react";
+import { configure, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // utils
@@ -24,6 +24,14 @@ import { server } from "../../mocks/server";
 // types
 import type { OrderProductType } from "../../../utils/types";
 
+vi.setConfig({
+  testTimeout: 10000,
+});
+
+configure({
+  asyncUtilTimeout: 10000,
+});
+
 describe("testing cart page", () => {
   it("should render forbidden screen when no user signed in", async () => {
     renderWithProviders(
@@ -32,12 +40,12 @@ describe("testing cart page", () => {
           <Route path="/cart" element={<CartPage />} />
         </Route>
       </Routes>,
-      { route: "/cart" }
+      { route: "/cart" },
     );
 
     const img = await screen.findByRole("img");
     const title = await screen.findByText(
-      "You need to login to access this page"
+      "You need to login to access this page",
     );
     const loginBtn = await screen.findByRole("link", { name: "Login" });
 
@@ -73,7 +81,7 @@ describe("testing cart page", () => {
 
     await waitFor(() => {
       const emptyListMsg = screen.getByText(
-        "you don't have items in your cart"
+        "you don't have items in your cart",
       );
       const browseProductsBtn = screen.getByRole("link", {
         name: "Browse Our Products",
@@ -181,11 +189,11 @@ describe("testing cart page", () => {
     });
     const firstItemPrice = await screen.findByText("$" + source.price);
     const firstItemMoreInfoBtn = await screen.findByTestId(
-      `go-to-${source._id}`
+      `go-to-${source._id}`,
     );
 
     const firstItemDeleteBtn = await screen.findByTestId(
-      `delete-product-${source._id}`
+      `delete-product-${source._id}`,
     );
 
     expect(firstItemDeleteBtn).toBeInTheDocument();
@@ -220,12 +228,12 @@ describe("testing cart page", () => {
         {
           route: "/cart",
           preloadedState: { user: userStateMock },
-        }
+        },
       );
       const source = products[0];
 
       const firstItemMoreInfoBtn = await screen.findByTestId(
-        `go-to-${source._id}`
+        `go-to-${source._id}`,
       );
 
       await userEvent.click(firstItemMoreInfoBtn);
@@ -248,24 +256,21 @@ describe("testing cart page", () => {
       expect(items.length).toBe(products.length);
 
       const firstItemDeleteBtn = await screen.findByTestId(
-        `delete-product-${source._id}`
+        `delete-product-${source._id}`,
       );
 
       await userEvent.click(firstItemDeleteBtn);
       expect(firstItemDeleteBtn).toBeDisabled();
 
-      await waitFor(
-        () => {
-          const newItems = screen.getAllByTestId("cart-item");
-          expect(newItems.length).toBe(products.length - 1);
+      await waitFor(() => {
+        const newItems = screen.getAllByTestId("cart-item");
+        expect(newItems.length).toBe(products.length - 1);
 
-          expect(
-            screen.queryByTitle(`product-${source._id}`)
-          ).not.toBeInTheDocument();
-        },
-        { timeout: 10000 }
-      );
-    }, 10000);
+        expect(
+          screen.queryByTitle(`product-${source._id}`),
+        ).not.toBeInTheDocument();
+      });
+    });
 
     it("should clear all products from cart when click on 'clear your cart' btn", async () => {
       renderWithProviders(<CartPage />, {
@@ -284,30 +289,27 @@ describe("testing cart page", () => {
       expect(clearCartBtn).toBeDisabled();
       expect(checkoutBtn).toBeDisabled();
 
-      await waitFor(
-        () => {
-          const newItems = screen.queryAllByTestId("cart-item");
-          const emptyListMsg = screen.getByText(
-            "you don't have items in your cart"
-          );
-          const browseProductsBtn = screen.getByRole("link", {
-            name: "Browse Our Products",
-          });
+      await waitFor(() => {
+        const newItems = screen.queryAllByTestId("cart-item");
+        const emptyListMsg = screen.getByText(
+          "you don't have items in your cart",
+        );
+        const browseProductsBtn = screen.getByRole("link", {
+          name: "Browse Our Products",
+        });
 
-          expect(newItems.length).toBe(0);
+        expect(newItems.length).toBe(0);
 
-          expect(
-            screen.queryByRole("button", {
-              name: /clear your cart/i,
-            })
-          ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("button", {
+            name: /clear your cart/i,
+          }),
+        ).not.toBeInTheDocument();
 
-          expect(emptyListMsg).toBeInTheDocument();
-          expect(browseProductsBtn).toBeInTheDocument();
-        },
-        { timeout: 10000 }
-      );
-    }, 10000);
+        expect(emptyListMsg).toBeInTheDocument();
+        expect(browseProductsBtn).toBeInTheDocument();
+      });
+    });
 
     it("should make a new order with selected items in cart when click on 'Submit Order' btn", async () => {
       renderWithProviders(<CartPage />, {
@@ -315,12 +317,10 @@ describe("testing cart page", () => {
         preloadedState: { user: userStateMock },
       });
 
-      const cashOnDeliveryOptionInput = await screen.findByLabelText(
-        /cash on delivery/i
-      );
-      const cashOnDeliveryOptionLabel = await screen.findByText(
-        "Cash on Delivery"
-      );
+      const cashOnDeliveryOptionInput =
+        await screen.findByLabelText(/cash on delivery/i);
+      const cashOnDeliveryOptionLabel =
+        await screen.findByText("Cash on Delivery");
 
       expect(cashOnDeliveryOptionInput).toBeInTheDocument();
       expect(cashOnDeliveryOptionLabel).toBeInTheDocument();
@@ -340,30 +340,27 @@ describe("testing cart page", () => {
       expect(submitOrderBtn).toBeDisabled();
       expect(clearCartBtn).toBeDisabled();
 
-      await waitFor(
-        () => {
-          const newItems = screen.queryAllByTestId("cart-item");
-          const emptyListMsg = screen.getByText(
-            "you don't have items in your cart"
-          );
-          const browseProductsBtn = screen.getByRole("link", {
-            name: "Browse Our Products",
-          });
+      await waitFor(() => {
+        const newItems = screen.queryAllByTestId("cart-item");
+        const emptyListMsg = screen.getByText(
+          "you don't have items in your cart",
+        );
+        const browseProductsBtn = screen.getByRole("link", {
+          name: "Browse Our Products",
+        });
 
-          expect(newItems.length).toBe(0);
+        expect(newItems.length).toBe(0);
 
-          expect(
-            screen.queryByRole("button", {
-              name: /clear your cart/i,
-            })
-          ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("button", {
+            name: /clear your cart/i,
+          }),
+        ).not.toBeInTheDocument();
 
-          expect(emptyListMsg).toBeInTheDocument();
-          expect(browseProductsBtn).toBeInTheDocument();
-        },
-        { timeout: 10000 }
-      );
-    }, 10000);
+        expect(emptyListMsg).toBeInTheDocument();
+        expect(browseProductsBtn).toBeInTheDocument();
+      });
+    });
 
     it.each([{ key: "brand" }, { key: "category" }])(
       "should navigate to products page filtered with selected $key when click on $key btn",
@@ -376,7 +373,7 @@ describe("testing cart page", () => {
           {
             route: "/cart",
             preloadedState: { user: userStateMock },
-          }
+          },
         );
         const model = products[0][
           key as keyof OrderProductType
@@ -390,13 +387,13 @@ describe("testing cart page", () => {
         await userEvent.click(firstItemModel);
 
         const location = new URL(
-          screen.getByTestId("location").textContent || ""
+          screen.getByTestId("location").textContent || "",
         );
 
         expect(location.pathname + "?" + location.searchParams).toBe(
-          `/products?${key}=${modelName.replaceAll(" ", "+")}`
+          `/products?${key}=${modelName.replaceAll(" ", "+")}`,
         );
-      }
+      },
     );
   });
 });
