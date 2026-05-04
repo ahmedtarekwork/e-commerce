@@ -8,6 +8,7 @@ import wishlistHandlers from "./handlers/wishlist/handlers";
 import loginHandlers from "./handlers/auth/login/handlers";
 import registerHandlers from "./handlers/auth/signup/handlers";
 import userHandlers from "./handlers/users/handlers";
+import productHandlers from "./handlers/products/handlers";
 
 export const server = setupServer(
   ...categoriesAndBrandsHandlers,
@@ -17,4 +18,5 @@ export const server = setupServer(
   ...loginHandlers,
   ...registerHandlers,
   ...userHandlers,
+  ...productHandlers,
 );

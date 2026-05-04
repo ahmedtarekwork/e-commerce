@@ -13,6 +13,16 @@ const handlers = [
     });
   }),
 
+  http.post("*/carts/:userId", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return HttpResponse.json({
+      products,
+      totalItemsLength: products
+        .map((prd) => prd.wantedQty)
+        .reduce((a, b) => a + b, 0),
+    });
+  }),
+
   http.delete("*/carts/:userId/removeProduct", async ({ request }) => {
     const body = (await request.json()) as { productId: string };
 

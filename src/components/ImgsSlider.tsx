@@ -51,6 +51,7 @@ const ImgsSlider = ({ imgs, imgWidth, withTimer, isHomeSlider }: Props) => {
           }}
         >
           <img
+            data-testid="slider-img"
             style={{
               objectFit: "contain",
               width: imgWidth,

@@ -17,7 +17,7 @@ import ProfilePage from "../pages/profilePage/ProfilePage";
 // products
 import ProductFormPage from "../pages/products/productsFormPage/ProductFormPage";
 import ProductsPage from "../pages/products/productsPage/ProductsPage";
-import SingleProductPage from "../pages/products/SingleProductPage";
+import SingleProductPage from "../pages/products/singleProductPage/SingleProductPage";
 // orders
 import OrdersPage from "../pages/orders/OrdersPage";
 import SingleOrderPage from "../pages/orders/SingleOrderPage/SingleOrderPage";
