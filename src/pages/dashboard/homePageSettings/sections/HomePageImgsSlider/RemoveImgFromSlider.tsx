@@ -62,9 +62,7 @@ const RemoveImgFromSlider = ({ imgId }: Props) => {
         time: 1200,
       });
 
-      setTimeout(() => {
-        dispatch(removeImgsFromHomeSliderAction([data]));
-      }, 1200);
+      dispatch(removeImgsFromHomeSliderAction([data]));
     },
   });
 

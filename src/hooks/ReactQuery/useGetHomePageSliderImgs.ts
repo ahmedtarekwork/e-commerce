@@ -5,11 +5,10 @@ const getHomePageSliderImgsQueryFn = async () => {
   return (await axios.get("dashboard/homepageSliderImgs")).data;
 };
 
-const useGetHomePageSliderImgs = (enabled: boolean = false) => {
+const useGetHomePageSliderImgs = () => {
   return useQuery({
     queryKey: ["getHomePageSliderImgs"],
     queryFn: getHomePageSliderImgsQueryFn,
-    enabled,
   });
 };
 

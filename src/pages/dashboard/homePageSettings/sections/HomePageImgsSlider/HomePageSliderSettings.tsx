@@ -24,7 +24,9 @@ const HomePageSliderSettings = () => {
   const dispatch = useDispatch();
   const { imgs } = useSelector((state) => state.homePageSliderImgs);
 
-  const [imgsToUpload, setImgsToUpload] = useState<{ id: string; file: File }[]>([]);
+  const [imgsToUpload, setImgsToUpload] = useState<
+    { id: string; file: File }[]
+  >([]);
 
   // hooks
   const {
@@ -32,20 +34,16 @@ const HomePageSliderSettings = () => {
     isError: homePageSliderImgsErr,
     isPending: homePageSliderImgsLoading,
     fetchStatus,
-    refetch: getHomePageSliderImgs,
     error: homePageSliderImgsErrData,
   } = useGetHomePageSliderImgs();
-
-  useEffect(() => {
-    if (!imgs.length) getHomePageSliderImgs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (homePageSliderImgs) {
       dispatch(setHomeSliderImgsAction(homePageSliderImgs));
     }
-  }, [homePageSliderImgs, dispatch]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [homePageSliderImgs]);
 
   // loading
   if (homePageSliderImgsLoading && fetchStatus !== "idle") {
@@ -58,10 +56,11 @@ const HomePageSliderSettings = () => {
     fetchStatus !== "fetching" &&
     homePageSliderImgsErr
   ) {
+    const defaultMsg = "something went wrogn while fetching images!";
     const errorMessage =
-      "message" in homePageSliderImgsErrData
-        ? homePageSliderImgsErrData.message
-        : "something went wrogn while fetching images!";
+      "response" in homePageSliderImgsErrData &&
+      (homePageSliderImgsErrData.response as { data: { message: string } })
+        ?.data?.message;
 
     return (
       <p
@@ -71,7 +70,7 @@ const HomePageSliderSettings = () => {
           textAlign: "center",
         }}
       >
-        {errorMessage}
+        {errorMessage || defaultMsg}
       </p>
     );
   }
@@ -79,16 +78,22 @@ const HomePageSliderSettings = () => {
   // no images in home page slider and no image has been selected to upload
   if (!homePageSliderImgsErr && !imgs?.length && !imgsToUpload.length) {
     return (
-      <p style={{ color: "var(--danger)" }}>
+      <>
         <strong
-          style={{ marginBottom: 10, display: "block", textAlign: "center" }}
+          style={{
+            marginBottom: 10,
+            display: "block",
+            textAlign: "center",
+            color: "var(--danger)",
+          }}
         >
           There aren't any home page slider images.
-        </strong>{" "}
+        </strong>
+
         <AddImgsToHomeSlidedrBtn setImgsToUpload={setImgsToUpload}>
           Add some images
         </AddImgsToHomeSlidedrBtn>
-      </p>
+      </>
     );
   }
 

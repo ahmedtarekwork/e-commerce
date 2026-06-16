@@ -30,19 +30,16 @@ const HomePageImgsSlider = () => {
     data: homePageSliderImgs,
     isError: homePageSliderImgsErr,
     isPending: homePageSliderImgsLoading,
-    refetch: getHomePageSliderImgs,
     fetchStatus,
-  } = useGetHomePageSliderImgs(true);
-
-  useEffect(() => {
-    getHomePageSliderImgs();
-  }, []);
+  } = useGetHomePageSliderImgs();
 
   useEffect(() => {
     if (homePageSliderImgs) {
       dispatch(setHomeSliderImgsAction(homePageSliderImgs));
     }
-  }, [homePageSliderImgs, dispatch]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [homePageSliderImgs]);
 
   return (
     <AnimatePresence mode="wait">

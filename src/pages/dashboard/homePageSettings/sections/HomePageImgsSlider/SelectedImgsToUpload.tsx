@@ -29,7 +29,7 @@ type Props = {
 
 // fetchers
 const addImageToHomeSliderMutationFn = async (
-  imgs: { id: string; file: File }[]
+  imgs: { id: string; file: File }[],
 ) => {
   const formData = new FormData();
 
@@ -66,10 +66,8 @@ const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
         content: "message" in data ? data.message : "images successfully added",
       });
 
-      setTimeout(() => {
-        dispatch(addImgsToHomeSliderAction(data.images));
-        setImgsToUpload([]);
-      }, 1200);
+      dispatch(addImgsToHomeSliderAction(data.images));
+      setImgsToUpload([]);
     },
   });
 
@@ -124,11 +122,11 @@ const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
 
             <button
               title="remove image from list"
-              disabled={isImgsRemoved || newHomePageSliderImgsLoading}
+              disabled={newHomePageSliderImgsLoading}
               className="red-btn"
               onClick={() => {
                 setImgsToUpload((prev) =>
-                  prev.filter((img) => img.id !== item.id)
+                  prev.filter((img) => img.id !== item.id),
                 );
               }}
             >
@@ -142,15 +140,15 @@ const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
         <BtnWithSpinner
           toggleSpinner={newHomePageSliderImgsLoading}
           title="upload selected images to home page iamges slider"
-          onClick={async () => addImgsToHomeSlider(imgsToUpload)}
+          onClick={() => addImgsToHomeSlider(imgsToUpload)}
           className="btn"
-          disabled={newHomePageSliderImgsLoading || isImgsRemoved}
+          disabled={newHomePageSliderImgsLoading}
         >
           submit images
         </BtnWithSpinner>
 
         <AddImgsToHomeSlidedrBtn
-          data-disabled={newHomePageSliderImgsLoading || isImgsRemoved}
+          data-disabled={newHomePageSliderImgsLoading}
           setImgsToUpload={setImgsToUpload}
         >
           Add more
