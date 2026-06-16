@@ -17,7 +17,11 @@ import { http, HttpResponse } from "msw";
 // mocks
 import { imgs } from "../../mocks/handlers/dashboard/homePageImgsSlider/statics";
 
-// https://picsum.photos/200/300
+const file = new File(["dummy"], "test.png", {
+  type: "image/png",
+});
+const mockImgs = [file, file];
+
 describe("test HomePageSettings page", () => {
   it("should render page normally without any images", async () => {
     server.use(
@@ -75,11 +79,6 @@ describe("test HomePageSettings page", () => {
       expect(addImgsBtn).not.toBeInTheDocument();
     },
   );
-
-  const file = new File(["dummy"], "test.png", {
-    type: "image/png",
-  });
-  const mockImgs = [file, file];
 
   it("should render selected images section only", async () => {
     server.use(

@@ -68,7 +68,7 @@ const ProductFormImgItem = memo(
     const handleRemoveImg = async (
       e: MouseEvent<HTMLButtonElement>,
       serverImg: boolean,
-      img: ImageType | ImgsListItem
+      img: ImageType | ImgsListItem,
     ) => {
       e.stopPropagation();
       if (!serverImg) {
@@ -79,7 +79,7 @@ const ProductFormImgItem = memo(
             .map((img, index) => ({
               ...img,
               order: index,
-            }))
+            })),
         );
       }
 
@@ -100,13 +100,13 @@ const ProductFormImgItem = memo(
       const file = e.target.files?.[0];
 
       if (file) {
-        if (serverImg) setReplacementImg(file);
+        setReplacementImg(file);
         setAllImgs((prev) =>
           prev.map((imgItem) =>
             imgItem._id === img._id
               ? { ...imgItem, replacementImg: file }
-              : imgItem
-          )
+              : imgItem,
+          ),
         );
       }
     };
@@ -120,8 +120,8 @@ const ProductFormImgItem = memo(
         prev.map((imgItem) =>
           imgItem._id === img._id
             ? { ...imgItem, replacementImg: undefined }
-            : imgItem
-        )
+            : imgItem,
+        ),
       );
     };
 
@@ -137,11 +137,7 @@ const ProductFormImgItem = memo(
       <SortableItem id={img._id}>
         <div className="img-preview-cell">
           <img
-            src={
-              replacementImg && serverImg
-                ? URL.createObjectURL(replacementImg)
-                : imgSrc
-            }
+            src={replacementImg ? URL.createObjectURL(replacementImg) : imgSrc}
             alt="product image"
             width="100%"
             height="100%"
@@ -185,6 +181,7 @@ const ProductFormImgItem = memo(
               id={`replace-img-${img._id}`}
               label={<MdOutlineFindReplace />}
               labelAttr={{
+                title: "replace image btn",
                 className: "btn",
                 style: { flex: 1, display: "grid", placeContent: "center" },
               }}
@@ -193,6 +190,6 @@ const ProductFormImgItem = memo(
         </div>
       </SortableItem>
     );
-  }
+  },
 );
 export default ProductFormImgItem;

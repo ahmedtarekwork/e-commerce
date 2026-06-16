@@ -18,6 +18,12 @@ const handlers = [
 
     return HttpResponse.json({ message: "product deleted successfully" });
   }),
+
+  http.post("*/products", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return HttpResponse.json(products[0]);
+  }),
 ];
 
 export default handlers;
