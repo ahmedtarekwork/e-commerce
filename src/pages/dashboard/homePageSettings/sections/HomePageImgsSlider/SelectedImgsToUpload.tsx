@@ -1,75 +1,21 @@
 // react
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 
 // components
-import BtnWithSpinner from "../../../../../components/animatedBtns/BtnWithSpinner";
 import GridList from "../../../../../components/gridList/GridList";
 import AddImgsToHomeSlidedrBtn from "./AddImgsToHomeSliderBtn";
+import ImgsWillBeAddSectionBtns from "./ImgsWillBeAddSectionBtns";
 
-// react query
-import { useMutation } from "@tanstack/react-query";
-
-// redux
-import useDispatch from "../../../../../hooks/redux/useDispatch";
-
-// hooks
-import useHandleErrorMsg from "../../../../../hooks/useHandleErrorMsg";
-import useShowMsg from "../../../../../hooks/useShowMsg";
-
-// utils
-import axios from "../../../../../utils/axios";
-
-// redux actions
-import { addImgsToHomeSliderAction } from "../../../../../store/fetures/homePageSliderImgsSlice";
-
-type Props = {
+export type SelectedImgsToUploadProps = {
   imgsToUpload: { id: string; file: File }[];
   setImgsToUpload: Dispatch<SetStateAction<{ id: string; file: File }[]>>;
 };
 
-// fetchers
-const addImageToHomeSliderMutationFn = async (
-  imgs: { id: string; file: File }[],
-) => {
-  const formData = new FormData();
-
-  imgs.forEach((img) => formData.append("images[]", img.file));
-
-  return (
-    await axios.post("dashboard/homepageSliderImgs", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-  ).data;
-};
-
-const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
-  const dispatch = useDispatch();
-  const showMsg = useShowMsg();
-  const handleError = useHandleErrorMsg();
-
-  const {
-    isPending: newHomePageSliderImgsLoading,
-    mutate: addImgsToHomeSlider,
-    isSuccess: isImgsRemoved,
-  } = useMutation({
-    mutationKey: ["addImageToHomeSlider"],
-    mutationFn: addImageToHomeSliderMutationFn,
-    onError(error) {
-      handleError(error, {
-        forAllStates:
-          "sorry, can't put images in the home page slider at the moment",
-      });
-    },
-    onSuccess(data) {
-      showMsg?.({
-        clr: "green",
-        content: "message" in data ? data.message : "images successfully added",
-      });
-
-      dispatch(addImgsToHomeSliderAction(data.images));
-      setImgsToUpload([]);
-    },
-  });
+const SelectedImgsToUpload = ({
+  imgsToUpload,
+  setImgsToUpload,
+}: SelectedImgsToUploadProps) => {
+  const [submitImgsLoading, setSubmitImgsLoading] = useState(false);
 
   if (!imgsToUpload.length) {
     return (
@@ -122,7 +68,7 @@ const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
 
             <button
               title="remove image from list"
-              disabled={newHomePageSliderImgsLoading}
+              disabled={submitImgsLoading}
               className="red-btn"
               onClick={() => {
                 setImgsToUpload((prev) =>
@@ -136,24 +82,12 @@ const SelectedImgsToUpload = ({ imgsToUpload, setImgsToUpload }: Props) => {
         ))}
       </GridList>
 
-      <div className="home-page-slider-settings-down-btns">
-        <BtnWithSpinner
-          toggleSpinner={newHomePageSliderImgsLoading}
-          title="upload selected images to home page iamges slider"
-          onClick={() => addImgsToHomeSlider(imgsToUpload)}
-          className="btn"
-          disabled={newHomePageSliderImgsLoading}
-        >
-          submit images
-        </BtnWithSpinner>
-
-        <AddImgsToHomeSlidedrBtn
-          data-disabled={newHomePageSliderImgsLoading}
-          setImgsToUpload={setImgsToUpload}
-        >
-          Add more
-        </AddImgsToHomeSlidedrBtn>
-      </div>
+      <ImgsWillBeAddSectionBtns
+        setImgsToUpload={setImgsToUpload}
+        imgsToUpload={imgsToUpload}
+        submitImgsLoading={submitImgsLoading}
+        setSubmitImgsLoading={setSubmitImgsLoading}
+      />
     </div>
   );
 };

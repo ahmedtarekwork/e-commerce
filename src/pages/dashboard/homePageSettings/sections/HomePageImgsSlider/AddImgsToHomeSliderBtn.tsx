@@ -1,10 +1,4 @@
-import type {
-  ChangeEvent,
-  ComponentProps,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-} from "react";
+import type { ChangeEvent, ComponentProps, ReactNode } from "react";
 
 // icons
 import { BiSolidImageAdd } from "react-icons/bi";
@@ -12,10 +6,13 @@ import { BiSolidImageAdd } from "react-icons/bi";
 // utils
 import { nanoid } from "@reduxjs/toolkit";
 
+// types
+import type { SelectedImgsToUploadProps } from "./SelectedImgsToUpload";
+
 type Props = {
-  setImgsToUpload: Dispatch<SetStateAction<{ id: string; file: File }[]>>;
   children: ReactNode;
-} & ComponentProps<"label">;
+} & ComponentProps<"label"> &
+  Pick<SelectedImgsToUploadProps, "setImgsToUpload">;
 
 const AddImgsToHomeSliderBtn = ({
   setImgsToUpload,
