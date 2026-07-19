@@ -13,7 +13,7 @@ The project focuses on **scalable architecture, type safety, maintainable code, 
 
 # 🌐 Live Demo
 
-https://ahmed-e-commerce.netlify.app
+https://ahmed-commerce.vercel.app
 
 ---
 
